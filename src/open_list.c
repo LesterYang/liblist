@@ -331,6 +331,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	switch(sort_type)
 	{
 		case sortAlph:	listdata_qsort_alph(list);	break;
+		case sortDirt:  listdata_qsort_dirt(list);  break;
 		case sortExte:	listdata_qsort_exte(list);	break;
 		case sortSize:	listdata_sort_size(list);	break;
 		case sortTime:	listdata_sort_time(list);	break;

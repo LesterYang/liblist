@@ -12,7 +12,7 @@
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
-#define MAX_PATH		(1024)
+#define MAX_PATH		(4096)
 #define MAX_FILES		(65536)
 #define BUF_SIZE		(256)
 
@@ -22,7 +22,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	0
-#define ReleaseNum	8
+#define ReleaseNum	9
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -75,7 +75,8 @@ struct list_head{
 struct list_item{
 	filetype file_type;
 	extetype exte_type;
-	char name[MAX_NAME];
+	char name[MAX_PATH];
+	char* path;
 };
 
 typedef struct{
@@ -150,6 +151,7 @@ void listdata_reset_index(list_data* list);
 void listdata_sort_filetype(list_data* list);
 
 int listdata_compare_alph(const void* i, const void* j);
+int listdata_compare_alph_filename(const void* i, const void* j);
 int listdata_compare_exte(const void* i, const void* j);
 
 void free_list_item(list_item** item, int num);

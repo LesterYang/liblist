@@ -10,6 +10,9 @@
 #include <list.h>
 #include <list_def.h>
 
+//static char g_name[MAX_NAME];
+//static char g_path[MAX_PATH];
+
 char* list_get_exettype_str(extetype exet_type)
 {
 	switch(exet_type)

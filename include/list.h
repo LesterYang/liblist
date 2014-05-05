@@ -48,6 +48,7 @@ typedef enum{
 typedef enum sorttype{
 	sortNone,
 	sortAlph,
+	sortDirt,
 	sortExte,
 	sortSize,
 	sortTime
@@ -159,6 +160,8 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 list_data* open_listdata_subdir(char* path);
 list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type);
 
+list_data* open_listdata_qsi_type_subdir(char* path, extetype exte_type, sorttype sort_type);
+
 // Close list_data structure, release memory
 void close_listdata(list_data* list);
 
@@ -178,7 +181,9 @@ void listdata_sort_exte(list_data* list);
 void listdata_sort_size(list_data* list);
 void listdata_sort_time(list_data* list);
 void listdata_qsort_alph(list_data* list);
+void listdata_qsort_dirt(list_data* list);
 void listdata_qsort_exte(list_data* list);
+
 
 // Get files count, return -1 if type error
 //    list_get_filetype_count : all/FIFO/Character/Directory/Block/Regular/Link/Socket/Other
