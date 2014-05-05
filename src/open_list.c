@@ -42,15 +42,15 @@ char*** open_list(char* path){
 			else					       num[Other]++;
 			num[all]++;
 		}
-		list[all]=(char**)malloc(num[all]*sizeof(char*));
-		list[FIFO]=(char**)malloc(num[FIFO]*sizeof(char*));
-		list[Character]=(char**)malloc(num[Character]*sizeof(char*));
-		list[Directory]=(char**)malloc(num[Directory]*sizeof(char*));
-		list[Block]=(char**)malloc(num[Block]*sizeof(char*));
-		list[Regular]=(char**)malloc(num[Regular]*sizeof(char*));
-		list[Link]=(char**)malloc(num[Link]*sizeof(char*));
-		list[Socket]=(char**)malloc(num[Socket]*sizeof(char*));
-		list[Other]=(char**)malloc(num[Other]*sizeof(char*));
+		list[all]=(char**)calloc(num[all],sizeof(char*));
+		list[FIFO]=(char**)calloc(num[FIFO],sizeof(char*));
+		list[Character]=(char**)calloc(num[Character],sizeof(char*));
+		list[Directory]=(char**)calloc(num[Directory],sizeof(char*));
+		list[Block]=(char**)calloc(num[Block],sizeof(char*));
+		list[Regular]=(char**)calloc(num[Regular],sizeof(char*));
+		list[Link]=(char**)calloc(num[Link],sizeof(char*));
+		list[Socket]=(char**)calloc(num[Socket],sizeof(char*));
+		list[Other]=(char**)calloc(num[Other],sizeof(char*));
 	}
 	closedir (dir);
 	return list;
@@ -269,7 +269,7 @@ list_data* open_listdata_subdir(char* path)
 
 		if((list->num.all = list_subdir_num(path)) <= 0){
 			LIST_DBG("no files");
-			goto close_dir;
+			goto free_list_data;
 		}
 
 		strcpy(list->path, path);

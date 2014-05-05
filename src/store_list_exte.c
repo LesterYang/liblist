@@ -318,6 +318,7 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 							list->list_item[store_idx]->file_type = Regular;
 							list->list_item[store_idx]->exte_type = audio;
 							list->num.audio++;
+							list->num.regular++;
 							if(list->idx.audio.next == 0)
 								list_set_index(&list->idx.audio, store_idx+1);
 							store_idx++;
@@ -331,6 +332,7 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 							list->list_item[store_idx]->file_type = Regular;
 							list->list_item[store_idx]->exte_type = video;
 							list->num.video++;
+							list->num.regular++;
 							if(list->idx.video.next == 0)
 								list_set_index(&list->idx.video, store_idx+1);
 							store_idx++;
@@ -344,6 +346,7 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 							list->list_item[store_idx]->file_type = Regular;
 							list->list_item[store_idx]->exte_type = image;
 							list->num.image++;
+							list->num.regular++;
 							if(list->idx.image.next == 0)
 								list_set_index(&list->idx.image, store_idx+1);
 							store_idx++;

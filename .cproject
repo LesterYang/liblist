@@ -45,7 +45,7 @@
 								</option>
 								<option id="gnu.c.compiler.option.misc.other.1185433457" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fPIC -fmessage-length=0  -std=gnu99" valueType="string"/>
 								<option id="gnu.c.compiler.option.debugging.gprof.850937951" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
-								<option id="gnu.c.compiler.option.optimization.level.264803726" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.most" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.optimization.level.264803726" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.warnings.pedantic.1879789065" name="Pedantic (-pedantic)" superClass="gnu.c.compiler.option.warnings.pedantic" value="false" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.430113569" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
@@ -927,7 +927,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.0.2" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
+				<configuration artifactExtension="so.1.0.8" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
 					<folderInfo id="0.308064247.98712758." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.702764346" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.53587341" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -961,6 +961,12 @@
 							</tool>
 							<tool command="/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.linker.base.100448022" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option defaultValue="true" id="gnu.cpp.link.option.shared.1520241985" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.libs.1349666378" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="tcmalloc"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.586009086" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.36136970" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -1833,7 +1839,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.0.2" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactExtension="so.1.0.8" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.308064247.1058103554." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.942075436" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1860653471" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -1865,6 +1871,12 @@
 							<tool command="/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.linker.base.1467679744" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.base">
 								<option defaultValue="true" id="gnu.cpp.link.option.shared.106320747" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.soname.810191429" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="liblist.so.1" valueType="string"/>
+								<option id="gnu.cpp.link.option.libs.543827827" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="tcmalloc"/>
+								</option>
+								<option id="gnu.cpp.link.option.paths.1680188465" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.369198892" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

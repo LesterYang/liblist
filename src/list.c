@@ -48,8 +48,12 @@ void list_extetype_select(list_data* list, extetype exte_type)
 				tmp_item = list->list_item[i];
 				list->list_item[i] = list->list_item[j];
 				list->list_item[j] = tmp_item;
+				break;
 			}
 		}
+
+		if(j == num)
+			break;
 	}
 
 	for (list->num.all=0; list->num.all<num; list->num.all++)
@@ -99,8 +103,12 @@ void list_extetype_exclude(list_data* list, extetype exte_type)
 				tmp_item = list->list_item[i];
 				list->list_item[i] = list->list_item[j];
 				list->list_item[j] = tmp_item;
+				break;
 			}
 		}
+
+		if(j == num)
+			break;
 	}
 
 	for (list->num.all=0; list->num.all<num; list->num.all++)
@@ -560,7 +568,6 @@ int list_peer_next_recycle_index(list_data* list, extetype exet_type, int curren
 
 int list_peer_begin_index(list_data* list, extetype exet_type)
 {
-	qsi_assert(list);
 	return list_peer_next_index(list, exet_type, 0);
 }
 
@@ -583,7 +590,7 @@ int list_check_index_error(list_data* list, int index)
 		LIST_DBG("empty data");
 		return 1;
 	}
-	if(index<0 || index > list->num.all)
+	if(index <= 0 || index > list->num.all)
 	{
 		LIST_DBG("error index");
 		return 1;
@@ -621,24 +628,24 @@ int list_get_index_by_name(list_data* list, char* name)
 	qsi_assert(list);
 	qsi_assert(name);
 
-	if(list->sort == sortAlph && list->subdir == 0)
+	if(list->sort == sortAlph)
 	{
 		return list_bsearch_index(list, name);
 	}
 
 	for(index=0; index<list->num.all; index++)
 	{
-		if(list->subdir == 0)
-		{
+		//if(list->subdir == 0)
+		//{
 			if(!strcmp(list->list_item[index]->name, name))
 				break;
-		}
-		else
-		{
-			if((strrchr(list->list_item[index]->name,'/') != 0) &&
-					!strcmp(strrchr(list->list_item[index]->name,'/')+1, name))
-				break;
-		}
+		//}
+		//else
+		//{
+		//	if((strrchr(list->list_item[index]->name,'/') != 0) &&
+		//			!strcmp(strrchr(list->list_item[index]->name,'/')+1, name))
+		//		break;
+		//}
 	}
 
 	return (index == list->num.all) ? -1 : index+1;

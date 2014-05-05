@@ -35,7 +35,7 @@ int* store_list(char*** list,char* path){
 			else if (8 == ent->d_type)		num[Regular]=store_fid(num[Regular],list[Regular],ent->d_name);
 			else if (10 == ent->d_type)		num[Link]=store_fid(num[Link],list[Link],ent->d_name);
 			else if (12 == ent->d_type)		num[Socket]=store_fid(num[Socket],list[Socket],ent->d_name);
-			else								num[Other]=store_fid(num[Other],list[Other],ent->d_name);
+			else							num[Other]=store_fid(num[Other],list[Other],ent->d_name);
 			num[all]=store_fid(num[all],list[all],ent->d_name);
 		}
 	}

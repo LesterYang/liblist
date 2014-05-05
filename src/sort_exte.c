@@ -82,7 +82,7 @@ void listdata_sort_exte(list_data* list)
 	pthread_mutex_unlock(&list->mutex);
 }
 
-int listdata_compar_exte(const void* i, const void* j)
+int listdata_compare_exte(const void* i, const void* j)
 {
 	list_item* item_i = *(list_item**)i;
 	list_item* item_j = *(list_item**)j;
@@ -103,11 +103,11 @@ void listdata_qsort_exte(list_data* list)
 	if(list->subdir == 0)
 	{
 		listdata_sort_filetype(list);
-		qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compar_alph);
-		qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compar_exte);
+		qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph);
+		qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_exte);
 	}
 	else
-		qsort(list->list_item, list->num.all, sizeof(list_item*), listdata_compar_exte);
+		qsort(list->list_item, list->num.all, sizeof(list_item*), listdata_compare_exte);
 
 	listdata_reset_index(list);
 	list->sort = sortAlph;

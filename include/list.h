@@ -98,8 +98,7 @@ const char* image_exte_str[]=
     ".jpg",
     ".jpeg",
     ".bmp",
-    ".png",
-    ".gif"
+    ".png"
 };
 #endif
 
@@ -229,7 +228,7 @@ int list_peer_next_recycle_index(list_data* list, extetype exet_type, int curren
 int list_peer_begin_index(list_data* list, extetype exet_type);
 int list_peer_end_index(list_data* list, extetype exet_type);
 
-//Search file name by keyword. It return index the first found, or -1 if search to end
+//Search file name by keyword. It return index the first found, or -1 if search to end.
 //Call again to get next matched file name. search_index_reset() for new search.
 int search_index_by_keyword_name(list_data* list, char* name);
 void search_index_reset(void);
