@@ -61,3 +61,33 @@ int list_subdir_num(char* path)
 	closedir(dir);
 	return num;
 }
+
+int list_subdir_type_num(char* path, extetype exte_type)
+{
+    int num=0;
+    DIR *dir;
+    struct dirent *ent;
+    char ipath[MAX_PATH];
+
+    if ((dir = opendir (path)) == NULL) {
+        liblist_perror("opendir");
+        return 0;
+    }
+
+    while ((ent = readdir (dir)) != NULL) {
+        if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
+            continue;
+
+        if(store_match_exte_type(exte_type, ent->d_name, ent->d_type))
+            num++;
+
+        if (4 == ent->d_type){
+            strcpy(ipath,path);
+            strcat(ipath,"/");
+            strcat(ipath,ent->d_name);
+            num += list_subdir_type_num(ipath, exte_type);
+        }
+    }
+    closedir(dir);
+    return num;
+}

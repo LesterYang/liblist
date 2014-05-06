@@ -234,6 +234,20 @@ char* list_get_name_by_index(list_data* list, int index)
 	return list->list_item[index-1]->name;
 }
 
+char* list_get_filename_by_index(list_data* list, int index)
+{
+    qsi_assert(list);
+
+    if(list_check_index_error(list, index))
+        return NULL;
+
+ //   return strrchr(list->list_item[index-1]->name, '/') + 1;
+    printf("%s\n",(list->list_item[index-1]->full_path)?list->list_item[index-1]->full_path:"null");
+
+    return strrchr(list->list_item[index-1]->full_path, '/') + 1;
+}
+
+
 filetype list_get_filetype_by_index(list_data* list, int index)
 {
 	qsi_assert(list);

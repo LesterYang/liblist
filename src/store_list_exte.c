@@ -267,6 +267,64 @@ int store_get_exte_type(list_item* item)
 	return unknown;
 }
 
+int store_get_exte_type2(list_item* item)
+{
+    if(!item)
+        return -1;
+
+    int i;
+
+    if ( (strrchr(item->name,'.')) )
+    {
+        for (i=0 ; i < audio_exte_num ; i++){
+            if (!strcasecmp(audio_exte_str[i], strrchr(item->full_path,'.')) )
+                return audio;
+        }
+        for (i=0 ; i < video_exte_num ; i++){
+            if (!strcasecmp(video_exte_str[i], strrchr(item->full_path,'.')) )
+                return video;
+        }
+        for (i=0 ; i < image_exte_num ; i++){
+            if (!strcasecmp(image_exte_str[i], strrchr(item->full_path,'.')) )
+                return image;
+        }
+    }
+    return unknown;
+}
+
+int store_match_exte_type(extetype exte_type, char* name, int type)
+{
+    int ret=0;
+
+    if(exte_type == allfile)
+        return 1;
+
+    if ((exte_type&dirct) && (type == MODE_DIRT))
+    {
+           ret=1;
+    }
+
+    if ((exte_type&audio) && (type == MODE_REGR))
+    {
+        if(store_check_exte_type(audio_exte_num, audio_exte_str, name))
+            ret=1;
+    }
+
+    if ((exte_type&video) && (type == MODE_REGR))
+    {
+        if(store_check_exte_type(video_exte_num, video_exte_str, name))
+            ret=1;
+    }
+
+    if ((exte_type&image) && (type == MODE_REGR))
+    {
+        if(store_check_exte_type(image_exte_num, image_exte_str, name))
+            ret=1;
+    }
+
+    return ret;
+}
+
 int store_check_exte_type(int exte_num, const char** exte_str, char* name)
 {
 	int i;

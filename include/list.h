@@ -158,7 +158,7 @@ int search_POI(char* index, char* POI, city local);
 list_data* open_listdata(char* path);
 list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type);
 list_data* open_listdata_subdir(char* path);
-list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type);
+list_data* open_listdata_subdir2(char* path, extetype exte_type, sorttype sort_type);
 
 list_data* open_listdata_qsi_type_subdir(char* path, extetype exte_type, sorttype sort_type);
 
@@ -184,6 +184,8 @@ void listdata_qsort_alph(list_data* list);
 void listdata_qsort_dirt(list_data* list);
 void listdata_qsort_exte(list_data* list);
 
+void listdata_qsort_alph2(list_data* list);
+void listdata_qsort_dirt2(list_data* list);
 
 // Get files count, return -1 if type error
 //    list_get_filetype_count : all/FIFO/Character/Directory/Block/Regular/Link/Socket/Other
@@ -202,6 +204,7 @@ char*    list_get_exettype_str(extetype exet_type);
 //    list_get_filetype_by_index : get file type
 //    list_get_extetype_by_index : get extension type
 char*    list_get_name_by_index(list_data* list, int index);
+char*    list_get_filename_by_index(list_data* list, int index);
 filetype list_get_filetype_by_index(list_data* list, int index);
 extetype list_get_extetype_by_index(list_data* list, int index);
 

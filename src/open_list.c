@@ -321,23 +321,109 @@ err:
 
 list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type)
 {
-	list = open_listdata_subdir(path);
+    list = open_listdata_subdir(path);
 
-	if(!list)
-		return NULL;
+    if(!list)
+        return NULL;
 
-	list_extetype_select(list, exte_type);
+    list_extetype_select(list, exte_type);
+
+    switch(sort_type)
+    {
+        case sortAlph:  listdata_qsort_alph(list);  break;
+        case sortDirt:  listdata_qsort_dirt(list);  break;
+        case sortExte:  listdata_qsort_exte(list);  break;
+        case sortSize:  listdata_sort_size(list);   break;
+        case sortTime:  listdata_sort_time(list);   break;
+        default:        listdata_qsort_alph(list);  break;
+    }
+
+    return list;
+}
+
+
+list_data* open_listdata_type_subdir2(char* path, extetype exte_type, sorttype sort_type)
+{
+    DIR *dir;
+    int i;
+
+    qsi_assert(path);
+
+    if((dir = opendir (path)) == NULL){
+        liblist_perror("opendir");
+        LIST_DBG("open %s error", path);
+        goto err;
+    }
+    else{
+
+        list=(list_data*)calloc(1, sizeof(list_data));
+
+        if(!list){
+            liblist_perror();
+            goto close_dir;
+        }
+
+        if((list->num.all = list_subdir_type_num(path, exte_type)) <= 0){
+            LIST_DBG("no files");
+            goto free_list_data;
+        }
+
+        strcpy(list->path, path);
+
+        list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
+
+        if(!list->list_item){
+            liblist_perror();
+            goto free_list_data;
+        }
+
+        for(i=0; i<list->num.all; i++){
+            list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
+
+            if(!list->list_item[i]){
+                liblist_perror();
+                goto free_list_item;
+            }
+        }
+
+    }
+    closedir (dir);
+
+    list_mutex_new(list, TRUE, TRUE);
+
+    if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
+        LIST_DBG("stored number less than malloc");
+
+    list->subdir = 1;
+    list->exte_select = exte_type;
 
 	switch(sort_type)
 	{
-		case sortAlph:	listdata_qsort_alph(list);	break;
-		case sortDirt:  listdata_qsort_dirt(list);  break;
+		case sortAlph:	listdata_qsort_alph2(list);	break;
+		case sortDirt:  listdata_qsort_dirt2(list);  break;
 		case sortExte:	listdata_qsort_exte(list);	break;
 		case sortSize:	listdata_sort_size(list);	break;
 		case sortTime:	listdata_sort_time(list);	break;
-		default: 		listdata_qsort_alph(list);	break;
+		default: 		listdata_qsort_alph2(list);	break;
 	}
 
 	return list;
+
+free_list_item:
+	    while(i--){
+	        if(list->list_item[i])
+	            free(list->list_item[i]);
+	    }
+	    if(list->list_item)
+	        free(list->list_item);
+free_list_data:
+	    if(list)
+	        free(list);
+close_dir:
+	    closedir(dir);
+err:
+	    return NULL;
 }
+
+
 

@@ -12,9 +12,17 @@
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
-#define MAX_PATH		(4096)
-#define MAX_FILES		(65536)
-#define BUF_SIZE		(256)
+#define MAX_PATH	(4096)
+#define MAX_FILES	(65536)
+#define BUF_SIZE	(256)
+
+#define MODE_FIFO   1
+#define MODE_CHAR   2
+#define MODE_DIRT   4
+#define MODE_BLCK   6
+#define MODE_REGR   8
+#define MODE_LINK   10
+#define MODE_SOCK   12
 
 #define _STR(s) #s
 #define STR(s) _STR(s)
@@ -76,7 +84,7 @@ struct list_item{
 	filetype file_type;
 	extetype exte_type;
 	char name[MAX_PATH];
-	char* path;
+	char* full_path;
 };
 
 typedef struct{
@@ -142,6 +150,8 @@ void print_listo(int* num,char*** list);
 int  store_listdata(list_data* list, char* path);
 int  store_listdata_extetype_select(list_data* list, char* path, extetype exte_type);
 int  store_get_exte_type(list_item* item);
+int  store_get_exte_type2(list_item* item);
+int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
 
 int  list_check_index_error(list_data* list, int index);
@@ -158,7 +168,9 @@ void free_list_item(list_item** item, int num);
 
 //subdir
 int list_subdir_num(char* path);
+int list_subdir_type_num(char* path, extetype exte_type);
 int store_listdata_subdir(list_data* list, char* path, int store_idx);
+int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
 // Print
 void list_show_index(list_data* list);
