@@ -158,9 +158,7 @@ int search_POI(char* index, char* POI, city local);
 list_data* open_listdata(char* path);
 list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type);
 list_data* open_listdata_subdir(char* path);
-list_data* open_listdata_subdir2(char* path, extetype exte_type, sorttype sort_type);
-
-list_data* open_listdata_qsi_type_subdir(char* path, extetype exte_type, sorttype sort_type);
+list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type);
 
 // Close list_data structure, release memory
 void close_listdata(list_data* list);
@@ -176,16 +174,11 @@ void list_extetype_exclude(list_data* list, extetype exte_type);
 // Sort data by alphanumeric/extension/size/modified_time
 // listdata_qsort_alph() and listdata_qsort_exte() are quick sort
 // Note: size sort and modified_time sort don't support for recursive list_data structure
-void listdata_sort_alph(list_data* list);
-void listdata_sort_exte(list_data* list);
 void listdata_sort_size(list_data* list);
 void listdata_sort_time(list_data* list);
 void listdata_qsort_alph(list_data* list);
 void listdata_qsort_dirt(list_data* list);
 void listdata_qsort_exte(list_data* list);
-
-void listdata_qsort_alph2(list_data* list);
-void listdata_qsort_dirt2(list_data* list);
 
 // Get files count, return -1 if type error
 //    list_get_filetype_count : all/FIFO/Character/Directory/Block/Regular/Link/Socket/Other
@@ -200,11 +193,12 @@ sorttype list_get_info_sorttype(list_data* list);
 char*    list_get_exettype_str(extetype exet_type);
 
 // Get list item information by index ,return -1 or NULL for index error
-//    list_get_name_by_index     : get file name. get complete path if open_listdata_subdir
-//    list_get_filetype_by_index : get file type
-//    list_get_extetype_by_index : get extension type
-char*    list_get_name_by_index(list_data* list, int index);
-char*    list_get_filename_by_index(list_data* list, int index);
+//    list_get_complete_path_by_index : get complete path
+//    list_get_file_name_by_index     : get file name
+//    list_get_filetype_by_index      : get file type
+//    list_get_extetype_by_index      : get extension type
+char*    list_get_complete_path_by_index(list_data* list, int index);
+char*    list_get_file_name_by_index(list_data* list, int index);
 filetype list_get_filetype_by_index(list_data* list, int index);
 extetype list_get_extetype_by_index(list_data* list, int index);
 
@@ -240,4 +234,8 @@ int list_peer_end_index(list_data* list, extetype exet_type);
 //Call again to get next matched file name. search_index_reset() for new search.
 int search_index_by_keyword_name(list_data* list, char* name);
 void search_index_reset(void);
+
+
+//print data
+void print_listdata(list_data* list);
 #endif /* LIST_H_ */

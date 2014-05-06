@@ -41,6 +41,7 @@ int search_file(char* path,char* filename)
 	return err;
 }
 
+#ifndef LESS_MEM
 int search_index_by_keyword_name(list_data* list, char* name)
 {
 	qsi_assert(list);
@@ -69,6 +70,38 @@ int search_index_by_keyword_name(list_data* list, char* name)
 	search_index++;
 	return search_index;
 }
+#else
+int search_index_by_keyword_name(list_data* list, char* name)
+{
+    qsi_assert(list);
+    qsi_assert(name);
+
+    for(; search_index<list->num.all; search_index++)
+    {
+        if(list->subdir == 0)
+        {
+            if(!strstr(list->list_item[search_index]->full_path, name))
+                break;
+        }
+        else
+        {
+            if((strrchr(list->list_item[search_index]->full_path,'/') != 0) &&
+                    strstr(strrchr(list->list_item[search_index]->full_path,'/')+1, name))
+                break;
+        }
+    }
+
+    if(search_index >= list->num.all){
+        search_index = 0;
+        return -1;
+    }
+    // Avoid searching same index for next time. Index also need plus 1 for AP
+    search_index++;
+    return search_index;
+}
+
+#endif
+
 
 void search_index_reset(void)
 {

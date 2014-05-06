@@ -51,6 +51,8 @@ void sort_time(int num,char** list,char* path){
 	}
 }
 
+#ifndef LESS_MEM
+
 void listdata_sort_time(list_data* list)
 {
 	struct stat sbi;
@@ -109,3 +111,59 @@ void listdata_sort_time(list_data* list)
 	list->sort = sortTime;
 	pthread_mutex_unlock(&list->mutex);
 }
+#else
+
+void listdata_sort_time(list_data* list)
+{
+    struct stat sbi;
+    struct stat sbj;
+    int i,j;
+    list_item* tmp_item;
+    char pathi[MAX_NAME];
+    char pathj[MAX_NAME];
+
+    qsi_assert(list);
+    pthread_mutex_lock(&list->mutex);
+
+    if(list->subdir == 0)
+        listdata_sort_filetype(list);
+    else
+    {
+        return;
+    }
+
+
+    for (i = 0 ; i < list->num.all ; i++)
+    {
+        if(list->subdir == 0 && list->list_item[i]->file_type == Directory)
+            continue;
+
+        memset(pathi, 0, MAX_NAME);
+        strcpy(pathi,list->path);
+        strcat(pathi,"/");
+        strcat(pathi,list->list_item[i]->full_path);
+
+        for (j = i + 1; j < list->num.all ; j++)
+        {
+            memset(pathj, 0, MAX_NAME);
+            strcpy(pathj,list->path);
+            strcat(pathj,"/");
+            strcat(pathj,list->list_item[j]->full_path);
+
+            if (-1 == lstat(pathi,&sbi) || -1 == lstat(pathj,&sbj)) {
+                perror("liblist : listdata_sort_time stat");
+                exit(EXIT_FAILURE);
+            }
+            else if ( sbi.st_mtime < sbj.st_mtime )
+            {
+                tmp_item = list->list_item[i];
+                list->list_item[i] = list->list_item[j];
+                list->list_item[j] = tmp_item;
+            }
+        }
+    }
+    listdata_reset_index(list);
+    list->sort = sortTime;
+    pthread_mutex_unlock(&list->mutex);
+}
+#endif

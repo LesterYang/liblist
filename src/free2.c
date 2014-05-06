@@ -13,6 +13,8 @@ void free2(int num,char** list){
 	list=NULL;
 }
 
+#ifndef LESS_MEM
+
 void free_list_item(list_item** item, int num)
 {
 	int i;
@@ -28,5 +30,31 @@ void free_list_item(list_item** item, int num)
 	}
 }
 
+#else
 
+void free_list_item(list_item** item, int num)
+{
+    int i;
+
+    if(item)
+    {
+        for(i=0; i<num; i++)
+        {
+            if(item[i])
+            {
+                if(item[i]->full_path)
+                {
+                    free(item[i]->full_path);
+                    item[i]->full_path = NULL;
+                }
+                free(item[i]);
+                item[i] = NULL;
+            }
+        }
+        free(item);
+        item=NULL;
+    }
+}
+
+#endif
 

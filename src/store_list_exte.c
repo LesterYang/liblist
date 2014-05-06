@@ -242,6 +242,8 @@ int* store_reg_exte_type(char*** list,char* path,int exte_type){
 	return num;
 }
 
+#ifndef LESS_MEM
+
 int store_get_exte_type(list_item* item)
 {
 	if(!item)
@@ -266,15 +268,15 @@ int store_get_exte_type(list_item* item)
 	}
 	return unknown;
 }
-
-int store_get_exte_type2(list_item* item)
+#else
+int store_get_exte_type(list_item* item)
 {
     if(!item)
         return -1;
 
     int i;
 
-    if ( (strrchr(item->name,'.')) )
+    if ( (strrchr(item->full_path,'.')) )
     {
         for (i=0 ; i < audio_exte_num ; i++){
             if (!strcasecmp(audio_exte_str[i], strrchr(item->full_path,'.')) )
@@ -291,6 +293,7 @@ int store_get_exte_type2(list_item* item)
     }
     return unknown;
 }
+#endif
 
 int store_match_exte_type(extetype exte_type, char* name, int type)
 {
@@ -335,7 +338,8 @@ int store_check_exte_type(int exte_num, const char** exte_str, char* name)
 	return 0;
 }
 
-int store_listdata_extetype_select(list_data* list, char* path, extetype exte_type)
+#ifndef LESS_MEM
+int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
 {
 	DIR *dir;
 	struct dirent *ent;
@@ -353,7 +357,7 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 
 			switch(ent->d_type)
 			{
-				case 4:
+				case MODE_DIRT:
 					if(store_idx == list->num.all)
 					{
 						liblist_perror("store overflow");
@@ -367,7 +371,7 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 					strcpy(list->list_item[store_idx++]->name, ent->d_name);
 					break;
 
-				case 8:
+				case MODE_REGR:
 					if ((exte_type&audio))
 					{
 						if(store_check_exte_type(audio_exte_num, audio_exte_str, ent->d_name))
@@ -422,5 +426,233 @@ int store_listdata_extetype_select(list_data* list, char* path, extetype exte_ty
 	return store_idx;
 }
 
+#else
+int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
+{
+    DIR *dir;
+    struct dirent *ent;
+    int store_idx = 0;
+    int match = 0;
+    size_t len_name;
+    size_t len_path = strlen(path);
 
+    if((dir = opendir (path)) == NULL){
+        liblist_perror("opendir");
+        return -1;
+    }
+    else{
+        while ((ent = readdir (dir)) != NULL)
+        {
+            if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
+                continue;
 
+            if((match = store_match_exte_type(exte_type, ent->d_name, ent->d_type)))
+            {
+                if(store_idx == list->num.all)
+                {
+                       liblist_perror("store overflow");
+                       break;
+                }
+
+                len_name = strlen(ent->d_name);
+                list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
+                memcpy(list->list_item[store_idx]->full_path, path, len_path);
+                memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
+                memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+
+                switch(ent->d_type)
+                {
+                    case MODE_FIFO:
+                        list->num.fifo++;
+                        list->list_item[store_idx]->file_type = FIFO;
+                        break;
+
+                    case MODE_CHAR:
+                        list->num.character++;
+                        list->list_item[store_idx]->file_type = Character;
+                        list->list_item[store_idx]->exte_type = dirct;
+                        break;
+
+                    case MODE_DIRT:
+                        list->num.directory++;
+                        list->list_item[store_idx]->file_type = Directory;
+                        if(list->idx.dirct.next == 0)
+                            list_set_index(&list->idx.dirct, store_idx+1);
+                        break;
+
+                    case MODE_BLCK:
+                        list->num.block++;
+                        list->list_item[store_idx]->file_type = Block;
+                        break;
+
+                    case MODE_REGR:
+                        list->num.regular++;
+                        list->list_item[store_idx]->file_type = Regular;
+                        switch((list->list_item[store_idx]->exte_type = store_get_exte_type(list->list_item[store_idx])))
+                        {
+                            case audio:
+                                list->num.audio++;
+                                if(list->idx.audio.next == 0)
+                                    list_set_index(&list->idx.audio, store_idx+1);
+                                break;
+                            case video:
+                                list->num.video++;
+                                if(list->idx.video.next == 0)
+                                    list_set_index(&list->idx.video, store_idx+1);
+                                break;
+                            case image:
+                                list->num.image++;
+                                if(list->idx.image.next == 0)
+                                    list_set_index(&list->idx.image, store_idx+1);
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+
+                    case MODE_LINK:
+                        list->num.link++;
+                        list->list_item[store_idx]->file_type = Link;
+                        break;
+
+                    case MODE_SOCK:
+                        list->num.socket++;
+                        list->list_item[store_idx]->file_type = Socket;
+                        break;
+
+                    default:
+                        list->num.other++;
+                        list->list_item[store_idx]->file_type = Other;
+                        break;
+                }
+            }
+
+            if(match)
+                store_idx++;
+
+        }
+    }
+    closedir (dir);
+    list->exte_select = exte_type|dirct;
+    return store_idx;
+}
+
+int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type)
+{
+    DIR *dir;
+    struct dirent *ent;
+    char ipath[MAX_PATH];
+    int match=0;
+
+    qsi_assert(path);
+
+    size_t len_name;
+    size_t len_path = strlen(path);
+
+    if ((dir = opendir (path)) == NULL) {
+        liblist_perror("opendir");
+        return store_idx;
+    }
+
+    while ((ent = readdir (dir)) != NULL)
+    {
+        if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
+            continue;
+
+        if((match = store_match_exte_type(exte_type, ent->d_name, ent->d_type)))
+        {
+            if(store_idx == list->num.all)
+            {
+                   liblist_perror("store overflow");
+                   break;
+            }
+
+            len_name = strlen(ent->d_name);
+            list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
+            memcpy(list->list_item[store_idx]->full_path, path, len_path);
+            memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
+            memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+
+            switch(ent->d_type)
+            {
+                case MODE_FIFO:
+                    list->num.fifo++;
+                    list->list_item[store_idx]->file_type = FIFO;
+                    break;
+
+                case MODE_CHAR:
+                    list->num.character++;
+                    list->list_item[store_idx]->file_type = Character;
+                    list->list_item[store_idx]->exte_type = dirct;
+                    break;
+
+                case MODE_DIRT:
+                    list->num.directory++;
+                    list->list_item[store_idx]->file_type = Directory;
+                    if(list->idx.dirct.next == 0)
+                        list_set_index(&list->idx.dirct, store_idx+1);
+                    break;
+
+                case MODE_BLCK:
+                    list->num.block++;
+                    list->list_item[store_idx]->file_type = Block;
+                    break;
+
+                case MODE_REGR:
+                    list->num.regular++;
+                    list->list_item[store_idx]->file_type = Regular;
+                    switch((list->list_item[store_idx]->exte_type = store_get_exte_type(list->list_item[store_idx])))
+                    {
+                        case audio:
+                            list->num.audio++;
+                            if(list->idx.audio.next == 0)
+                                list_set_index(&list->idx.audio, store_idx+1);
+                            break;
+                        case video:
+                            list->num.video++;
+                            if(list->idx.video.next == 0)
+                                list_set_index(&list->idx.video, store_idx+1);
+                            break;
+                        case image:
+                            list->num.image++;
+                            if(list->idx.image.next == 0)
+                                list_set_index(&list->idx.image, store_idx+1);
+                            break;
+                        default:
+                            break;
+                    }
+                    break;
+
+                case MODE_LINK:
+                    list->num.link++;
+                    list->list_item[store_idx]->file_type = Link;
+                    break;
+
+                case MODE_SOCK:
+                    list->num.socket++;
+                    list->list_item[store_idx]->file_type = Socket;
+                    break;
+
+                default:
+                    list->num.other++;
+                    list->list_item[store_idx]->file_type = Other;
+                    break;
+            }
+        }
+
+        if(match)
+            store_idx++;
+
+        if(ent->d_type == MODE_DIRT)
+        {
+            strcpy(ipath,path);
+            strcat(ipath,"/");
+            strcat(ipath,ent->d_name);
+            store_idx = store_listdata_type_subdir(list, ipath, store_idx, exte_type);
+        }
+    }
+    closedir(dir);
+
+    return store_idx;
+}
+#endif

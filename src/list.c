@@ -29,6 +29,8 @@ char* list_get_exettype_str(extetype exet_type)
 	return "unknown";
 }
 
+#ifndef LESS_MEM
+
 void list_extetype_select(list_data* list, extetype exte_type)
 {
 	qsi_assert(list);
@@ -138,6 +140,135 @@ void list_extetype_exclude(list_data* list, extetype exte_type)
 	listdata_reset_index(list);
 	list->exte_select &= (~exte_type & allfile);
 }
+#else
+void list_extetype_select(list_data* list, extetype exte_type)
+{
+    qsi_assert(list);
+
+    int i,j;
+    list_item* tmp_item;
+    int num = list->num.all;
+
+    memset(&list->num, 0, sizeof(list_number));
+
+    for (i=0; i<num; i++)
+    {
+        if ((list->list_item[i]->exte_type & (exte_type | dirct)))
+            continue;
+
+        for (j=i+1; j<num; j++)
+        {
+            if ((list->list_item[j]->exte_type & (exte_type | dirct)))
+            {
+                tmp_item = list->list_item[i];
+                list->list_item[i] = list->list_item[j];
+                list->list_item[j] = tmp_item;
+                break;
+            }
+        }
+
+        if(j == num)
+            break;
+    }
+
+    for (list->num.all=0; list->num.all<num; list->num.all++)
+    {
+        if (!(list->list_item[list->num.all]->exte_type & (exte_type | dirct)))
+            break;
+
+        switch((list->list_item[list->num.all]->exte_type))
+        {
+            case dirct: list->num.directory++;      break;
+            case audio: list->num.audio++;          break;
+            case video: list->num.video++;          break;
+            case image: list->num.image++;          break;
+            default:    liblist_perror();           break;
+        }
+    }
+
+    while( list->num.all != num){
+        num--;
+        if(list->list_item[num])
+        {
+            if(list->list_item[num]->full_path)
+            {
+                free(list->list_item[num]->full_path);
+                list->list_item[num]->full_path = NULL;
+            }
+            free(list->list_item[num]);
+            list->list_item[num] = NULL;
+        }
+    }
+
+    listdata_reset_index(list);
+    list->exte_select = exte_type|dirct;
+}
+
+void list_extetype_exclude(list_data* list, extetype exte_type)
+{
+    qsi_assert(list);
+
+    int i,j;
+    list_item* tmp_item;
+    int num = list->num.all;
+
+    memset(&list->num, 0, sizeof(list_number));
+
+    for (i=0; i<num; i++)
+    {
+        if (!(list->list_item[i]->exte_type & exte_type))
+            continue;
+
+        for (j=i+1; j<num; j++)
+        {
+            if (!(list->list_item[j]->exte_type & exte_type))
+            {
+                tmp_item = list->list_item[i];
+                list->list_item[i] = list->list_item[j];
+                list->list_item[j] = tmp_item;
+                break;
+            }
+        }
+
+        if(j == num)
+            break;
+    }
+
+    for (list->num.all=0; list->num.all<num; list->num.all++)
+    {
+        if ((list->list_item[list->num.all]->exte_type & exte_type))
+            break;
+
+        switch((list->list_item[list->num.all]->exte_type))
+        {
+            case dirct: list->num.directory++;      break;
+            case audio: list->num.audio++;          break;
+            case video: list->num.video++;          break;
+            case image: list->num.image++;          break;
+            default:                                break;
+        }
+    }
+
+    while( list->num.all != num){
+        num--;
+        if(list->list_item[num])
+        {
+            if(list->list_item[num]->full_path)
+            {
+                free(list->list_item[num]->full_path);
+                list->list_item[num]->full_path = NULL;
+            }
+            free(list->list_item[num]);
+            list->list_item[num] = NULL;
+        }
+    }
+
+    listdata_reset_index(list);
+    list->exte_select &= (~exte_type & allfile);
+}
+
+
+#endif
 
 int list_get_extetype_count(list_data* list, extetype exte_type)
 {
@@ -179,9 +310,9 @@ int list_get_filetype_count(list_data* list, filetype file_type)
 void list_set_index(list_index* data, int idx)
 {
 	if(data->current == 0)
-		data->current = idx;
+		data->current = idx;    // first set
 	else
-		data->next = idx;
+		data->next = idx;       // second set
 }
 
 void list_show_index(list_data* list)
@@ -224,14 +355,17 @@ char* list_get_info_path(list_data* list)
 	return list->path;
 }
 
+
+#ifndef LESS_MEM
+
 char* list_get_name_by_index(list_data* list, int index)
 {
-	qsi_assert(list);
+    qsi_assert(list);
 
-	if(list_check_index_error(list, index))
-		return NULL;
+    if(list_check_index_error(list, index))
+        return NULL;
 
-	return list->list_item[index-1]->name;
+    return list->list_item[index-1]->name;
 }
 
 char* list_get_filename_by_index(list_data* list, int index)
@@ -241,12 +375,29 @@ char* list_get_filename_by_index(list_data* list, int index)
     if(list_check_index_error(list, index))
         return NULL;
 
- //   return strrchr(list->list_item[index-1]->name, '/') + 1;
-    printf("%s\n",(list->list_item[index-1]->full_path)?list->list_item[index-1]->full_path:"null");
+    return strrchr(list->list_item[index-1]->name, '/') + 1;
+
+}
+#else
+char* list_get_complete_path_by_index(list_data* list, int index)
+{
+    qsi_assert(list);
+
+    if(list_check_index_error(list, index))
+        return NULL;
+
+    return list->list_item[index-1]->full_path;
+}
+char* list_get_file_name_by_index(list_data* list, int index)
+{
+    qsi_assert(list);
+
+    if(list_check_index_error(list, index))
+        return NULL;
 
     return strrchr(list->list_item[index-1]->full_path, '/') + 1;
 }
-
+#endif
 
 filetype list_get_filetype_by_index(list_data* list, int index)
 {
@@ -445,7 +596,11 @@ int list_get_begin_index(list_data* list, extetype exet_type)
 	if(data != NULL)
 	{
 		data->prev = 0;
-		data->current = list_peer_next_index(list, exet_type, 0);
+
+		if((list->list_item[0]->exte_type & exet_type))
+		    data->current = 1;
+		else
+		    data->current = list_peer_next_index(list, exet_type, 1);
 
 		index = data->current;
 		data->next = list_peer_next_index(list, exet_type, index);
@@ -609,11 +764,13 @@ int list_check_index_error(list_data* list, int index)
 	}
 	if(index <= 0 || index > list->num.all)
 	{
-		LIST_DBG("error index");
+		LIST_DBG("error index %d", index);
 		return 1;
 	}
 	return 0;
 }
+
+#ifndef LESS_MEM
 
 int list_bsearch_index(list_data* list, char* name)
 {
@@ -667,6 +824,56 @@ int list_get_index_by_name(list_data* list, char* name)
 
 	return (index == list->num.all) ? -1 : index+1;
 }
+
+#else
+
+int list_bsearch_index(list_data* list, char* name)
+{
+    int base = list->num.directory;
+    int size = list->num.all -list->num.directory;
+    int idx, cmp;
+
+    for(;size!=0; size>>=1)
+    {
+        idx = base + (size>>1);
+
+        cmp = strcasecmp(name, list->list_item[idx]->full_path);
+
+        LIST_DBG("find idx:%d, %s", idx,list->list_item[idx]->full_path);
+
+        if(cmp==0)
+            return idx+1;
+
+        if(cmp>0)
+        {
+            base = idx + 1;
+            size--;
+        }
+    }
+    return -1;
+}
+
+int list_get_index_by_name(list_data* list, char* name)
+{
+    int index;
+    qsi_assert(list);
+    qsi_assert(name);
+
+    //if(((list->subdir == 0) && (list->sort == sortAlph)) || ((list->subdir == 1) && (list->sort == sortDirt)))
+    //{
+    //   return list_bsearch_index(list, name);
+    //}
+
+    for(index=0; index<list->num.all; index++)
+    {
+        if(!strcmp(list->list_item[index]->full_path, name))
+               break;
+    }
+
+    return (index == list->num.all) ? -1 : index+1;
+}
+
+#endif
 
 void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority)
 {

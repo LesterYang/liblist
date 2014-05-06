@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 
+#define LESS_MEM
+
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
@@ -80,12 +82,20 @@ struct list_head{
 	struct list_head *next,*prev;
 };
 
+#ifdef LESS_MEM
 struct list_item{
 	filetype file_type;
 	extetype exte_type;
-	char name[MAX_PATH];
 	char* full_path;
 };
+#else
+
+struct list_item{
+    filetype file_type;
+    extetype exte_type;
+    char name[MAX_PATH];
+};
+#endif
 
 typedef struct{
 	int prev;
@@ -148,9 +158,8 @@ void print_listo(int* num,char*** list);
 //=======================================================================
 
 int  store_listdata(list_data* list, char* path);
-int  store_listdata_extetype_select(list_data* list, char* path, extetype exte_type);
+int  store_listdata_extetype(list_data* list, char* path, extetype exte_type);
 int  store_get_exte_type(list_item* item);
-int  store_get_exte_type2(list_item* item);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
 
@@ -174,6 +183,5 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 
 // Print
 void list_show_index(list_data* list);
-void print_listdata(list_data* list);
 
 #endif /* LIST_DEF_H_ */

@@ -6,12 +6,14 @@
 #include <list.h>
 #include <list_def.h>
 
+/*
 extern const char* audio_exte_str[];
 extern const char* video_exte_str[];
 extern const char* image_exte_str[];
 extern unsigned int audio_exte_num;
 extern unsigned int video_exte_num;
 extern unsigned int image_exte_num;
+*/
 
 static list_data* list;
 
@@ -157,33 +159,13 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 			goto close_dir;
 		}
 
-		while((ent = readdir(dir)) != NULL){
+		while((ent = readdir(dir)) != NULL)
+		{
 			if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
 				continue;
 
-			if((4 == ent->d_type))
-			{
-				list->num.all++;
-			}
-			else if((8 == ent->d_type))
-			{
-				if ((exte_type&audio))
-				{
-					if(store_check_exte_type(audio_exte_num, audio_exte_str, ent->d_name))
-						list->num.all++;
-				}
-				if ((exte_type&video))
-				{
-					if(store_check_exte_type(video_exte_num, video_exte_str, ent->d_name))
-						list->num.all++;
-				}
-				if ((exte_type&image))
-				{
-					if(store_check_exte_type(image_exte_num, image_exte_str, ent->d_name))
-						list->num.all++;
-				}
-			}
-
+			if(store_match_exte_type(exte_type, ent->d_name, ent->d_type))
+			    list->num.all++;
 		}
 
 		if(list->num.all > 0)
@@ -214,7 +196,7 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 
 	list_mutex_new(list, TRUE, TRUE);
 
-	if(list->num.all != store_listdata_extetype_select(list, path, exte_type))
+	if(list->num.all != store_listdata_extetype(list, path, exte_type))
 		LIST_DBG("store number error");
 
 	list->subdir = 0;
@@ -319,6 +301,7 @@ err:
 	return NULL;
 }
 
+#ifndef LESS_MEM
 list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type)
 {
     list = open_listdata_subdir(path);
@@ -340,9 +323,9 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 
     return list;
 }
+#else
 
-
-list_data* open_listdata_type_subdir2(char* path, extetype exte_type, sorttype sort_type)
+list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type)
 {
     DIR *dir;
     int i;
@@ -399,12 +382,12 @@ list_data* open_listdata_type_subdir2(char* path, extetype exte_type, sorttype s
 
 	switch(sort_type)
 	{
-		case sortAlph:	listdata_qsort_alph2(list);	break;
-		case sortDirt:  listdata_qsort_dirt2(list);  break;
+		case sortAlph:	listdata_qsort_alph(list);	break;
+		case sortDirt:  listdata_qsort_dirt(list);  break;
 		case sortExte:	listdata_qsort_exte(list);	break;
 		case sortSize:	listdata_sort_size(list);	break;
 		case sortTime:	listdata_sort_time(list);	break;
-		default: 		listdata_qsort_alph2(list);	break;
+		default: 		listdata_qsort_alph(list);	break;
 	}
 
 	return list;
@@ -425,5 +408,5 @@ err:
 	    return NULL;
 }
 
-
+#endif
 
