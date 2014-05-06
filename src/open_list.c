@@ -15,6 +15,11 @@ extern unsigned int video_exte_num;
 extern unsigned int image_exte_num;
 */
 
+#ifdef Time_Measure
+#include <sys/time>
+struct timeval tv;
+unsigned long long start_utime, end_utime;
+#endif
 static list_data* list;
 
 char*** open_list(char* path){
@@ -332,6 +337,11 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 
     qsi_assert(path);
 
+#ifdef Time_Measure
+	gettimeofday(&tv,NULL);
+	start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+	
     if((dir = opendir (path)) == NULL){
         liblist_perror("opendir");
         LIST_DBG("open %s error", path);
@@ -371,7 +381,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 
     }
     closedir (dir);
-
+	
     list_mutex_new(list, TRUE, TRUE);
 
     if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
@@ -380,6 +390,16 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     list->subdir = 1;
     list->exte_select = exte_type;
 
+#ifdef Time_Measure
+	gettimeofday(&tv,NULL);
+	end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+	LIST_DBG("build list time : %llu ms", (end_utime - start_utime)/1000);
+#endif	
+	
+#ifdef Time_Measure
+	gettimeofday(&tv,NULL);
+	start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
 	switch(sort_type)
 	{
 		case sortAlph:	listdata_qsort_alph(list);	break;
@@ -389,6 +409,11 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 		case sortTime:	listdata_sort_time(list);	break;
 		default: 		listdata_qsort_alph(list);	break;
 	}
+#ifdef Time_Measure
+	gettimeofday(&tv,NULL);
+	end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+	LIST_DBG("sort time : %llu ms", (end_utime - start_utime)/1000);
+#endif
 
 	return list;
 
