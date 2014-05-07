@@ -172,6 +172,7 @@ void listdata_sort_filetype(list_data* list);
 
 int listdata_compare_alph(const void* i, const void* j);
 int listdata_compare_alph_filename(const void* i, const void* j);
+int listdata_compare_dirt(const void* i, const void* j);
 int listdata_compare_exte(const void* i, const void* j);
 
 void free_list_item(list_item** item, int num);
@@ -184,5 +185,8 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 
 // Print
 void list_show_index(list_data* list);
+
+
+int list_deep(char* path);
 
 #endif /* LIST_DEF_H_ */

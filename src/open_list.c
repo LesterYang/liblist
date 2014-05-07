@@ -16,7 +16,7 @@ extern unsigned int image_exte_num;
 */
 
 #ifdef Time_Measure
-#include <sys/time>
+#include <sys/time.h>
 struct timeval tv;
 unsigned long long start_utime, end_utime;
 #endif
