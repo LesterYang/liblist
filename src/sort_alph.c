@@ -134,12 +134,60 @@ int listdata_compare_alph_filename(const void* i, const void* j)
 
 int listdata_compare_dirt(const void* i, const void* j)
 {
+    int val, dirt_i=0, dirt_j=0;
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
+    while((val=(int)(*(item_i->full_path)-*(item_j->full_path)))==0)
+    {
+        if(!*(item_i->full_path))
+            break;
+        item_i->full_path++;
+        item_j->full_path++;
+    }
+
+    while(*(item_i->full_path))
+    {
+        if(*(item_i->full_path++)=='/')
+        {
+            dirt_i=1;
+            break;
+        }
+    }
+    while(*(item_j->full_path))
+    {
+        if(*(item_j->full_path++)=='/')
+        {
+            dirt_j=1;
+            break;
+        }
+    }
+
+
+    if(val>0)
+    {
+        if((dirt_i == dirt_j)
+            return 1;
+        else
+            return -1;
+    }
+    if(val<0)
+    {
+        if(dirt_i==1 && dirt_j==0)
+            return 1;
+        else
+            return -1;
+    }
+
+    return 0;
+/*
     int swap = 0;
     int val;
+<<<<<<< HEAD
 #if 1
+=======
+
+>>>>>>> 92d4f0edb0d12d8e91b08bc385fdac8f6d896e64
     char *name_i = strrchr(item_i->full_path, '/');
     char *name_j = strrchr(item_j->full_path, '/');
     int pathlen_i=(int)(name_i - item_i->full_path);
@@ -182,9 +230,14 @@ int listdata_compare_dirt(const void* i, const void* j)
         else
             swap = -1;
     }
+*/
 
+<<<<<<< HEAD
 
 #else
+=======
+/*
+>>>>>>> 92d4f0edb0d12d8e91b08bc385fdac8f6d896e64
     int deep_i = list_deep(item_i->full_path);
     int deep_j = list_deep(item_j->full_path);
 
@@ -194,8 +247,18 @@ int listdata_compare_dirt(const void* i, const void* j)
         swap = 1;
     else if(val < 0)
         swap = -1;
+<<<<<<< HEAD
 #endif
+=======
+
+
+    if (swap==1)
+        printf("swap:%s and %s\n",item_i->full_path,item_j->full_path);
+
+
+>>>>>>> 92d4f0edb0d12d8e91b08bc385fdac8f6d896e64
     return swap;
+*/
 }
 
 
