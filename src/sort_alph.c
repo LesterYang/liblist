@@ -139,7 +139,7 @@ int listdata_compare_dirt(const void* i, const void* j)
 
     int swap = 0;
     int val;
-#if 0
+#if 1
     char *name_i = strrchr(item_i->full_path, '/');
     char *name_j = strrchr(item_j->full_path, '/');
     int pathlen_i=(int)(name_i - item_i->full_path);
@@ -183,8 +183,8 @@ int listdata_compare_dirt(const void* i, const void* j)
             swap = -1;
     }
 
-#endif
 
+#else
     int deep_i = list_deep(item_i->full_path);
     int deep_j = list_deep(item_j->full_path);
 
@@ -194,11 +194,7 @@ int listdata_compare_dirt(const void* i, const void* j)
         swap = 1;
     else if(val < 0)
         swap = -1;
-
-
-    if (swap==1)
-        printf("swap:%s and %s\n",item_i->full_path,item_j->full_path);
-
+#endif
     return swap;
 }
 
