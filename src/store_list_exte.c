@@ -455,10 +455,11 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
                 }
 
                 len_name = strlen(ent->d_name);
-                list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
+                list->list_item[store_idx]->full_path=(char*)malloc(len_name + len_path + 2);
                 memcpy(list->list_item[store_idx]->full_path, path, len_path);
                 memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
                 memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+                list->list_item[store_idx]->full_path[len_path+len_name+1]=0;
 
                 switch(ent->d_type)
                 {
@@ -533,7 +534,7 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
         }
     }
     closedir (dir);
-    list->exte_select = exte_type|dirct;
+    list->exte_select = exte_type;
     return store_idx;
 }
 
@@ -568,10 +569,11 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
             }
 
             len_name = strlen(ent->d_name);
-            list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
+            list->list_item[store_idx]->full_path=(char*)malloc(len_name + len_path + 2);
             memcpy(list->list_item[store_idx]->full_path, path, len_path);
             memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
             memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+            list->list_item[store_idx]->full_path[len_path+len_name+1]=0;
 
             switch(ent->d_type)
             {

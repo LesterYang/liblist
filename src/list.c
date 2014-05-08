@@ -17,13 +17,22 @@ char* list_get_exettype_str(extetype exet_type)
 {
 	switch(exet_type)
 	{
-		case audio:			return "audio";
-		case video:			return "video";
-		case image:			return "image";
-		case audio|video:	return "audio and video";
-		case audio|image:	return "audio and image";
-		case video|image:	return "video and image";
-		case alltype:		return "all type";
+		case audio:			        return "audio";
+		case video:			        return "video";
+		case image:			        return "image";
+		case audio|video:	        return "audio/video";
+		case audio|image:	        return "audio/image";
+		case video|image:	        return "video/image";
+		case alltype:	            return "audio/video/image";
+		case dirct:                 return "folder";
+        case dirct|audio:           return "folder/audio";
+        case dirct|video:           return "folder/video";
+        case dirct|image:           return "folder/image";
+        case dirct|audio|video:     return "folder/audio/video";
+        case dirct|audio|image:     return "folder/audio/image";
+        case dirct|video|image:     return "folder/video/image";
+		case dirct|alltype:         return "folder/audio/video/image";
+		case allfile:               return "all";
 		default: 			break;
 	}
 	return "unknown";

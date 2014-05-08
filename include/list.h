@@ -171,7 +171,7 @@ char* list_get_version_number(void);
 void list_extetype_select(list_data* list, extetype exte_type);
 void list_extetype_exclude(list_data* list, extetype exte_type);
 
-// Sort data by alphanumeric/extension/size/modified_time
+// Sort data by alphanumeric/extension/size/modified_time/folder
 // listdata_qsort_alph() and listdata_qsort_exte() are quick sort
 // Note: size sort and modified_time sort don't support for recursive list_data structure
 void listdata_sort_size(list_data* list);

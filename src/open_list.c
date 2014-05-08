@@ -342,21 +342,24 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 	
-    if((dir = opendir (path)) == NULL){
+    if((dir = opendir (path)) == NULL)
+    {
         liblist_perror("opendir");
         LIST_DBG("open %s error", path);
         goto err;
     }
-    else{
-
+    else
+    {
         list=(list_data*)calloc(1, sizeof(list_data));
 
-        if(!list){
+        if(!list)
+        {
             liblist_perror();
             goto close_dir;
         }
 
-        if((list->num.all = list_subdir_type_num(path, exte_type)) <= 0){
+        if((list->num.all = list_subdir_type_num(path, exte_type)) <= 0)
+        {
             LIST_DBG("no files");
             goto free_list_data;
         }
@@ -365,12 +368,14 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 
         list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
-        if(!list->list_item){
+        if(!list->list_item)
+        {
             liblist_perror();
             goto free_list_data;
         }
 
-        for(i=0; i<list->num.all; i++){
+        for(i=0; i<list->num.all; i++)
+        {
             list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
 
             if(!list->list_item[i]){
@@ -393,7 +398,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 #ifdef Time_Measure
 	gettimeofday(&tv,NULL);
 	end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
-	LIST_DBG("build list time : %llu ms", (end_utime - start_utime)/1000);
+	LIST_DBG("list time : %llu ms", (end_utime - start_utime)/1000);
 #endif	
 	
 #ifdef Time_Measure
