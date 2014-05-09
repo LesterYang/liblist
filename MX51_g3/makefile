@@ -44,7 +44,7 @@ all: liblist.so.1.0.9
 liblist.so.1.0.9: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++ -L/Space/ltib2/ltib/rootfs/usr/lib -shared -o"liblist.so.1.0.9" $(OBJS) $(USER_OBJS) $(LIBS)
+	/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++ -L/Space/ltib2/ltib/rootfs/usr/lib -shared -pg -o"liblist.so.1.0.9" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

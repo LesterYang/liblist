@@ -934,16 +934,17 @@
 							<tool command="/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++" id="cdt.managedbuild.tool.gnu.cpp.compiler.base.298018932" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.base">
 								<option id="gnu.cpp.compiler.option.debugging.level.1724855271" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.other.other.1668564113" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fPIC -fmessage-length=0 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -std=gnu99" valueType="string"/>
-								<option id="gnu.cpp.compiler.option.optimization.level.649660651" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.649660651" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1145163297" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/include"/>
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/include"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.debugging.gprof.323126579" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.313941152" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-gcc" id="cdt.managedbuild.tool.gnu.c.compiler.base.2045400271" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
-								<option id="gnu.c.compiler.option.optimization.level.1275988124" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.optimization.level.1275988124" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.most" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.471322047" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.misc.other.1726013535" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fPIC -fmessage-length=0" valueType="string"/>
 								<option id="gnu.c.compiler.option.include.paths.886223536" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
@@ -951,7 +952,7 @@
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/include"/>
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/include"/>
 								</option>
-								<option id="gnu.c.compiler.option.debugging.gprof.1723498012" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.debugging.gprof.1723498012" name="Generate gprof information (-pg)" superClass="gnu.c.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1068605733" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.linker.base.1453300703" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.base">
@@ -965,6 +966,7 @@
 								<option id="gnu.cpp.link.option.paths.586009086" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>
 								</option>
+								<option id="gnu.cpp.link.option.debugging.gprof.1245357785" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.36136970" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

@@ -10,7 +10,7 @@
 #include <pthread.h>
 
 #define LESS_MEM
-#define Time_Measure
+//#define Time_Measure
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1

@@ -162,12 +162,12 @@ void list_extetype_select(list_data* list, extetype exte_type)
 
     for (i=0; i<num; i++)
     {
-        if ((list->list_item[i]->exte_type & (exte_type | dirct)))
+        if ((list->list_item[i]->exte_type & (exte_type)))
             continue;
 
         for (j=i+1; j<num; j++)
         {
-            if ((list->list_item[j]->exte_type & (exte_type | dirct)))
+            if ((list->list_item[j]->exte_type & (exte_type)))
             {
                 tmp_item = list->list_item[i];
                 list->list_item[i] = list->list_item[j];
@@ -182,7 +182,7 @@ void list_extetype_select(list_data* list, extetype exte_type)
 
     for (list->num.all=0; list->num.all<num; list->num.all++)
     {
-        if (!(list->list_item[list->num.all]->exte_type & (exte_type | dirct)))
+        if (!(list->list_item[list->num.all]->exte_type & (exte_type)))
             break;
 
         switch((list->list_item[list->num.all]->exte_type))
@@ -210,7 +210,7 @@ void list_extetype_select(list_data* list, extetype exte_type)
     }
 
     listdata_reset_index(list);
-    list->exte_select = exte_type|dirct;
+    list->exte_select = exte_type;
 }
 
 void list_extetype_exclude(list_data* list, extetype exte_type)
@@ -907,7 +907,7 @@ void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_
     }
 }
 
-
+#if 0
 int list_deep(char* s)
 {
 	char *p;
@@ -919,3 +919,4 @@ int list_deep(char* s)
 	}
 	return n;
 }
+#endif
