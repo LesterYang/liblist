@@ -242,33 +242,6 @@ int* store_reg_exte_type(char*** list,char* path,int exte_type){
 	return num;
 }
 
-#ifndef LESS_MEM
-
-int store_get_exte_type(list_item* item)
-{
-	if(!item)
-		return -1;
-
-	int i;
-
-	if ( (strrchr(item->name,'.')) )
-	{
-		for (i=0 ; i < audio_exte_num ; i++){
-			if (!strcasecmp(audio_exte_str[i], strrchr(item->name,'.')) )
-				return audio;
-		}
-		for (i=0 ; i < video_exte_num ; i++){
-			if (!strcasecmp(video_exte_str[i], strrchr(item->name,'.')) )
-				return video;
-		}
-		for (i=0 ; i < image_exte_num ; i++){
-			if (!strcasecmp(image_exte_str[i], strrchr(item->name,'.')) )
-				return image;
-		}
-	}
-	return unknown;
-}
-#else
 int store_get_exte_type(list_item* item)
 {
     if(!item)
@@ -293,7 +266,6 @@ int store_get_exte_type(list_item* item)
     }
     return unknown;
 }
-#endif
 
 int store_match_exte_type(extetype exte_type, char* name, int type)
 {
@@ -338,95 +310,6 @@ int store_check_exte_type(int exte_num, const char** exte_str, char* name)
 	return 0;
 }
 
-#ifndef LESS_MEM
-int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
-{
-	DIR *dir;
-	struct dirent *ent;
-	int store_idx = 0;
-
-	if((dir = opendir (path)) == NULL){
-		liblist_perror("opendir");
-		return -1;
-	}
-	else{
-		while ((ent = readdir (dir)) != NULL)
-		{
-			if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
-				continue;
-
-			switch(ent->d_type)
-			{
-				case MODE_DIRT:
-					if(store_idx == list->num.all)
-					{
-						liblist_perror("store overflow");
-						break;
-					}
-					list->num.directory++;
-					list->list_item[store_idx]->file_type = Directory;
-					list->list_item[store_idx]->exte_type = dirct;
-					if(list->idx.dirct.next == 0)
-						list_set_index(&list->idx.dirct, store_idx+1);
-					strcpy(list->list_item[store_idx++]->name, ent->d_name);
-					break;
-
-				case MODE_REGR:
-					if ((exte_type&audio))
-					{
-						if(store_check_exte_type(audio_exte_num, audio_exte_str, ent->d_name))
-						{
-							strcpy(list->list_item[store_idx]->name, ent->d_name);
-							list->list_item[store_idx]->file_type = Regular;
-							list->list_item[store_idx]->exte_type = audio;
-							list->num.audio++;
-							list->num.regular++;
-							if(list->idx.audio.next == 0)
-								list_set_index(&list->idx.audio, store_idx+1);
-							store_idx++;
-						}
-					}
-					if ((exte_type&video))
-					{
-						if(store_check_exte_type(video_exte_num, video_exte_str, ent->d_name))
-						{
-							strcpy(list->list_item[store_idx]->name, ent->d_name);
-							list->list_item[store_idx]->file_type = Regular;
-							list->list_item[store_idx]->exte_type = video;
-							list->num.video++;
-							list->num.regular++;
-							if(list->idx.video.next == 0)
-								list_set_index(&list->idx.video, store_idx+1);
-							store_idx++;
-						}
-					}
-					if ((exte_type&image))
-					{
-						if(store_check_exte_type(image_exte_num, image_exte_str, ent->d_name))
-						{
-							strcpy(list->list_item[store_idx]->name, ent->d_name);
-							list->list_item[store_idx]->file_type = Regular;
-							list->list_item[store_idx]->exte_type = image;
-							list->num.image++;
-							list->num.regular++;
-							if(list->idx.image.next == 0)
-								list_set_index(&list->idx.image, store_idx+1);
-							store_idx++;
-						}
-					}
-					break;
-
-				default:
-					break;
-			}
-		}
-	}
-	closedir (dir);
-	list->exte_select = exte_type|dirct;
-	return store_idx;
-}
-
-#else
 int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
 {
     DIR *dir;
@@ -657,4 +540,3 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 
     return store_idx;
 }
-#endif

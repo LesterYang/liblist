@@ -6,15 +6,6 @@
 #include <list.h>
 #include <list_def.h>
 
-/*
-extern const char* audio_exte_str[];
-extern const char* video_exte_str[];
-extern const char* image_exte_str[];
-extern unsigned int audio_exte_num;
-extern unsigned int video_exte_num;
-extern unsigned int image_exte_num;
-*/
-
 #ifdef Time_Measure
 #include <sys/time.h>
 struct timeval tv;
@@ -93,7 +84,6 @@ list_data* open_listdata(char* path)
 
 		if(list->num.all > 0)
 		{
-			strcpy(list->path, path);
 			list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 		
 			if(!list->list_item){
@@ -122,6 +112,7 @@ list_data* open_listdata(char* path)
 	if(list->num.all != store_listdata(list, path))
 		LIST_DBG("store number error");
 
+	list->parent_path = list_strdup(path);
 	list->subdir = 0;
 
 	return list;
@@ -175,7 +166,6 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 
 		if(list->num.all > 0)
 		{
-			strcpy(list->path, path);
 			list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
 			if(!list->list_item){
@@ -204,14 +194,15 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	if(list->num.all != store_listdata_extetype(list, path, exte_type))
 		LIST_DBG("store number error");
 
+	list->parent_path = list_strdup(path);
 	list->subdir = 0;
 
 	switch(sort_type)
 	{
 		case sortAlph:	listdata_qsort_alph(list);	break;
 		case sortExte:	listdata_qsort_exte(list);	break;
-		case sortSize:	listdata_sort_size(list);	break;
-		case sortTime:	listdata_sort_time(list);	break;
+		case sortSize:	listdata_qsort_size(list);	break;
+		case sortTime:	listdata_qsort_time(list);	break;
 		default: 		listdata_qsort_alph(list);	break;
 	}
 
@@ -259,8 +250,6 @@ list_data* open_listdata_subdir(char* path)
 			goto free_list_data;
 		}
 
-		strcpy(list->path, path);
-
 		list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
 		if(!list->list_item){
@@ -286,6 +275,7 @@ list_data* open_listdata_subdir(char* path)
 	if(list->num.all != store_listdata_subdir(list, path, 0))
 		LIST_DBG("stored number less than malloc");
 
+	list->parent_path = list_strdup(path);
 	list->subdir = 1;
 
 	return list;
@@ -305,30 +295,6 @@ close_dir:
 err:
 	return NULL;
 }
-
-#ifndef LESS_MEM
-list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type)
-{
-    list = open_listdata_subdir(path);
-
-    if(!list)
-        return NULL;
-
-    list_extetype_select(list, exte_type);
-
-    switch(sort_type)
-    {
-        case sortAlph:  listdata_qsort_alph(list);  break;
-        case sortDirt:  listdata_qsort_dirt(list);  break;
-        case sortExte:  listdata_qsort_exte(list);  break;
-        case sortSize:  listdata_sort_size(list);   break;
-        case sortTime:  listdata_sort_time(list);   break;
-        default:        listdata_qsort_alph(list);  break;
-    }
-
-    return list;
-}
-#else
 
 list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype sort_type)
 {
@@ -364,8 +330,6 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
             goto free_list_data;
         }
 
-        strcpy(list->path, path);
-
         list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
         if(!list->list_item)
@@ -392,6 +356,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
         LIST_DBG("stored number less than malloc");
 
+    list->parent_path = list_strdup(path);
     list->subdir = 1;
     list->exte_select = exte_type;
 
@@ -410,8 +375,8 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 		case sortAlph:	listdata_qsort_alph(list);	break;
 		case sortDirt:  listdata_qsort_dirt(list);  break;
 		case sortExte:	listdata_qsort_exte(list);	break;
-		case sortSize:	listdata_sort_size(list);	break;
-		case sortTime:	listdata_sort_time(list);	break;
+		case sortSize:	listdata_qsort_size(list);	break;
+		case sortTime:	listdata_qsort_time(list);	break;
 		default: 		listdata_qsort_alph(list);	break;
 	}
 #ifdef Time_Measure
@@ -437,6 +402,4 @@ close_dir:
 err:
 	    return NULL;
 }
-
-#endif
 

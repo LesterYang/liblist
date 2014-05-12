@@ -9,8 +9,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define LESS_MEM
-//#define Time_Measure
+#define Time_Measure
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
@@ -33,7 +32,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	0
-#define ReleaseNum	9
+#define ReleaseNum	10
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -83,20 +82,11 @@ struct list_head{
 	struct list_head *next,*prev;
 };
 
-#ifdef LESS_MEM
 struct list_item{
 	filetype file_type;
 	extetype exte_type;
 	char* full_path;
 };
-#else
-
-struct list_item{
-    filetype file_type;
-    extetype exte_type;
-    char name[MAX_PATH];
-};
-#endif
 
 typedef struct{
 	int prev;
@@ -124,7 +114,7 @@ struct list_data{
 	list_item** list_item;
 	list_number num;
 
-	char path[MAX_NAME];
+	char* parent_path;
 	extetype exte_select;
 	sorttype sort;
 	char subdir;
@@ -174,6 +164,8 @@ int listdata_compare_alph(const void* i, const void* j);
 int listdata_compare_alph_filename(const void* i, const void* j);
 int listdata_compare_dirt(const void* i, const void* j);
 int listdata_compare_exte(const void* i, const void* j);
+int listdata_compare_sort(const void* i, const void* j);
+int listdata_compare_time(const void* i, const void* j);
 
 void free_list_item(list_item** item, int num);
 
@@ -187,6 +179,7 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 void list_show_index(list_data* list);
 
 
-int list_deep(char* path);
+char* list_strdup(const char *str);
+int list_count_sign(char* str, char sign);
 
 #endif /* LIST_DEF_H_ */

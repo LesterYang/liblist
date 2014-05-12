@@ -13,25 +13,6 @@ void free2(int num,char** list){
 	list=NULL;
 }
 
-#ifndef LESS_MEM
-
-void free_list_item(list_item** item, int num)
-{
-	int i;
-
-	if(item){
-		for(i=0; i<num; i++){
-			if(item[i])
-				free(item[i]);
-			item[i]=NULL;
-		}
-		free(item);
-		item=NULL;
-	}
-}
-
-#else
-
 void free_list_item(list_item** item, int num)
 {
     int i;
@@ -55,6 +36,3 @@ void free_list_item(list_item** item, int num)
         item=NULL;
     }
 }
-
-#endif
-

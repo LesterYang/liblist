@@ -172,10 +172,9 @@ void list_extetype_select(list_data* list, extetype exte_type);
 void list_extetype_exclude(list_data* list, extetype exte_type);
 
 // Sort data by alphanumeric/extension/size/modified_time/folder
-// listdata_qsort_alph() and listdata_qsort_exte() are quick sort
-// Note: size sort and modified_time sort don't support for recursive list_data structure
-void listdata_sort_size(list_data* list);
-void listdata_sort_time(list_data* list);
+// Sorting algorithm : quick sort
+void listdata_qsort_size(list_data* list);
+void listdata_qsort_time(list_data* list);
 void listdata_qsort_alph(list_data* list);
 void listdata_qsort_dirt(list_data* list);
 void listdata_qsort_exte(list_data* list);

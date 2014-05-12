@@ -361,33 +361,9 @@ sorttype list_get_info_sorttype(list_data* list)
 char* list_get_info_path(list_data* list)
 {
 	qsi_assert(list);
-	return list->path;
+	return list->parent_path;
 }
 
-
-#ifndef LESS_MEM
-
-char* list_get_name_by_index(list_data* list, int index)
-{
-    qsi_assert(list);
-
-    if(list_check_index_error(list, index))
-        return NULL;
-
-    return list->list_item[index-1]->name;
-}
-
-char* list_get_filename_by_index(list_data* list, int index)
-{
-    qsi_assert(list);
-
-    if(list_check_index_error(list, index))
-        return NULL;
-
-    return strrchr(list->list_item[index-1]->name, '/') + 1;
-
-}
-#else
 char* list_get_complete_path_by_index(list_data* list, int index)
 {
     qsi_assert(list);
@@ -406,7 +382,6 @@ char* list_get_file_name_by_index(list_data* list, int index)
 
     return strrchr(list->list_item[index-1]->full_path, '/') + 1;
 }
-#endif
 
 filetype list_get_filetype_by_index(list_data* list, int index)
 {
@@ -749,7 +724,10 @@ int list_peer_next_recycle_index(list_data* list, extetype exet_type, int curren
 
 int list_peer_begin_index(list_data* list, extetype exet_type)
 {
-	return list_peer_next_index(list, exet_type, 0);
+    if((list->list_item[0]->exte_type & exet_type))
+        return 1;
+    else
+        return list_peer_next_index(list, exet_type, 1);
 }
 
 int list_peer_end_index(list_data* list, extetype exet_type)
@@ -778,63 +756,6 @@ int list_check_index_error(list_data* list, int index)
 	}
 	return 0;
 }
-
-#ifndef LESS_MEM
-
-int list_bsearch_index(list_data* list, char* name)
-{
-	int base = list->num.directory;
-	int size = list->num.all -list->num.directory;
-	int idx, cmp;
-
-	for(;size!=0; size>>=1)
-	{
-		idx = base + (size>>1);
-
-		cmp = strcasecmp(name, list->list_item[idx]->name);
-
-		if(cmp==0)
-			return idx+1;
-
-		if(cmp>0)
-		{
-			base = idx + 1;
-			size--;
-		}
-	}
-	return -1;
-}
-
-int list_get_index_by_name(list_data* list, char* name)
-{
-	int index;
-	qsi_assert(list);
-	qsi_assert(name);
-
-	if(list->sort == sortAlph)
-	{
-		return list_bsearch_index(list, name);
-	}
-
-	for(index=0; index<list->num.all; index++)
-	{
-		//if(list->subdir == 0)
-		//{
-			if(!strcmp(list->list_item[index]->name, name))
-				break;
-		//}
-		//else
-		//{
-		//	if((strrchr(list->list_item[index]->name,'/') != 0) &&
-		//			!strcmp(strrchr(list->list_item[index]->name,'/')+1, name))
-		//		break;
-		//}
-	}
-
-	return (index == list->num.all) ? -1 : index+1;
-}
-
-#else
 
 int list_bsearch_index(list_data* list, char* name)
 {
@@ -868,11 +789,6 @@ int list_get_index_by_name(list_data* list, char* name)
     qsi_assert(list);
     qsi_assert(name);
 
-    //if(((list->subdir == 0) && (list->sort == sortAlph)) || ((list->subdir == 1) && (list->sort == sortDirt)))
-    //{
-    //   return list_bsearch_index(list, name);
-    //}
-
     for(index=0; index<list->num.all; index++)
     {
         if(!strcmp(list->list_item[index]->full_path, name))
@@ -881,8 +797,6 @@ int list_get_index_by_name(list_data* list, char* name)
 
     return (index == list->num.all) ? -1 : index+1;
 }
-
-#endif
 
 void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority)
 {
@@ -907,16 +821,35 @@ void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_
     }
 }
 
-#if 0
-int list_deep(char* s)
-{
-	char *p;
-	int n;
 
-	for(n=0; NULL!=(p=strchr(s,'/')); n++)
+char* list_strdup(const char *s)
+{
+    char *r=NULL;
+
+    if (s)
+    {
+        size_t l;
+        l = strlen(s) + 1;
+        r = (char*)calloc(1, l);
+        memcpy(r, s, l);
+    }
+    return r;
+}
+
+
+int list_count_sign(char* s, char a)
+{
+	char *p,*d;
+	int n = 0;
+
+	if(s)
+	    d=s;
+	else
+	    return -1;
+
+	for(n=0; NULL!=(p=strchr(d,a)); n++)
 	{
-		s=p+1;
+		d=p+1;
 	}
 	return n;
 }
-#endif

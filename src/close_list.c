@@ -22,6 +22,11 @@ void close_listdata(list_data* list)
 
 	pthread_mutex_destroy(&list->mutex);
 	free_list_item(list->list_item, list->num.all);
+
+	if(list->parent_path)
+	    free(list->parent_path);
 	free(list);
+
+	list->parent_path=NULL;
 	list=NULL;
 }

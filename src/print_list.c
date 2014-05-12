@@ -44,72 +44,6 @@ void print_list(int* num,char*** list){
 	}
 }
 
-#ifndef LESS_MEM
-
-void print_listdata(list_data* list)
-{
-	qsi_assert(list);
-
-	int i;
-
-	printf("Index  File   Exte  FileName\n");
-	for(i=0; i<list->num.all; i++)
-	{
-
-		printf("%5d: ", i+1);
-		switch(list->list_item[i]->file_type)
-		{
-			case FIFO:
-				printf("FIFO,      , ");
-				break;
-
-			case Character:
-				printf("CHAR,      , ");
-				break;
-
-			case Directory:
-				printf("DIRT, ");
-				switch(list->list_item[i]->exte_type)
-				{
-					case dirct: printf("dirct, "); break;
-					default:	printf("     , "); break;
-				}
-				break;
-
-			case Block:
-				printf("BLCK,      , ");
-				break;
-
-			case Regular:
-				printf("REGL, ");
-				switch(list->list_item[i]->exte_type)
-				{
-					case audio: printf("audio, "); break;
-					case video: printf("video, "); break;
-					case image: printf("image, "); break;
-					default:	printf("     , "); break;
-				}
-				break;
-
-			case Link:
-				printf("LINK,      , ");
-				break;
-
-			case Socket:
-				printf("SOCK,      , ");
-				break;
-
-			case Other:
-				//break;
-
-			default:
-				printf("OTHE,      , ");
-				break;
-		}
-		printf("name:%s\n",list->list_item[i]->name);
-	}
-}
-#else
 void print_listdata(list_data* list)
 {
     qsi_assert(list);
@@ -173,7 +107,6 @@ void print_listdata(list_data* list)
         printf("name:%s\n",list->list_item[i]->full_path);
     }
 }
-#endif
 
 int range_ls(int* start,int* end, int num){
 	int err=1;

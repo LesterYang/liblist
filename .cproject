@@ -925,7 +925,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.0.9" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
+				<configuration artifactExtension="so.1.0.10" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
 					<folderInfo id="0.308064247.98712758." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.702764346" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.53587341" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -940,7 +940,7 @@
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/include"/>
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/include"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.debugging.gprof.323126579" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.debugging.gprof.323126579" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.313941152" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool command="/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-gcc" id="cdt.managedbuild.tool.gnu.c.compiler.base.2045400271" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.base">
@@ -966,7 +966,7 @@
 								<option id="gnu.cpp.link.option.paths.586009086" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>
 								</option>
-								<option id="gnu.cpp.link.option.debugging.gprof.1245357785" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.debugging.gprof.1245357785" name="Generate gprof information (-pg)" superClass="gnu.cpp.link.option.debugging.gprof" value="true" valueType="boolean"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.36136970" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -1839,7 +1839,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.0.9" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactExtension="so.1.0.10" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.308064247.1058103554." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.942075436" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1860653471" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>

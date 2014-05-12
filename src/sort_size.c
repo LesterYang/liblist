@@ -49,117 +49,40 @@ void sort_size(int num,char** list,char* path){
 	}
 }
 
-#ifndef LESS_MEM
-
-void listdata_sort_size(list_data* list)
+int listdata_compare_sort(const void* i, const void* j)
 {
-	struct stat sbi;
-	struct stat sbj;
-	int i,j;
-	list_item* tmp_item;
-	char pathi[MAX_NAME];
-	char pathj[MAX_NAME];
+    list_item* item_i = *(list_item**)i;
+    list_item* item_j = *(list_item**)j;
 
-	qsi_assert(list);
-	pthread_mutex_lock(&list->mutex);
-
-	if(list->subdir == 0)
-		listdata_sort_filetype(list);
-	else
-	{
-		return;
-	}
-
-	for (i = 0 ; i < list->num.all ; i++)
-	{
-		if(list->subdir == 0 && list->list_item[i]->file_type == Directory)
-			continue;
-
-		memset(pathi, 0, MAX_NAME);
-		strcpy(pathi,list->path);
-		strcat(pathi,"/");
-		strcat(pathi,list->list_item[i]->name);
-
-		for (j = i + 1; j < list->num.all ; j++)
-		{
-			memset(pathj, 0, MAX_NAME);
-			strcpy(pathj,list->path);
-			strcat(pathj,"/");
-			strcat(pathj,list->list_item[j]->name);
-
-			if (-1 == lstat(pathi,&sbi) || -1 == lstat(pathj,&sbj)) {
-				perror("liblist : listdata_sort_size stat");
-				exit(EXIT_FAILURE);
-			}
-			else if ( sbi.st_size < sbj.st_size )
-			{
-				tmp_item = list->list_item[i];
-				list->list_item[i] = list->list_item[j];
-				list->list_item[j] = tmp_item;
-
-				memset(pathi, 0, MAX_NAME);
-				strcpy(pathi,list->path);
-				strcat(pathi,"/");
-				strcat(pathi,list->list_item[i]->name);
-			}
-		}
-	}
-	listdata_reset_index(list);
-	list->sort = sortSize;
-	pthread_mutex_unlock(&list->mutex);
-}
-#else
-void listdata_sort_size(list_data* list)
-{
     struct stat sbi;
     struct stat sbj;
-    int i,j;
-    list_item* tmp_item;
-    char pathi[MAX_NAME];
-    char pathj[MAX_NAME];
 
+    if (-1 == lstat(item_i->full_path, &sbi) || -1 == lstat(item_j->full_path, &sbj))
+    {
+        perror("liblist : listdata_sort_size stat");
+        exit(EXIT_FAILURE);
+    }
+
+    if(sbi.st_size < sbj.st_size)
+        return 1;
+    else if (sbi.st_size > sbj.st_size)
+        return -1;
+
+    return 0;
+}
+
+void listdata_qsort_size(list_data* list)
+{
     qsi_assert(list);
     pthread_mutex_lock(&list->mutex);
 
-    if(list->subdir == 0)
-        listdata_sort_filetype(list);
-    else
-    {
-        return;
-    }
+    listdata_sort_filetype(list);
 
-    for (i = 0 ; i < list->num.all ; i++)
-    {
-        if(list->subdir == 0 && list->list_item[i]->file_type == Directory)
-            continue;
+    qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_sort);
+    qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_sort);
 
-        memset(pathi, 0, MAX_NAME);
-        strcpy(pathi,list->path);
-        strcat(pathi,"/");
-        strcat(pathi,list->list_item[i]->full_path);
-
-        for (j = i + 1; j < list->num.all ; j++)
-        {
-            memset(pathj, 0, MAX_NAME);
-            strcpy(pathj,list->path);
-            strcat(pathj,"/");
-            strcat(pathj,list->list_item[j]->full_path);
-
-            if (-1 == lstat(pathi,&sbi) || -1 == lstat(pathj,&sbj)) {
-                perror("liblist : listdata_sort_size stat");
-                exit(EXIT_FAILURE);
-            }
-            else if ( sbi.st_size < sbj.st_size )
-            {
-                tmp_item = list->list_item[i];
-                list->list_item[i] = list->list_item[j];
-                list->list_item[j] = tmp_item;
-            }
-        }
-    }
     listdata_reset_index(list);
     list->sort = sortSize;
     pthread_mutex_unlock(&list->mutex);
 }
 
-#endif
