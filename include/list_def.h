@@ -82,39 +82,43 @@ struct list_head{
 	struct list_head *next,*prev;
 };
 
-struct list_item{
-	filetype file_type;
-	extetype exte_type;
-	char* full_path;
-};
+typedef struct{
+    int all;
+    int fifo;
+    int character;
+    int directory;
+    int block;
+    int regular;
+    int link;
+    int socket;
+    int other;
+
+    int audio;
+    int video;
+    int image;
+}list_number;
 
 typedef struct{
-	int prev;
-	int current;
-	int next;
+    int prev;
+    int current;
+    int next;
 }list_index;
 
-typedef struct{
-	int all;
-	int fifo;
-	int character;
-	int directory;
-	int block;
-	int regular;
-	int link;
-	int socket;
-	int other;
-
-	int audio;
-	int video;
-	int image;
-}list_number;
+struct list_item{
+    int id;
+	filetype file_type;
+	extetype exte_type;
+	size_t name_len;
+	list_number* f_num;
+	char* full_path;
+	struct list_item* parent;
+};
 
 struct list_data{
 	list_item** list_item;
 	list_number num;
+	list_item* root;
 
-	char* parent_path;
 	extetype exte_select;
 	sorttype sort;
 	char subdir;

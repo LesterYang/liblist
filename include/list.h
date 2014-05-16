@@ -184,9 +184,15 @@ void listdata_qsort_exte(list_data* list);
 //    list_get_extetype_count : audio/video/image/dirct
 int list_get_filetype_count(list_data* list, filetype file_type);
 int list_get_extetype_count(list_data* list, extetype exte_type);
+// Get files count only in the directory, return:
+//    -1 : type error or the item doesn't allocate memory to save
+//    -2 : can't find the folder
+//    -3 : it's not a folder
+int list_get_filetype_count_folder(list_data* list, filetype file_type, char* folder);
+int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* folder);
 
 // Get list structure information
-char*    list_get_info_path(list_data* list);
+char*    list_get_info_open_path(list_data* list);
 extetype list_get_info_filter(list_data* list);
 sorttype list_get_info_sorttype(list_data* list);
 char*    list_get_exettype_str(extetype exet_type);

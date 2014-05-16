@@ -47,8 +47,8 @@ int store_listdata(list_data* list, char* path)
 {
     DIR *dir;
     struct dirent *ent;
+    list_item** item = list->list_item;
     int store_idx = 0;
-    size_t len_name;
     size_t len_path = strlen(path);
 
     if((dir = opendir (path)) == NULL)
@@ -68,41 +68,41 @@ int store_listdata(list_data* list, char* path)
                 break;
             }
 
-            len_name = strlen(ent->d_name);
-            list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
-            memcpy(list->list_item[store_idx]->full_path, path, len_path);
-            memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
-            memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+            item[store_idx]->name_len = strlen(ent->d_name);
+            item[store_idx]->full_path=(char*)calloc(1, item[store_idx]->name_len + len_path + 2);
+            memcpy(item[store_idx]->full_path, path, len_path);
+            memcpy(item[store_idx]->full_path + len_path, "/", 1);
+            memcpy(item[store_idx]->full_path + len_path + 1, ent->d_name, item[store_idx]->name_len);
 
             switch(ent->d_type)
             {
-                case 1:
+                case MODE_FIFO:
                     list->num.fifo++;
-                    list->list_item[store_idx]->file_type = FIFO;
+                    item[store_idx]->file_type = FIFO;
                     break;
 
-                case 2:
+                case MODE_CHAR:
                     list->num.character++;
-                    list->list_item[store_idx]->file_type = Character;
+                    item[store_idx]->file_type = Character;
                     break;
 
-                case 4:
+                case MODE_DIRT:
                     list->num.directory++;
-                    list->list_item[store_idx]->file_type = Directory;
-                    list->list_item[store_idx]->exte_type = dirct;
+                    item[store_idx]->file_type = Directory;
+                    item[store_idx]->exte_type = dirct;
                     if(list->idx.dirct.next == 0)
                         list_set_index(&list->idx.dirct, store_idx+1);
                     break;
 
-                case 6:
+                case MODE_BLCK:
                     list->num.block++;
-                    list->list_item[store_idx]->file_type = Block;
+                    item[store_idx]->file_type = Block;
                     break;
 
-                case 8:
+                case MODE_REGR:
                     list->num.regular++;
-                    list->list_item[store_idx]->file_type = Regular;
-                    switch((list->list_item[store_idx]->exte_type = store_get_exte_type(list->list_item[store_idx])))
+                    item[store_idx]->file_type = Regular;
+                    switch((item[store_idx]->exte_type = store_get_exte_type(item[store_idx])))
                     {
                         case audio:
                             list->num.audio++;
@@ -124,19 +124,19 @@ int store_listdata(list_data* list, char* path)
                     }
                     break;
 
-                case 10:
+                case MODE_LINK:
                     list->num.link++;
-                    list->list_item[store_idx]->file_type = Link;
+                    item[store_idx]->file_type = Link;
                     break;
 
-                case 12:
+                case MODE_SOCK:
                     list->num.socket++;
-                    list->list_item[store_idx]->file_type = Socket;
+                    item[store_idx]->file_type = Socket;
                     break;
 
                 default:
                     list->num.other++;
-                    list->list_item[store_idx]->file_type = Other;
+                    item[store_idx]->file_type = Other;
                     break;
             }
             store_idx++;
@@ -151,12 +151,21 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
 {
     DIR *dir;
     struct dirent *ent;
+    list_item** item = list->list_item;
+    list_item* parent_item = NULL;
+    list_number link_num;
     char ipath[MAX_PATH];
 
     qsi_assert(path);
 
-    size_t len_name;
     size_t len_path = strlen(path);
+    if(store_idx > 0 && list->list_item[store_idx-1])
+        parent_item = list->list_item[store_idx-1];
+    else
+        parent_item = list->root;
+
+    parent_item->f_num = (list_number*)calloc(1, sizeof(list_number));
+    memset(&link_num, 0, sizeof(list_number));
 
     if ((dir = opendir (path)) == NULL) {
         liblist_perror("opendir");
@@ -173,28 +182,33 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
             break;
         }
 
-        len_name = strlen(ent->d_name);
-        list->list_item[store_idx]->full_path=(char*)calloc(1, len_name + len_path + 2);
-        memcpy(list->list_item[store_idx]->full_path, path, len_path);
-        memcpy(list->list_item[store_idx]->full_path + len_path, "/", 1);
-        memcpy(list->list_item[store_idx]->full_path + len_path + 1, ent->d_name, len_name);
+        item[store_idx]->name_len = strlen(ent->d_name);
+        item[store_idx]->full_path=(char*)calloc(1, item[store_idx]->name_len + len_path + 2);
+        memcpy(item[store_idx]->full_path, path, len_path);
+        memcpy(item[store_idx]->full_path + len_path, "/", 1);
+        memcpy(item[store_idx]->full_path + len_path + 1, ent->d_name, item[store_idx]->name_len);
+        item[store_idx]->parent=parent_item;
+        parent_item->f_num->all++;
 
         switch(ent->d_type)
         {
             case MODE_FIFO:
                 list->num.fifo++;
-                list->list_item[store_idx++]->file_type = FIFO;
+                parent_item->f_num->fifo++;
+                item[store_idx++]->file_type = FIFO;
                 break;
 
             case MODE_CHAR:
                 list->num.character++;
-                list->list_item[store_idx++]->file_type = Character;
+                parent_item->f_num->character++;
+                item[store_idx++]->file_type = Character;
                 break;
 
             case MODE_DIRT:
                 list->num.directory++;
-                list->list_item[store_idx]->file_type = Directory;
-                list->list_item[store_idx]->exte_type = dirct;
+                parent_item->f_num->directory++;
+                item[store_idx]->file_type = Directory;
+                item[store_idx]->exte_type = dirct;
                 store_idx++;
                 strcpy(ipath,path);
                 strcat(ipath,"/");
@@ -205,17 +219,28 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
 
             case MODE_BLCK:
                 list->num.block++;
-                list->list_item[store_idx++]->file_type = Block;
+                parent_item->f_num->block++;
+                item[store_idx++]->file_type = Block;
                 break;
 
             case MODE_REGR:
                 list->num.regular++;
-                list->list_item[store_idx]->file_type = Regular;
-                switch((list->list_item[store_idx]->exte_type = store_get_exte_type(list->list_item[store_idx])))
+                parent_item->f_num->regular++;
+                item[store_idx]->file_type = Regular;
+                switch((item[store_idx]->exte_type = store_get_exte_type(item[store_idx])))
                 {
-                    case audio: list->num.audio++; break;
-                    case video: list->num.video++; break;
-                    case image: list->num.image++; break;
+                    case audio:
+                        list->num.audio++;
+                        parent_item->f_num->audio++;
+                        break;
+                    case video:
+                        list->num.video++;
+                        parent_item->f_num->video++;
+                        break;
+                    case image:
+                        list->num.image++;
+                        parent_item->f_num->image++;
+                        break;
                     default: break;
                 }
                 store_idx++;
@@ -223,21 +248,23 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
 
             case MODE_LINK:
                 list->num.link++;
-                list->list_item[store_idx++]->file_type = Link;
+                parent_item->f_num->link++;
+                item[store_idx++]->file_type = Link;
                 break;
 
             case MODE_SOCK:
                 list->num.socket++;
-                list->list_item[store_idx++]->file_type = Socket;
+                parent_item->f_num->socket++;
+                item[store_idx++]->file_type = Socket;
                 break;
 
             default:
                 list->num.other++;
-                list->list_item[store_idx++]->file_type = Other;
+                parent_item->f_num->other++;
+                item[store_idx++]->file_type = Other;
                 break;
             }
     }
     closedir(dir);
-    list->exte_select = allfile;
     return store_idx;
 }

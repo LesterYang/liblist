@@ -28,6 +28,11 @@ void free_list_item(list_item** item, int num)
                     free(item[i]->full_path);
                     item[i]->full_path = NULL;
                 }
+                if((item[i]->file_type == Directory) && (item[i]->file_type))
+                {
+                    free(item[i]->f_num);
+                    item[i]->f_num = NULL;
+                }
                 free(item[i]);
                 item[i] = NULL;
             }

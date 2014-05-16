@@ -70,6 +70,7 @@ list_data* open_listdata(char* path)
 	else{
 
 		list=(list_data*)calloc(1, sizeof(list_data));
+		list->root=(list_item*)calloc(1, sizeof(list_item));
 
 		if(!list){
 			liblist_perror();
@@ -112,19 +113,22 @@ list_data* open_listdata(char* path)
 	if(list->num.all != store_listdata(list, path))
 		LIST_DBG("store number error");
 
-	list->parent_path = list_strdup(path);
+	list->root->full_path = list_strdup(path);
 	list->subdir = 0;
 
 	return list;
 	
 free_list_item:
-	while(i--){
+	while(i--)
+	{
 		if(list->list_item[i])
 			free(list->list_item[i]);
 	}
 	if(list->list_item)
 		free(list->list_item);
 free_list_data:
+    if(list->root)
+        free(list->root);
 	if(list)
 		free(list);
 close_dir:
@@ -149,6 +153,7 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	else{
 
 		list=(list_data*)calloc(1, sizeof(list_data));
+		list->root=(list_item*)calloc(1, sizeof(list_item));
 
 		if(!list){
 			liblist_perror();
@@ -194,7 +199,7 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	if(list->num.all != store_listdata_extetype(list, path, exte_type))
 		LIST_DBG("store number error");
 
-	list->parent_path = list_strdup(path);
+	list->root->full_path = list_strdup(path);
 	list->subdir = 0;
 
 	switch(sort_type)
@@ -209,13 +214,16 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	return list;
 
 free_list_item:
-	while(i--){
+	while(i--)
+	{
 		if(list->list_item[i])
 			free(list->list_item[i]);
 	}
 	if(list->list_item)
 		free(list->list_item);
 free_list_data:
+    if(list->root)
+        free(list->root);
 	if(list)
 		free(list);
 close_dir:
@@ -239,6 +247,7 @@ list_data* open_listdata_subdir(char* path)
 	else{
 
 		list=(list_data*)calloc(1, sizeof(list_data));
+		list->root=(list_item*)calloc(1, sizeof(list_item));
 
 		if(!list){
 			liblist_perror();
@@ -275,19 +284,23 @@ list_data* open_listdata_subdir(char* path)
 	if(list->num.all != store_listdata_subdir(list, path, 0))
 		LIST_DBG("stored number less than malloc");
 
-	list->parent_path = list_strdup(path);
+	list->exte_select = allfile;
+	list->root->full_path = list_strdup(path);
 	list->subdir = 1;
 
 	return list;
 
 free_list_item:
-	while(i--){
+	while(i--)
+	{
 		if(list->list_item[i])
 			free(list->list_item[i]);
 	}
 	if(list->list_item)
 		free(list->list_item);
 free_list_data:
+    if(list->root)
+        free(list->root);
 	if(list)
 		free(list);
 close_dir:
@@ -317,6 +330,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     else
     {
         list=(list_data*)calloc(1, sizeof(list_data));
+        list->root=(list_item*)calloc(1, sizeof(list_item));
 
         if(!list)
         {
@@ -356,7 +370,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
         LIST_DBG("stored number less than malloc");
 
-    list->parent_path = list_strdup(path);
+    list->root->full_path = list_strdup(path);
     list->subdir = 1;
     list->exte_select = exte_type;
 
@@ -388,18 +402,21 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	return list;
 
 free_list_item:
-	    while(i--){
-	        if(list->list_item[i])
-	            free(list->list_item[i]);
-	    }
-	    if(list->list_item)
-	        free(list->list_item);
+	while(i--)
+	{
+	    if(list->list_item[i])
+	        free(list->list_item[i]);
+	}
+	if(list->list_item)
+	    free(list->list_item);
 free_list_data:
-	    if(list)
-	        free(list);
+    if(list->root)
+        free(list->root);
+	if(list)
+	    free(list);
 close_dir:
-	    closedir(dir);
+    closedir(dir);
 err:
-	    return NULL;
+    return NULL;
 }
 

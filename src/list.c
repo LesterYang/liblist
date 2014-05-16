@@ -38,118 +38,6 @@ char* list_get_exettype_str(extetype exet_type)
 	return "unknown";
 }
 
-#ifndef LESS_MEM
-
-void list_extetype_select(list_data* list, extetype exte_type)
-{
-	qsi_assert(list);
-
-	int i,j;
-	list_item* tmp_item;
-	int num = list->num.all;
-
-	memset(&list->num, 0, sizeof(list_number));
-
-	for (i=0; i<num; i++)
-	{
-		if ((list->list_item[i]->exte_type & (exte_type | dirct)))
-			continue;
-
-		for (j=i+1; j<num; j++)
-		{
-			if ((list->list_item[j]->exte_type & (exte_type | dirct)))
-			{
-				tmp_item = list->list_item[i];
-				list->list_item[i] = list->list_item[j];
-				list->list_item[j] = tmp_item;
-				break;
-			}
-		}
-
-		if(j == num)
-			break;
-	}
-
-	for (list->num.all=0; list->num.all<num; list->num.all++)
-	{
-		if (!(list->list_item[list->num.all]->exte_type & (exte_type | dirct)))
-			break;
-
-		switch((list->list_item[list->num.all]->exte_type))
-		{
-			case dirct: list->num.directory++; 		break;
-			case audio: list->num.audio++; 			break;
-			case video: list->num.video++; 			break;
-			case image: list->num.image++; 			break;
-			default: 	liblist_perror();			break;
-		}
-	}
-
-	while( list->num.all != num){
-		num--;
-		if(list->list_item[num])
-			free(list->list_item[num]);
-	}
-
-	listdata_reset_index(list);
-	list->exte_select = exte_type|dirct;
-}
-
-void list_extetype_exclude(list_data* list, extetype exte_type)
-{
-	qsi_assert(list);
-
-	int i,j;
-	list_item* tmp_item;
-	int num = list->num.all;
-
-	memset(&list->num, 0, sizeof(list_number));
-
-	for (i=0; i<num; i++)
-	{
-		if (!(list->list_item[i]->exte_type & exte_type))
-			continue;
-
-		for (j=i+1; j<num; j++)
-		{
-			if (!(list->list_item[j]->exte_type & exte_type))
-			{
-				tmp_item = list->list_item[i];
-				list->list_item[i] = list->list_item[j];
-				list->list_item[j] = tmp_item;
-				break;
-			}
-		}
-
-		if(j == num)
-			break;
-	}
-
-	for (list->num.all=0; list->num.all<num; list->num.all++)
-	{
-		if ((list->list_item[list->num.all]->exte_type & exte_type))
-			break;
-
-		switch((list->list_item[list->num.all]->exte_type))
-		{
-			case dirct: list->num.directory++; 		break;
-			case audio: list->num.audio++; 			break;
-			case video: list->num.video++; 			break;
-			case image: list->num.image++; 			break;
-			default:								break;
-		}
-	}
-
-	while( list->num.all != num){
-		num--;
-		if(list->list_item[num])
-			free(list->list_item[num]);
-	}
-
-	listdata_reset_index(list);
-	list->exte_select &= (~exte_type & allfile);
-}
-#else
 void list_extetype_select(list_data* list, extetype exte_type)
 {
     qsi_assert(list);
@@ -276,9 +164,6 @@ void list_extetype_exclude(list_data* list, extetype exte_type)
     list->exte_select &= (~exte_type & allfile);
 }
 
-
-#endif
-
 int list_get_extetype_count(list_data* list, extetype exte_type)
 {
 	qsi_assert(list);
@@ -314,6 +199,87 @@ int list_get_filetype_count(list_data* list, filetype file_type)
 		default:									break;
 	}
 	return num;
+}
+
+int list_get_filetype_count_folder(list_data* list, filetype file_type, char* folder)
+{
+    qsi_assert(list);
+    qsi_assert(folder);
+
+    list_item* item;
+
+    int index = list_get_index_by_name(list, folder);
+
+    if(index == -1)
+    {
+        LIST_DBG("can't find %s",folder);
+        return -2;
+    }
+
+    item = list->list_item[index];
+
+    if(item->file_type != Directory)
+    {
+        LIST_DBG("%s is not directory",folder);
+        return -3;
+    }
+
+    if(!item->f_num)
+        return -1;
+
+    int num = -1;
+    switch(file_type)
+    {
+        case all:       num = item->f_num->all;        break;
+        case FIFO:      num = item->f_num->fifo;       break;
+        case Character: num = item->f_num->character;  break;
+        case Directory: num = item->f_num->directory;  break;
+        case Block:     num = item->f_num->block;      break;
+        case Regular:   num = item->f_num->regular;    break;
+        case Link:      num = item->f_num->link;       break;
+        case Socket:    num = item->f_num->socket;     break;
+        case Other:     num = item->f_num->other;      break;
+        default:                                    break;
+    }
+    return num;
+}
+
+int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* folder)
+{
+    qsi_assert(list);
+    qsi_assert(folder);
+
+    list_item* item;
+
+    int index = list_get_index_by_name(list, folder);
+
+    if(index == -1)
+    {
+        LIST_DBG("can't find %s",folder);
+        return -2;
+    }
+
+    item = list->list_item[index];
+
+    if(item->file_type != Directory)
+    {
+        LIST_DBG("%s is not directory",folder);
+        return -3;
+    }
+
+    if(!item->f_num)
+        return -1;
+
+    int num = -1;
+    switch(exte_type)
+    {
+        case audio: num = item->f_num->audio;      break;
+        case video: num = item->f_num->video;      break;
+        case image: num = item->f_num->image;      break;
+        case dirct: num = item->f_num->directory;  break;
+        default:                                break;
+    }
+    return num;
 }
 
 void list_set_index(list_index* data, int idx)
@@ -358,10 +324,10 @@ sorttype list_get_info_sorttype(list_data* list)
 	return list->sort;
 }
 
-char* list_get_info_path(list_data* list)
+char* list_get_info_open_path(list_data* list)
 {
 	qsi_assert(list);
-	return list->parent_path;
+	return list->root->full_path;
 }
 
 char* list_get_complete_path_by_index(list_data* list, int index)
@@ -627,9 +593,10 @@ int list_peer_prev_index(list_data* list, extetype exet_type, int current_idx)
 	if(list_check_index_error(list, current_idx))
 		return -1;
 
-	if ( !(	((exet_type & audio) && list->num.audio) ||
-			((exet_type & video) && list->num.video) ||
-			((exet_type & image) && list->num.image) ) )
+    if ( !( ((exet_type & audio) && list->num.audio) ||
+            ((exet_type & video) && list->num.video) ||
+            ((exet_type & image) && list->num.image) ||
+            ((exet_type & dirct) && list->num.directory)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -652,7 +619,8 @@ int list_peer_next_index(list_data* list, extetype exet_type, int current_idx)
 
 	if ( !(	((exet_type & audio) && list->num.audio) ||
 			((exet_type & video) && list->num.video) ||
-			((exet_type & image) && list->num.image) ) )
+			((exet_type & image) && list->num.image) ||
+			((exet_type & dirct) && list->num.directory)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -676,9 +644,10 @@ int list_peer_prev_recycle_index(list_data* list, extetype exet_type, int curren
 	if(list_check_index_error(list, current_idx))
 		return -1;
 
-	if ( !(	((exet_type & audio) && list->num.audio) ||
-			((exet_type & video) && list->num.video) ||
-			((exet_type & image) && list->num.image) ) )
+    if ( !( ((exet_type & audio) && list->num.audio) ||
+            ((exet_type & video) && list->num.video) ||
+            ((exet_type & image) && list->num.image) ||
+            ((exet_type & dirct) && list->num.directory)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -702,9 +671,10 @@ int list_peer_next_recycle_index(list_data* list, extetype exet_type, int curren
 	if(list_check_index_error(list, current_idx))
 		return -1;
 
-	if ( !(	((exet_type & audio) && list->num.audio) ||
-			((exet_type & video) && list->num.video) ||
-			((exet_type & image) && list->num.image) ) )
+    if ( !( ((exet_type & audio) && list->num.audio) ||
+            ((exet_type & video) && list->num.video) ||
+            ((exet_type & image) && list->num.image) ||
+            ((exet_type & dirct) && list->num.directory)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
