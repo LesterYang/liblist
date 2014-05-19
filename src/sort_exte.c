@@ -51,7 +51,7 @@ int listdata_compare_exte(const void* i, const void* j)
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
-    int val = list_check_swap(item_i->full_path, item_j->full_path);
+    int val = list_check_swap(item_i->name, item_j->name);
 
     if(val)
         return 1;

@@ -11,10 +11,13 @@
 
 #define Time_Measure
 
+#define TestName 1
+
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
 #define MAX_PATH	(4096)
+#define MAX_NAME    (255)
 #define MAX_FILES	(65536)
 #define BUF_SIZE	(256)
 
@@ -105,12 +108,11 @@ typedef struct{
 }list_index;
 
 struct list_item{
-    int id;
 	filetype file_type;
 	extetype exte_type;
+	list_number* link_num;
 	size_t name_len;
-	list_number* f_num;
-	char* full_path;
+	char* name;
 	struct list_item* parent;
 };
 
@@ -130,6 +132,7 @@ struct list_data{
 		list_index image;
 	}idx;
 	pthread_mutex_t mutex;
+	char path[MAX_PATH];
 };
 
 
@@ -183,6 +186,7 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 void list_show_index(list_data* list);
 
 
+void list_compose_name(char* path, list_item* item, int* done);
 char* list_strdup(const char *str);
 int list_count_sign(char* str, char sign);
 

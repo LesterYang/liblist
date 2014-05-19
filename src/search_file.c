@@ -50,13 +50,13 @@ int search_index_by_keyword_name(list_data* list, char* name)
     {
         if(list->subdir == 0)
         {
-            if(!strstr(list->list_item[search_index]->full_path, name))
+            if(!strstr(list->list_item[search_index]->name, name))
                 break;
         }
         else
         {
-            if((strrchr(list->list_item[search_index]->full_path,'/') != 0) &&
-                    strstr(strrchr(list->list_item[search_index]->full_path,'/')+1, name))
+            if((strrchr(list->list_item[search_index]->name,'/') != 0) &&
+                    strstr(strrchr(list->list_item[search_index]->name,'/')+1, name))
                 break;
         }
     }

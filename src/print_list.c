@@ -104,7 +104,7 @@ void print_listdata(list_data* list)
                 printf("OTHE,      , ");
                 break;
         }
-        printf("name:%s\n",list->list_item[i]->full_path);
+        printf("name:%30s , folder:%s\n",list->list_item[i]->name,list->list_item[i]->parent->name);
     }
 }
 

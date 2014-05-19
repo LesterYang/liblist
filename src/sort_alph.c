@@ -30,7 +30,7 @@ int listdata_compare_alph(const void* i, const void* j)
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
-    int val = strcasecmp(item_i->full_path, item_j->full_path);
+    int val = strcasecmp(item_i->name, item_j->name);
 
     if(val > 0)
         return 1;
@@ -45,10 +45,15 @@ int listdata_compare_alph_filename(const void* i, const void* j)
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
-    char *name_i = strrchr(item_i->full_path, '/');
-    char *name_j = strrchr(item_j->full_path, '/');
+#if TestName
+    int val = strcasecmp(item_i->name, item_j->name);
+#else
+    char *name_i = strrchr(item_i->name, '/');
+    char *name_j = strrchr(item_j->name, '/');
 
     int val = strcasecmp(name_i, name_j);
+#endif
+
 
     if(val > 0)
         return 1;
@@ -60,12 +65,30 @@ int listdata_compare_alph_filename(const void* i, const void* j)
 
 int listdata_compare_dirt(const void* i, const void* j)
 {
-    int val, dirt_i=0, dirt_j=0;
+    int val;
+    //int dirt_i=0, dirt_j=0;
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
-    char* path_i=item_i->full_path;
-    char* path_j=item_j->full_path;
+#if TestName
+    if (item_i->parent == item_j->parent)
+    {
+        val=strcasecmp(item_i->name, item_j->name);
+    }
+    else
+    {
+        val=strcasecmp(item_i->parent->name, item_j->parent->name);
+    }
+
+    if(val > 0)
+        return 1;
+    else if (val < 0)
+        return -1;
+
+    return 0;
+#else
+    char* path_i=item_i->name;
+    char* path_j=item_j->name;
 
     while((val=(int)(*(path_i)-*(path_j)))==0)
     {
@@ -107,6 +130,7 @@ int listdata_compare_dirt(const void* i, const void* j)
     }
 
     return 0;
+#endif
 }
 
 

@@ -113,7 +113,8 @@ list_data* open_listdata(char* path)
 	if(list->num.all != store_listdata(list, path))
 		LIST_DBG("store number error");
 
-	list->root->full_path = list_strdup(path);
+	list->root->name_len = strlen(path);
+	list->root->name = list_strdup(path);
 	list->subdir = 0;
 
 	return list;
@@ -199,7 +200,8 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	if(list->num.all != store_listdata_extetype(list, path, exte_type))
 		LIST_DBG("store number error");
 
-	list->root->full_path = list_strdup(path);
+	list->root->name_len = strlen(path);
+	list->root->name = list_strdup(path);
 	list->subdir = 0;
 
 	switch(sort_type)
@@ -285,7 +287,8 @@ list_data* open_listdata_subdir(char* path)
 		LIST_DBG("stored number less than malloc");
 
 	list->exte_select = allfile;
-	list->root->full_path = list_strdup(path);
+	list->root->name_len = strlen(path);
+	list->root->name = list_strdup(path);
 	list->subdir = 1;
 
 	return list;
@@ -370,7 +373,8 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
         LIST_DBG("stored number less than malloc");
 
-    list->root->full_path = list_strdup(path);
+    list->root->name_len = strlen(path);
+    list->root->name = list_strdup(path);
     list->subdir = 1;
     list->exte_select = exte_type;
 

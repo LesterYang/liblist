@@ -193,6 +193,8 @@ int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* fo
 
 // Get list structure information
 const char* list_get_info_open_path(list_data* list);
+const char* list_get_parent_by_index(list_data* list, int index);
+const char* list_get_parent_by_name(list_data* list, const char* name);
 extetype list_get_info_filter(list_data* list);
 sorttype list_get_info_sorttype(list_data* list);
 char*    list_get_exettype_str(extetype exet_type);
