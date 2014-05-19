@@ -192,7 +192,7 @@ int list_get_filetype_count_folder(list_data* list, filetype file_type, char* fo
 int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* folder);
 
 // Get list structure information
-char*    list_get_info_open_path(list_data* list);
+const char* list_get_info_open_path(list_data* list);
 extetype list_get_info_filter(list_data* list);
 sorttype list_get_info_sorttype(list_data* list);
 char*    list_get_exettype_str(extetype exet_type);
@@ -202,8 +202,8 @@ char*    list_get_exettype_str(extetype exet_type);
 //    list_get_file_name_by_index     : get file name
 //    list_get_filetype_by_index      : get file type
 //    list_get_extetype_by_index      : get extension type
-char*    list_get_complete_path_by_index(list_data* list, int index);
-char*    list_get_file_name_by_index(list_data* list, int index);
+const char* list_get_complete_path_by_index(list_data* list, int index);
+const char* list_get_file_name_by_index(list_data* list, int index);
 filetype list_get_filetype_by_index(list_data* list, int index);
 extetype list_get_extetype_by_index(list_data* list, int index);
 
@@ -214,7 +214,7 @@ extetype list_get_extetype_by_index(list_data* list, int index);
 //    >0 : index value
 
 // Get index by file name
-int list_get_index_by_name(list_data* list, char* name);
+int list_get_index_by_name(list_data* list, const char* name);
 
 // Following exet_type : use audio/video/image/dirct alone
 // Current index is saved in library.

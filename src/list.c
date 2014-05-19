@@ -168,15 +168,19 @@ int list_get_extetype_count(list_data* list, extetype exte_type)
 {
 	qsi_assert(list);
 
-	int num = -1;
-	switch(exte_type)
-	{
-		case audio: num = list->num.audio; 		break;
-		case video: num = list->num.video; 		break;
-		case image: num = list->num.image;		break;
-		case dirct: num = list->num.directory;	break;
-		default: 								break;
-	}
+	int num = 0;
+
+	if((exte_type&audio))
+	    num += list->num.audio;
+    if((exte_type&video))
+        num += list->num.video;
+    if((exte_type&image))
+        num += list->num.image;
+    if((exte_type&dirct))
+        num += list->num.directory;
+    if((exte_type&allfile))
+        num = list->num.all;
+
 	return num;
 }
 
@@ -324,29 +328,30 @@ sorttype list_get_info_sorttype(list_data* list)
 	return list->sort;
 }
 
-char* list_get_info_open_path(list_data* list)
+const char* list_get_info_open_path(list_data* list)
 {
 	qsi_assert(list);
-	return list->root->full_path;
+	return (const char*)list->root->full_path;
 }
 
-char* list_get_complete_path_by_index(list_data* list, int index)
+
+const char * list_get_complete_path_by_index(list_data* list, int index)
 {
     qsi_assert(list);
 
     if(list_check_index_error(list, index))
         return NULL;
 
-    return list->list_item[index-1]->full_path;
+    return (const char*)list->list_item[index-1]->full_path;
 }
-char* list_get_file_name_by_index(list_data* list, int index)
+const char* list_get_file_name_by_index(list_data* list, int index)
 {
     qsi_assert(list);
 
     if(list_check_index_error(list, index))
         return NULL;
 
-    return strrchr(list->list_item[index-1]->full_path, '/') + 1;
+    return (const char*)(strrchr(list->list_item[index-1]->full_path, '/') + 1);
 }
 
 filetype list_get_filetype_by_index(list_data* list, int index)
@@ -753,7 +758,7 @@ int list_bsearch_index(list_data* list, char* name)
     return -1;
 }
 
-int list_get_index_by_name(list_data* list, char* name)
+int list_get_index_by_name(list_data* list, const char* name)
 {
     int index;
     qsi_assert(list);
