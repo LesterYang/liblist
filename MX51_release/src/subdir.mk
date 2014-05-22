@@ -8,6 +8,7 @@ C_SRCS += \
 ../src/free2.c \
 ../src/liblist_version.c \
 ../src/list.c \
+../src/list_lib.c \
 ../src/list_subdir.c \
 ../src/open_list.c \
 ../src/print_list.c \
@@ -27,6 +28,7 @@ OBJS += \
 ./src/free2.o \
 ./src/liblist_version.o \
 ./src/list.o \
+./src/list_lib.o \
 ./src/list_subdir.o \
 ./src/open_list.o \
 ./src/print_list.o \
@@ -46,6 +48,7 @@ C_DEPS += \
 ./src/free2.d \
 ./src/liblist_version.d \
 ./src/list.d \
+./src/list_lib.d \
 ./src/list_subdir.d \
 ./src/open_list.d \
 ./src/print_list.d \
