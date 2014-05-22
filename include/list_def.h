@@ -12,8 +12,6 @@
 
 #define Time_Measure
 
-#define TestName 1
-
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
@@ -172,9 +170,6 @@ int  store_get_exte_type(list_item* item);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
 
-int  list_check_index_error(list_data* list, int index);
-void list_set_index(list_index* data, int idx);
-void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 void listdata_reset_index(list_data* list);
 void listdata_sort_filetype(list_data* list);
 
@@ -193,12 +188,17 @@ int list_subdir_type_num(char* path, extetype exte_type);
 int store_listdata_subdir(list_data* list, char* path, int store_idx);
 int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
-// Print
-void list_show_index(list_data* list);
-
-
-void list_compose_name(char* path, list_item* item, int* done);
+// list_lib
+void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
-int list_count_sign(char* str, char sign);
+void  list_set_index(list_index* data, int idx);
+list_index* list_get_index(list_data* list, extetype exet_type);
+int   list_check_index_error(list_data* list, int index);
+int   list_check_item_id(int id);
+int   list_check_type_item_id(int id, extetype exet_type);
+void  list_compose_name(char* path, list_item* item, int* done);
+int   list_bsearch_index(list_data* list, char* name);
+void  list_show_index(list_data* list);
+int   list_count_sign(char* str, char sign);
 
 #endif /* LIST_DEF_H_ */

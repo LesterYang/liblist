@@ -40,37 +40,13 @@ int listdata_compare_alph(const void* i, const void* j)
     return 0;
 }
 
-int listdata_compare_alph_filename(const void* i, const void* j)
-{
-    list_item* item_i = *(list_item**)i;
-    list_item* item_j = *(list_item**)j;
-
-#if TestName
-    int val = strcasecmp(item_i->name, item_j->name);
-#else
-    char *name_i = strrchr(item_i->name, '/');
-    char *name_j = strrchr(item_j->name, '/');
-
-    int val = strcasecmp(name_i, name_j);
-#endif
-
-
-    if(val > 0)
-        return 1;
-    else if (val < 0)
-        return -1;
-
-    return 0;
-}
-
 int listdata_compare_dirt(const void* i, const void* j)
 {
     int val;
-    //int dirt_i=0, dirt_j=0;
+
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
 
-#if TestName
     if (item_i->parent == item_j->parent)
     {
         val=strcasecmp(item_i->name, item_j->name);
@@ -86,7 +62,9 @@ int listdata_compare_dirt(const void* i, const void* j)
         return -1;
 
     return 0;
-#else
+
+#if 0 // old
+    int dirt_i=0, dirt_j=0;
     char* path_i=item_i->name;
     char* path_j=item_j->name;
 
@@ -141,17 +119,8 @@ void listdata_qsort_alph(list_data* list)
 
     listdata_sort_filetype(list);
 
-    if(list->subdir == 0)
-    {
-
-        qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph);
-        qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_alph);
-    }
-    else
-    {
-        qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph_filename);
-        qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_alph_filename);
-    }
+    qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph);
+    qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_alph);
 
     listdata_reset_index(list);
     list->sort = sortAlph;

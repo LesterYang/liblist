@@ -318,7 +318,6 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
     list_item** item = list->list_item;
     int store_idx = 0;
     int match = 0;
-    //size_t len_path = strlen(path);
 
     if((dir = opendir (path)) == NULL){
         liblist_perror("opendir");
@@ -338,17 +337,9 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
                        break;
                 }
 
-#if TestName
                 item[store_idx]->self = item[store_idx];
                 item[store_idx]->name_len = strlen(ent->d_name);
                 item[store_idx]->name = list_strdup(ent->d_name);
-#else
-                item[store_idx]->name_len = strlen(ent->d_name);
-                item[store_idx]->name=(char*)calloc(1, item[store_idx]->name_len + len_path + 2);
-                memcpy(item[store_idx]->name, path, len_path);
-                memcpy(item[store_idx]->name + len_path, "/", 1);
-                memcpy(item[store_idx]->name + len_path + 1, ent->d_name, item[store_idx]->name_len);
-#endif
                 item[store_idx]->parent=list->root;
 
                 switch(ent->d_type)
@@ -361,12 +352,13 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
                     case MODE_CHAR:
                         list->num.character++;
                         item[store_idx]->file_type = Character;
-                        item[store_idx]->exte_type = dirct;
                         break;
 
                     case MODE_DIRT:
                         list->num.directory++;
                         item[store_idx]->file_type = Directory;
+                        item[store_idx]->exte_type = dirct;
+                        item[store_idx]->link_num = (list_number*)calloc(1, sizeof(list_number));
                         if(list->idx.dirct.next == 0)
                             list_set_index(&list->idx.dirct, store_idx+1);
                         break;
@@ -434,21 +426,15 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
     struct dirent *ent;
     list_item** item = list->list_item;
     list_item* parent_item = NULL;
-    list_number link_num;
     char ipath[MAX_PATH];
     int match=0;
 
     qsi_assert(path);
 
-    //size_t len_path = strlen(path);
-
     if(store_idx > 0 && list->list_item[store_idx-1])
         parent_item = list->list_item[store_idx-1];
     else
         parent_item = list->root;
-
-    parent_item->link_num = (list_number*)calloc(1, sizeof(list_number));
-    memset(&link_num, 0, sizeof(list_number));
 
     if ((dir = opendir (path)) == NULL) {
         liblist_perror("opendir");
@@ -468,17 +454,9 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
                    break;
             }
 
-#if TestName
             item[store_idx]->self = item[store_idx];
             item[store_idx]->name_len = strlen(ent->d_name);
             item[store_idx]->name = list_strdup(ent->d_name);
-#else
-            item[store_idx]->name_len = strlen(ent->d_name);
-            item[store_idx]->name=(char*)calloc(1, item[store_idx]->name_len + len_path + 2);
-            memcpy(item[store_idx]->name, path, len_path);
-            memcpy(item[store_idx]->name + len_path, "/", 1);
-            memcpy(item[store_idx]->name + len_path + 1, ent->d_name, item[store_idx]->name_len);
-#endif
             item[store_idx]->parent = parent_item;
             parent_item->link_num->all++;
 
@@ -501,6 +479,7 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
                     parent_item->link_num->directory++;
                     item[store_idx]->file_type = Directory;
                     item[store_idx]->exte_type = dirct;
+                    item[store_idx]->link_num = (list_number*)calloc(1, sizeof(list_number));
                     if(list->idx.dirct.next == 0)
                         list_set_index(&list->idx.dirct, store_idx+1);
                     break;

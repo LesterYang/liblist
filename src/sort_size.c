@@ -58,7 +58,6 @@ int listdata_compare_sort(const void* i, const void* j)
     struct stat sbi;
     struct stat sbj;
 
-#if TestName
     char path_i[MAX_PATH]={0};
     char path_j[MAX_PATH]={0};
 
@@ -79,14 +78,6 @@ int listdata_compare_sort(const void* i, const void* j)
         perror("liblist : listdata_sort_size stat");
         exit(EXIT_FAILURE);
     }
-
-#else
-    if (-1 == lstat(item_i->name, &sbi) || -1 == lstat(item_j->name, &sbj))
-    {
-        perror("liblist : listdata_sort_size stat");
-        exit(EXIT_FAILURE);
-    }
-#endif
 
     if(sbi.st_size < sbj.st_size)
         return 1;

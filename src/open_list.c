@@ -62,22 +62,41 @@ list_data* open_listdata(char* path)
 
 	qsi_assert(path);
 
-	if((dir = opendir (path)) == NULL){
+	if((dir = opendir (path)) == NULL)
+	{
 		liblist_perror("opendir");
 		LIST_DBG("open %s error", path);
 		goto err;
 	}
-	else{
+	else
+	{
+        if(!( list=(list_data*)calloc(1, sizeof(list_data)) ))
+        {
+            liblist_perror();
+            goto close_dir;
+        }
 
-		list=(list_data*)calloc(1, sizeof(list_data));
-		list->root=(list_item*)calloc(1, sizeof(list_item));
+        if(!( list->root=(list_item*)calloc(1, sizeof(list_item)) ))
+        {
+            liblist_perror();
+            goto free_list_data;
+        }
 
-		if(!list){
-			liblist_perror();
-			goto close_dir;
-		}
+	    list->root->self = list->root;
+	    list->root->file_type = Directory;
+	    list->root->exte_type = dirct;
+	    list->root->name_len = strlen(path);
 
-		while((ent = readdir(dir)) != NULL){
+        if(!( list->root->name = list_strdup(path) ))
+        {
+            liblist_perror();
+            goto free_list_root;
+        }
+
+	    list->root->link_num = &list->num;
+
+		while((ent = readdir(dir)) != NULL)
+		{
 			if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name)) 
 				continue;
 			list->num.all++;
@@ -87,23 +106,27 @@ list_data* open_listdata(char* path)
 		{
 			list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 		
-			if(!list->list_item){
+			if(!list->list_item)
+			{
 				liblist_perror();
-				goto free_list_data;
+				goto free_list_root_name;
 			}
 
-			for(i=0; i<list->num.all; i++){
+			for(i=0; i<list->num.all; i++)
+			{
 				list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
 				
-				if(!list->list_item[i]){
+				if(!list->list_item[i])
+				{
 					liblist_perror();
 					goto free_list_item;
 				}
 			}
 		}
-		else{
+		else
+		{
 			LIST_DBG("no files");
-			goto free_list_data;
+			goto free_list_root_name;
 		}
 	}
 	closedir (dir);
@@ -113,8 +136,7 @@ list_data* open_listdata(char* path)
 	if(list->num.all != store_listdata(list, path))
 		LIST_DBG("store number error");
 
-	list->root->name_len = strlen(path);
-	list->root->name = list_strdup(path);
+	list->exte_select = allfile;
 	list->subdir = 0;
 
 	return list;
@@ -127,13 +149,22 @@ free_list_item:
 	}
 	if(list->list_item)
 		free(list->list_item);
-free_list_data:
+
+free_list_root_name:
+    if(list->root->name)
+        free(list->root->name);
+
+free_list_root:
     if(list->root)
         free(list->root);
-	if(list)
-		free(list);
+
+free_list_data:
+    if(list)
+        free(list);
+
 close_dir:
 	closedir(dir);
+
 err:
 	return NULL;
 }
@@ -146,20 +177,38 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 
 	qsi_assert(path);
 
-	if((dir = opendir (path)) == NULL){
+	if((dir = opendir (path)) == NULL)
+	{
 		liblist_perror("opendir");
 		LIST_DBG("open %s error", path);
 		goto err;
 	}
-	else{
+	else
+	{
+        if(!( list=(list_data*)calloc(1, sizeof(list_data)) ))
+        {
+            liblist_perror();
+            goto close_dir;
+        }
 
-		list=(list_data*)calloc(1, sizeof(list_data));
-		list->root=(list_item*)calloc(1, sizeof(list_item));
+        if(!( list->root=(list_item*)calloc(1, sizeof(list_item)) ))
+        {
+            liblist_perror();
+            goto free_list_data;
+        }
 
-		if(!list){
-			liblist_perror();
-			goto close_dir;
-		}
+	    list->root->self = list->root;
+	    list->root->file_type = Directory;
+	    list->root->exte_type = dirct;
+	    list->root->name_len = strlen(path);
+
+        if(!( list->root->name = list_strdup(path) ))
+        {
+            liblist_perror();
+            goto free_list_root;
+        }
+
+	    list->root->link_num = &list->num;
 
 		while((ent = readdir(dir)) != NULL)
 		{
@@ -174,23 +223,27 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 		{
 			list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
-			if(!list->list_item){
+			if(!list->list_item)
+			{
 				liblist_perror();
-				goto free_list_data;
+				goto free_list_root_name;
 			}
 
-			for(i=0; i<list->num.all; i++){
+			for(i=0; i<list->num.all; i++)
+			{
 				list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
 
-				if(!list->list_item[i]){
+				if(!list->list_item[i])
+				{
 					liblist_perror();
 					goto free_list_item;
 				}
 			}
 		}
-		else{
+		else
+		{
 			LIST_DBG("no matched file");
-			goto free_list_data;
+			goto free_list_root_name;
 		}
 	}
 	closedir (dir);
@@ -200,8 +253,7 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	if(list->num.all != store_listdata_extetype(list, path, exte_type))
 		LIST_DBG("store number error");
 
-	list->root->name_len = strlen(path);
-	list->root->name = list_strdup(path);
+	list->exte_select = exte_type;
 	list->subdir = 0;
 
 	switch(sort_type)
@@ -223,13 +275,22 @@ free_list_item:
 	}
 	if(list->list_item)
 		free(list->list_item);
-free_list_data:
+
+free_list_root_name:
+    if(list->root->name)
+        free(list->root->name);
+
+free_list_root:
     if(list->root)
         free(list->root);
-	if(list)
-		free(list);
+
+free_list_data:
+    if(list)
+        free(list);
+
 close_dir:
 	closedir(dir);
+
 err:
 	return NULL;
 }
@@ -241,37 +302,62 @@ list_data* open_listdata_subdir(char* path)
 
 	qsi_assert(path);
 
-	if((dir = opendir (path)) == NULL){
+	if((dir = opendir (path)) == NULL)
+	{
 		liblist_perror("opendir");
 		LIST_DBG("open %s error", path);
 		goto err;
 	}
-	else{
+	else
+	{
+        if(!( list=(list_data*)calloc(1, sizeof(list_data)) ))
+        {
+            liblist_perror();
+            goto close_dir;
+        }
 
-		list=(list_data*)calloc(1, sizeof(list_data));
-		list->root=(list_item*)calloc(1, sizeof(list_item));
+        if(!( list->root=(list_item*)calloc(1, sizeof(list_item)) ))
+        {
+            liblist_perror();
+            goto free_list_data;
+        }
 
-		if(!list){
-			liblist_perror();
-			goto close_dir;
-		}
+	    list->root->self = list->root;
+	    list->root->file_type = Directory;
+	    list->root->exte_type = dirct;
+	    list->root->name_len = strlen(path);
 
-		if((list->num.all = list_subdir_num(path)) <= 0){
+        if(!( list->root->name = list_strdup(path) ))
+        {
+            liblist_perror();
+            goto free_list_root;
+        }
+
+        if(!( list->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+        {
+            liblist_perror();
+            goto free_list_root_name;
+        }
+
+		if((list->num.all = list_subdir_num(path)) <= 0)
+		{
 			LIST_DBG("no files");
-			goto free_list_data;
+			goto free_list_link_num;
 		}
 
 		list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
-		if(!list->list_item){
+		if(!list->list_item)
+		{
 			liblist_perror();
-			goto free_list_data;
+			goto free_list_link_num;
 		}
 
 		for(i=0; i<list->num.all; i++){
 			list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
 
-			if(!list->list_item[i]){
+			if(!list->list_item[i])
+			{
 				liblist_perror();
 				goto free_list_item;
 			}
@@ -282,13 +368,10 @@ list_data* open_listdata_subdir(char* path)
 
 	list_mutex_new(list, TRUE, TRUE);
 
-
 	if(list->num.all != store_listdata_subdir(list, path, 0))
 		LIST_DBG("stored number less than malloc");
 
 	list->exte_select = allfile;
-	list->root->name_len = strlen(path);
-	list->root->name = list_strdup(path);
 	list->subdir = 1;
 
 	return list;
@@ -301,13 +384,26 @@ free_list_item:
 	}
 	if(list->list_item)
 		free(list->list_item);
-free_list_data:
+
+free_list_link_num:
+    if(list->root->link_num)
+        free(list->root->link_num);
+
+free_list_root_name:
+    if(list->root->name)
+        free(list->root->name);
+
+free_list_root:
     if(list->root)
         free(list->root);
-	if(list)
-		free(list);
+
+free_list_data:
+    if(list)
+        free(list);
+
 close_dir:
 	closedir(dir);
+
 err:
 	return NULL;
 }
@@ -332,15 +428,36 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     }
     else
     {
-        list=(list_data*)calloc(1, sizeof(list_data));
-        list->root=(list_item*)calloc(1, sizeof(list_item));
-        exte_type |= dirct;
-
-        if(!list)
+        if(!( list=(list_data*)calloc(1, sizeof(list_data)) ))
         {
             liblist_perror();
             goto close_dir;
         }
+
+        if(!( list->root=(list_item*)calloc(1, sizeof(list_item)) ))
+        {
+            liblist_perror();
+            goto free_list_data;
+        }
+
+        list->root->self = list->root;
+        list->root->file_type = Directory;
+        list->root->exte_type = dirct;
+        list->root->name_len = strlen(path);
+
+        if(!( list->root->name = list_strdup(path) ))
+        {
+            liblist_perror();
+            goto free_list_root;
+        }
+
+        if(!( list->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+        {
+            liblist_perror();
+            goto free_list_root_name;
+        }
+
+        exte_type |= dirct;
 
 #ifdef Time_Measure
         gettimeofday(&tv,NULL);
@@ -350,7 +467,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
         if((list->num.all = list_subdir_type_num(path, exte_type)) <= 0)
         {
             LIST_DBG("no files");
-            goto free_list_data;
+            goto free_list_link_num;
         }
 
 #ifdef Time_Measure
@@ -363,14 +480,15 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
         if(!list->list_item)
         {
             liblist_perror();
-            goto free_list_data;
+            goto free_list_link_num;
         }
 
         for(i=0; i<list->num.all; i++)
         {
             list->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
 
-            if(!list->list_item[i]){
+            if(!list->list_item[i])
+            {
                 liblist_perror();
                 goto free_list_item;
             }
@@ -393,10 +511,9 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
         gettimeofday(&tv,NULL);
         LIST_DBG("store_listdata_type_subdir time : %llu ms", (tv.tv_sec * 1000000 + tv.tv_usec - tmp_utime)/1000);
 #endif
-    list->root->name_len = strlen(path);
-    list->root->name = list_strdup(path);
-    list->subdir = 1;
+
     list->exte_select = exte_type;
+    list->subdir = 1;
 
 #ifdef Time_Measure
 	gettimeofday(&tv,NULL);
@@ -408,6 +525,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	gettimeofday(&tv,NULL);
 	start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
+
 	switch(sort_type)
 	{
 		case sortAlph:	listdata_qsort_alph(list);	break;
@@ -433,11 +551,23 @@ free_list_item:
 	}
 	if(list->list_item)
 	    free(list->list_item);
-free_list_data:
+
+free_list_link_num:
+    if(list->root->link_num)
+        free(list->root->link_num);
+
+free_list_root_name:
+    if(list->root->name)
+        free(list->root->name);
+
+free_list_root:
     if(list->root)
         free(list->root);
-	if(list)
-	    free(list);
+
+free_list_data:
+    if(list)
+        free(list);
+
 close_dir:
     closedir(dir);
 err:
