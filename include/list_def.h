@@ -20,6 +20,8 @@
 #define MAX_FILES	(65536)
 #define BUF_SIZE	(256)
 
+#define USB_PATH    "/mnt/usb"
+
 #define MODE_FIFO   1
 #define MODE_CHAR   2
 #define MODE_DIRT   4
@@ -33,8 +35,8 @@
 
 // Version information
 #define MajorVerNum	1
-#define MinorVerNum	0
-#define ReleaseNum	11
+#define MinorVerNum	1
+#define ReleaseNum	0
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -189,6 +191,7 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx);
 int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
 // list_lib
+const char* list_get_complete_path_by_item(list_data* list, list_item* item);
 void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
 void  list_set_index(list_index* data, int idx);
@@ -200,5 +203,6 @@ void  list_compose_name(char* path, list_item* item, int* done);
 int   list_bsearch_index(list_data* list, char* name);
 void  list_show_index(list_data* list);
 int   list_count_sign(char* str, char sign);
+
 
 #endif /* LIST_DEF_H_ */

@@ -171,20 +171,6 @@ char* list_get_version_number(void);
 void list_extetype_select(list_data* list, extetype exte_type);
 void list_extetype_exclude(list_data* list, extetype exte_type);
 
-// Sort data by alphanumeric/extension/size/modified_time/folder
-// Sorting algorithm : quick sort
-void listdata_qsort_size(list_data* list);
-void listdata_qsort_time(list_data* list);
-void listdata_qsort_alph(list_data* list);
-void listdata_qsort_dirt(list_data* list);
-void listdata_qsort_exte(list_data* list);
-
-// Get files count, return -1 if type error
-//    list_get_filetype_count : all/FIFO/Character/Directory/Block/Regular/Link/Socket/Other
-//    list_get_extetype_count : audio/video/image/dirct
-int list_get_filetype_count(list_data* list, filetype file_type);
-int list_get_extetype_count(list_data* list, extetype exte_type);
-
 // Get list structure information
 const char* list_get_info_open_path(list_data* list);
 const char* list_get_parent_path_by_index(list_data* list, int index);
@@ -202,7 +188,6 @@ const char* list_get_complete_path_by_index(list_data* list, int index);
 const char* list_get_file_name_by_index(list_data* list, int index);
 filetype list_get_filetype_by_index(list_data* list, int index);
 extetype list_get_extetype_by_index(list_data* list, int index);
-
 
 
 // Get index by three methods(name,get,peer).
@@ -239,34 +224,62 @@ int search_index_by_keyword_name(list_data* list, char* name);
 void search_index_reset(void);
 
 
-//print data
-void print_listdata(list_data* list);
+// Get files count only in the directory, return:
+//    -1 : type error or the item doesn't allocate memory to save
+//    -2 : can't find the folder
+//    -3 : it's not a folder
+int list_get_filetype_count_folder_by_name(list_data* list, filetype file_type, char* folder);
+int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, char* folder);
 
 
 //=======================================================================
 // version 1.1.x  new API
 //=======================================================================
 
-// Get files count only in the directory, return:
-//    -1 : type error or the item doesn't allocate memory to save
-//    -2 : can't find the folder
-//    -3 : it's not a folder
-int list_get_filetype_count_folder(list_data* list, filetype file_type, char* folder);
-int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* folder);
+// open "/mnt/usb" to initialize list structure
+// sort = alphanumeric, file type = audio|video|image|directory
+// return id of "/mnt/usb", or 0 if error
+int list_init(list_data** plist);
 
-const char* list_get_complete_path_by_item(list_data* list, list_item* item);
-const char* list_get_complete_path_in_dirct(list_data* list, extetype exte_type, int id, int index);
-
-// Get id by index/name
-int list_get_id_by_index(list_data* list, int index);
-int list_get_id_by_name(list_data* list, char* name);
-
-// Get files count only in the directory by id, return:
+// Get files count
+// Get files count only in the id directory
+// error code:
 //    -1 : type error
 //    -2 : id error
-int list_get_filetype_count_in_dirct(list_data* list, filetype file_type, int id);
-int list_get_extetype_count_in_dirct(list_data* list, extetype exte_type, int id);
+int list_get_filetype_count(list_data* list, filetype file_type);
+int list_get_extetype_count(list_data* list, extetype exte_type);
+int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
+int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id);
 
+// Get complete path by index
+// Get complete path only in the id directory by index
+const char* list_get_file_name(list_data* list, extetype exte_type, int index);
+const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
+
+// Get id by complete name
+int list_get_id_by_name(list_data* list, char* name);
 int list_get_parent_id_by_name(list_data* list, char* name);
+
+// Get list item information by id ,return -1 or NULL for id error
+//    list_get_complete_path_by_index : get complete path
+//    list_get_file_name_by_index     : get file name
+//    list_get_filetype_by_index      : get file type
+//    list_get_extetype_by_index      : get extension type
+const char* list_get_complete_path_by_id(list_data* list, int id);
+const char* list_get_file_name_by_id(int id);
+filetype list_get_filetype_by_id(int id);
+extetype list_get_extetype_by_id(int id);
+
+
+// Sort data by alphanumeric/extension/size/modified_time/folder
+// Sorting algorithm : quick sort
+void listdata_qsort_size(list_data* list);
+void listdata_qsort_time(list_data* list);
+void listdata_qsort_alph(list_data* list);
+void listdata_qsort_dirt(list_data* list);
+void listdata_qsort_exte(list_data* list);
+
+//print data
+void print_listdata(list_data* list);
 
 #endif /* LIST_H_ */

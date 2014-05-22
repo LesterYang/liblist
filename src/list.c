@@ -656,7 +656,7 @@ int list_get_index_by_name(list_data* list, char* name)
  *  New API for 1.1.x               *
  *  ******************************  */
 
-int list_get_filetype_count_folder(list_data* list, filetype file_type, char* folder)
+int list_get_filetype_count_folder_by_name(list_data* list, filetype file_type, char* folder)
 {
     qsi_assert(list);
     qsi_assert(folder);
@@ -699,7 +699,7 @@ int list_get_filetype_count_folder(list_data* list, filetype file_type, char* fo
     return num;
 }
 
-int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* folder)
+int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, char* folder)
 {
     qsi_assert(list);
     qsi_assert(folder);
@@ -751,35 +751,52 @@ int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* fo
     return num;
 }
 
-const char* list_get_complete_path_by_item(list_data* list, list_item* item)
+const char* list_get_file_name(list_data* list, extetype exte_type, int index)
 {
     qsi_assert(list);
-    qsi_assert(item);
 
+    int max_num = 0;
+    int offset = -1;
     int done=0;
-    list_item* parent = item->parent;
 
-    while(list->root != parent)
+    switch(exte_type)
     {
-        if(parent->parent)
-        {
-            parent = parent->parent;
-        }
-        else
-        {
-            LIST_DBG("item aren't belong to list");
+        case audio: max_num = list->num.audio; break;
+        case video: max_num = list->num.video; break;
+        case image: max_num = list->num.image; break;
+        case dirct: max_num = list->num.dirct; break;
+        default:                               break;;
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return NULL;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return NULL;
+    }
+
+    while(index)
+    {
+        if(++offset == list->num.all)
             return NULL;
-        }
+
+        if (list->list_item[offset]->exte_type == exte_type)
+            index--;
     }
 
     memset(list->path, 0, sizeof(list->path));
-    list_compose_name(list->path, item->parent, &done);
-    memcpy(list->path + done, item->name, item->name_len);
+    list_compose_name(list->path, list->list_item[offset]->parent, &done);
+    memcpy(list->path + done, list->list_item[offset]->name, list->list_item[offset]->name_len);
 
     return (const char*)list->path;
 }
 
-const char* list_get_complete_path_in_dirct(list_data* list, extetype exte_type, int id, int index)
+const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index)
 {
     qsi_assert(list);
 
@@ -833,14 +850,6 @@ const char* list_get_complete_path_in_dirct(list_data* list, extetype exte_type,
     return (const char*)list->path;
 }
 
-int list_get_id_by_index(list_data* list, int index)
-{
-    qsi_assert(list);
-    if(list_check_index_error(list, index))
-        return 0;
-
-    return list->list_item[index-1]->id;
-}
 
 int list_get_id_by_name(list_data* list, char* name)
 {
@@ -853,7 +862,7 @@ int list_get_id_by_name(list_data* list, char* name)
         return 0;
 }
 
-int list_get_filetype_count_in_dirct(list_data* list, filetype file_type, int id)
+int list_get_filetype_count_folder(list_data* list, filetype file_type, int id)
 {
     qsi_assert(list);
 
@@ -883,7 +892,7 @@ int list_get_filetype_count_in_dirct(list_data* list, filetype file_type, int id
     return num;
 }
 
-int list_get_extetype_count_in_dirct(list_data* list, extetype exte_type, int id)
+int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id)
 {
     qsi_assert(list);
 
@@ -922,6 +931,47 @@ int list_get_extetype_count_in_dirct(list_data* list, extetype exte_type, int id
 
 int list_get_parent_id_by_name(list_data* list, char* name)
 {
+#if 0
     char* parent_name = (char*)list_get_parent_path_by_name(list, name);
     return list_get_id_by_name(list, parent_name);
+#else
+    int id = list_get_id_by_name(list, name);
+
+    if(id)
+        return ((list_item*)id)->parent->id;
+    else
+        return 0;
+#endif
+}
+
+const char* list_get_complete_path_by_id(list_data* list, int id)
+{
+    if(list_check_item_id(id))
+        return NULL;
+
+    return list_get_complete_path_by_item(list, (list_item*)id);
+}
+
+const char* list_get_file_name_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return NULL;
+
+    return (const char*)(((list_item*)id)->name);
+}
+
+filetype list_get_filetype_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->file_type;
+}
+
+extetype list_get_extetype_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->exte_type;
 }

@@ -574,3 +574,118 @@ err:
     return NULL;
 }
 
+int list_init(list_data** plist)
+{
+    DIR *dir;
+    int i;
+    list_data* l;
+
+    if((dir = opendir(USB_PATH)) == NULL)
+    {
+        liblist_perror("opendir");
+        LIST_DBG("open %s error", USB_PATH);
+        goto err;
+    }
+    else
+    {
+        if(!( *plist=(list_data*)calloc(1, sizeof(list_data)) ))
+        {
+            liblist_perror();
+            goto close_dir;
+        }
+
+        l = *plist;
+
+        if(!( l->root=(list_item*)calloc(1, sizeof(list_item)) ))
+        {
+            liblist_perror();
+            goto free_list_data;
+        }
+
+        l->root->self = l->root;
+        l->root->file_type = Directory;
+        l->root->exte_type = dirct;
+        l->root->name_len = strlen(USB_PATH);
+
+        if(!( l->root->name = list_strdup(USB_PATH) ))
+        {
+            liblist_perror();
+            goto free_list_root;
+        }
+
+        if(!( l->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+        {
+            liblist_perror();
+            goto free_list_root_name;
+        }
+
+        if((l->num.all = list_subdir_type_num(USB_PATH, alltype|dirct)) <= 0)
+        {
+            LIST_DBG("no files");
+            goto free_list_link_num;
+        }
+
+        l->list_item=(list_item**)malloc((l->num.all)*sizeof(list_item*));
+
+        if(!l->list_item)
+        {
+            liblist_perror();
+            goto free_list_link_num;
+        }
+
+        for(i=0; i<l->num.all; i++)
+        {
+            l->list_item[i]=(list_item*)calloc(1, sizeof(list_item));
+
+            if(!l->list_item[i])
+            {
+                liblist_perror();
+                goto free_list_item;
+            }
+        }
+
+    }
+    closedir(dir);
+
+    list_mutex_new(l, TRUE, TRUE);
+
+    if(l->num.all != store_listdata_type_subdir(l, USB_PATH, 0, alltype|dirct))
+        LIST_DBG("stored number less than malloc");
+
+    l->exte_select = alltype|dirct;
+    l->subdir = 1;
+
+    listdata_qsort_alph(l);
+
+    return l->root->id;
+
+free_list_item:
+    while(i--)
+    {
+        if(l->list_item[i])
+            free(l->list_item[i]);
+    }
+    if(l->list_item)
+        free(l->list_item);
+
+free_list_link_num:
+    if(l->root->link_num)
+        free(l->root->link_num);
+
+free_list_root_name:
+    if(l->root->name)
+        free(l->root->name);
+
+free_list_root:
+    if(l->root)
+        free(l->root);
+
+free_list_data:
+    if(l)
+        free(l);
+
+close_dir:
+    closedir(dir);
+err:
+    return 0;
+}

@@ -12,6 +12,34 @@
 #include <list.h>
 #include <list_def.h>
 
+const char* list_get_complete_path_by_item(list_data* list, list_item* item)
+{
+    qsi_assert(list);
+    qsi_assert(item);
+
+    int done=0;
+    list_item* parent = item->parent;
+
+    while(list->root != parent)
+    {
+        if(parent->parent)
+        {
+            parent = parent->parent;
+        }
+        else
+        {
+            LIST_DBG("item aren't belong to list");
+            return NULL;
+        }
+    }
+
+    memset(list->path, 0, sizeof(list->path));
+    list_compose_name(list->path, item->parent, &done);
+    memcpy(list->path + done, item->name, item->name_len);
+
+    return (const char*)list->path;
+}
+
 void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority)
 {
     pthread_mutexattr_t attr;
