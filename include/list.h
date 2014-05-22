@@ -148,7 +148,7 @@ int search_POI(char* index, char* POI, city local);
 
 
 //=======================================================================
-// New for version 1.x.x
+// New for version 1.0.x
 //=======================================================================
 
 // Open list_data structure by path, allocate memory, return NULL if open error:
@@ -264,4 +264,12 @@ void search_index_reset(void);
 
 //print data
 void print_listdata(list_data* list);
+
+//=======================================================================
+// New for version 1.1.x
+//=======================================================================
+
+
+
+
 #endif /* LIST_H_ */
