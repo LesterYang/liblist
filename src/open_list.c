@@ -619,7 +619,7 @@ int list_init(list_data** plist)
             goto free_list_root_name;
         }
 
-        if((l->num.all = list_subdir_type_num(USB_PATH, alltype|dirct)) <= 0)
+        if((l->num.all = list_num(USB_PATH)) <= 0)
         {
             LIST_DBG("no files");
             goto free_list_link_num;
@@ -649,7 +649,7 @@ int list_init(list_data** plist)
 
     list_mutex_new(l, TRUE, TRUE);
 
-    if(l->num.all != store_listdata_type_subdir(l, USB_PATH, 0, alltype|dirct))
+    if(l->num.all != store_list_usb(l, USB_PATH, 0))
         LIST_DBG("stored number less than malloc");
 
     l->exte_select = alltype|dirct;

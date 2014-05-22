@@ -168,7 +168,9 @@ void print_listo(int* num,char*** list);
 
 int  store_listdata(list_data* list, char* path);
 int  store_listdata_extetype(list_data* list, char* path, extetype exte_type);
+int  store_list_usb(list_data* list, char* path, int store_idx);
 int  store_get_exte_type(list_item* item);
+int  store_match_type(char* name, int type);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
 
@@ -187,6 +189,7 @@ void free_list_item(list_item** item, int num);
 //subdir
 int list_subdir_num(char* path);
 int list_subdir_type_num(char* path, extetype exte_type);
+int list_num(char* path);
 int store_listdata_subdir(list_data* list, char* path, int store_idx);
 int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
