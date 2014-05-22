@@ -81,7 +81,7 @@ int list_subdir_type_num(char* path, extetype exte_type)
         if(store_match_exte_type(exte_type, ent->d_name, ent->d_type))
             num++;
 
-        if (4 == ent->d_type){
+        if (MODE_DIRT == ent->d_type){
             strcpy(ipath,path);
             strcat(ipath,"/");
             strcat(ipath,ent->d_name);

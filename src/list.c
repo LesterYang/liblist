@@ -10,9 +10,6 @@
 #include <list.h>
 #include <list_def.h>
 
-//static char g_name[MAX_NAME];
-//static char g_path[MAX_PATH];
-
 char* list_get_exettype_str(extetype exet_type)
 {
 	switch(exet_type)
@@ -48,6 +45,9 @@ void list_extetype_select(list_data* list, extetype exte_type)
 
     memset(&list->num, 0, sizeof(list_number));
 
+    if(list->subdir)
+        exte_type |= dirct;
+
     for (i=0; i<num; i++)
     {
         if ((list->list_item[i]->exte_type & (exte_type)))
@@ -75,7 +75,7 @@ void list_extetype_select(list_data* list, extetype exte_type)
 
         switch((list->list_item[list->num.all]->exte_type))
         {
-            case dirct: list->num.directory++;      break;
+            case dirct: list->num.dirct++;      break;
             case audio: list->num.audio++;          break;
             case video: list->num.video++;          break;
             case image: list->num.image++;          break;
@@ -111,6 +111,9 @@ void list_extetype_exclude(list_data* list, extetype exte_type)
 
     memset(&list->num, 0, sizeof(list_number));
 
+    if(list->subdir)
+        exte_type &= ~dirct;
+
     for (i=0; i<num; i++)
     {
         if (!(list->list_item[i]->exte_type & exte_type))
@@ -138,7 +141,7 @@ void list_extetype_exclude(list_data* list, extetype exte_type)
 
         switch((list->list_item[list->num.all]->exte_type))
         {
-            case dirct: list->num.directory++;      break;
+            case dirct: list->num.dirct++;      break;
             case audio: list->num.audio++;          break;
             case video: list->num.video++;          break;
             case image: list->num.image++;          break;
@@ -173,23 +176,23 @@ int list_get_extetype_count(list_data* list, extetype exte_type)
 
     switch(exte_type)
     {
-        case audio:             num = n->audio;                                      break;
-        case video:             num = n->video;                                      break;
-        case image:             num = n->image;                                      break;
-        case audio|video:       num = n->audio + n->video;                           break;
-        case audio|image:       num = n->audio + n->image;                           break;
-        case video|image:       num = n->video + n->image;                           break;
-        case alltype:           num = n->audio + n->video + n->image;                break;
-        case dirct:             num = n->directory;                                  break;
-        case dirct|audio:       num = n->directory + n->audio;                       break;
-        case dirct|video:       num = n->directory + n->video;                       break;
-        case dirct|image:       num = n->directory + n->image;                       break;
-        case dirct|audio|video: num = n->directory + n->audio + n->video;            break;
-        case dirct|audio|image: num = n->directory + n->audio + n->image;            break;
-        case dirct|video|image: num = n->directory + n->video + n->image;            break;
-        case dirct|alltype:     num = n->directory + n->audio + n->video + n->image; break;
-        case allfile:           num = n->all;                                        break;
-        default:                                                                     break;
+        case audio:             num = n->audio;                                  break;
+        case video:             num = n->video;                                  break;
+        case image:             num = n->image;                                  break;
+        case audio|video:       num = n->audio + n->video;                       break;
+        case audio|image:       num = n->audio + n->image;                       break;
+        case video|image:       num = n->video + n->image;                       break;
+        case alltype:           num = n->audio + n->video + n->image;            break;
+        case dirct:             num = n->dirct;                                  break;
+        case dirct|audio:       num = n->dirct + n->audio;                       break;
+        case dirct|video:       num = n->dirct + n->video;                       break;
+        case dirct|image:       num = n->dirct + n->image;                       break;
+        case dirct|audio|video: num = n->dirct + n->audio + n->video;            break;
+        case dirct|audio|image: num = n->dirct + n->audio + n->image;            break;
+        case dirct|video|image: num = n->dirct + n->video + n->image;            break;
+        case dirct|alltype:     num = n->dirct + n->audio + n->video + n->image; break;
+        case allfile:           num = n->all;                                    break;
+        default:                                                                 break;
     }
 	return num;
 }
@@ -253,7 +256,7 @@ int list_get_filetype_count_folder(list_data* list, filetype file_type, char* fo
         case Link:      num = item->link_num->link;       break;
         case Socket:    num = item->link_num->socket;     break;
         case Other:     num = item->link_num->other;      break;
-        default:                                    break;
+        default:                                          break;
     }
     return num;
 }
@@ -289,24 +292,135 @@ int list_get_extetype_count_folder(list_data* list, extetype exte_type, char* fo
 
     switch(exte_type)
     {
-        case audio:             num = n->audio;                                      break;
-        case video:             num = n->video;                                      break;
-        case image:             num = n->image;                                      break;
-        case audio|video:       num = n->audio + n->video;                           break;
-        case audio|image:       num = n->audio + n->image;                           break;
-        case video|image:       num = n->video + n->image;                           break;
-        case alltype:           num = n->audio + n->video + n->image;                break;
-        case dirct:             num = n->directory;                                  break;
-        case dirct|audio:       num = n->directory + n->audio;                       break;
-        case dirct|video:       num = n->directory + n->video;                       break;
-        case dirct|image:       num = n->directory + n->image;                       break;
-        case dirct|audio|video: num = n->directory + n->audio + n->video;            break;
-        case dirct|audio|image: num = n->directory + n->audio + n->image;            break;
-        case dirct|video|image: num = n->directory + n->video + n->image;            break;
-        case dirct|alltype:     num = n->directory + n->audio + n->video + n->image; break;
-        case allfile:           num = n->all;                                        break;
-        default:                                                                     break;
+        case audio:             num = n->audio;                                  break;
+        case video:             num = n->video;                                  break;
+        case image:             num = n->image;                                  break;
+        case audio|video:       num = n->audio + n->video;                       break;
+        case audio|image:       num = n->audio + n->image;                       break;
+        case video|image:       num = n->video + n->image;                       break;
+        case alltype:           num = n->audio + n->video + n->image;            break;
+        case dirct:             num = n->dirct;                                  break;
+        case dirct|audio:       num = n->dirct + n->audio;                       break;
+        case dirct|video:       num = n->dirct + n->video;                       break;
+        case dirct|image:       num = n->dirct + n->image;                       break;
+        case dirct|audio|video: num = n->dirct + n->audio + n->video;            break;
+        case dirct|audio|image: num = n->dirct + n->audio + n->image;            break;
+        case dirct|video|image: num = n->dirct + n->video + n->image;            break;
+        case dirct|alltype:     num = n->dirct + n->audio + n->video + n->image; break;
+        case allfile:           num = n->all;                                    break;
+        default:                                                                 break;
     }
+    return num;
+}
+
+int list_get_id_by_index(list_data* list, int index)
+{
+    qsi_assert(list);
+    if(list_check_index_error(list, index))
+        return 0;
+
+    return list->list_item[index-1]->id;
+}
+
+int list_get_id_by_name(list_data* list, char* name)
+{
+    qsi_assert(list);
+    int index = list_get_index_by_name(list, name);
+
+    if(index > 0)
+        return list->list_item[index-1]->id;
+    else
+        return 0;
+}
+
+int list_get_filetype_count_in_dirct(list_data* list, filetype file_type, int dirct_id)
+{
+    qsi_assert(list);
+
+    // check the value is an address that points to list_item
+    if(dirct_id != *(int*)dirct_id)
+    {
+        LIST_DBG("id error");
+        return -2;
+    }
+
+    list_item* item=(list_item*)dirct_id;
+
+    if(item->file_type != Directory)
+    {
+        LIST_DBG("id %d is not directory", dirct_id);
+        return -3;
+    }
+
+    if(!item->link_num)
+        return -1;
+
+    int num = -1;
+    switch(file_type)
+    {
+        case all:       num = item->link_num->all;        break;
+        case FIFO:      num = item->link_num->fifo;       break;
+        case Character: num = item->link_num->character;  break;
+        case Directory: num = item->link_num->directory;  break;
+        case Block:     num = item->link_num->block;      break;
+        case Regular:   num = item->link_num->regular;    break;
+        case Link:      num = item->link_num->link;       break;
+        case Socket:    num = item->link_num->socket;     break;
+        case Other:     num = item->link_num->other;      break;
+        default:                                          break;
+    }
+
+    return num;
+}
+
+int list_get_extetype_count_in_dirct(list_data* list, extetype exte_type, int dirct_id)
+{
+    qsi_assert(list);
+
+    // check the value is an address that points to list_item
+    if(dirct_id != *(int*)dirct_id)
+    {
+        LIST_DBG("id error");
+        return -2;
+    }
+
+    list_item* item=(list_item*)dirct_id;
+
+    //LIST_DBG("folder:%s",list_get_complete_path_by_item(list,item));
+
+    if(item->file_type != Directory)
+    {
+        LIST_DBG("id %d is not directory", dirct_id);
+        return -3;
+    }
+
+    if(!item->link_num)
+        return -1;
+
+    int num = -1;
+    list_number* n = item->link_num;
+
+    switch(exte_type)
+    {
+        case audio:             num = n->audio;                                  break;
+        case video:             num = n->video;                                  break;
+        case image:             num = n->image;                                  break;
+        case audio|video:       num = n->audio + n->video;                       break;
+        case audio|image:       num = n->audio + n->image;                       break;
+        case video|image:       num = n->video + n->image;                       break;
+        case alltype:           num = n->audio + n->video + n->image;            break;
+        case dirct:             num = n->dirct;                                  break;
+        case dirct|audio:       num = n->dirct + n->audio;                       break;
+        case dirct|video:       num = n->dirct + n->video;                       break;
+        case dirct|image:       num = n->dirct + n->image;                       break;
+        case dirct|audio|video: num = n->dirct + n->audio + n->video;            break;
+        case dirct|audio|image: num = n->dirct + n->audio + n->image;            break;
+        case dirct|video|image: num = n->dirct + n->video + n->image;            break;
+        case dirct|alltype:     num = n->dirct + n->audio + n->video + n->image; break;
+        case allfile:           num = n->all;                                    break;
+        default:                                                                 break;
+    }
+
     return num;
 }
 
@@ -358,14 +472,20 @@ const char* list_get_info_open_path(list_data* list)
 	return (const char*)list->root->name;
 }
 
-const char* list_get_parent_by_index(list_data* list, int index)
+const char* list_get_parent_path_by_index(list_data* list, int index)
 {
     return (const char*)list->list_item[index-1]->parent->name;
 }
 
-const char* list_get_parent_by_name(list_data* list, const char* name)
+const char* list_get_parent_path_by_name(list_data* list, char* name)
 {
-    return list_get_parent_by_index(list, list_get_index_by_name(list, name));
+    return list_get_parent_path_by_index(list, list_get_index_by_name(list, name));
+}
+
+int list_get_parent_id_by_name(list_data* list, char* name)
+{
+    char* parent_name = (char*)list_get_parent_path_by_name(list, name);
+    return list_get_id_by_name(list, parent_name);
 }
 
 void list_compose_name(char* path, list_item* item, int* done)
@@ -379,7 +499,7 @@ void list_compose_name(char* path, list_item* item, int* done)
     *done += (item->name_len + 1);
 }
 
-const char * list_get_complete_path_by_index(list_data* list, int index)
+const char* list_get_complete_path_by_index(list_data* list, int index)
 {
     qsi_assert(list);
 
@@ -397,6 +517,84 @@ const char * list_get_complete_path_by_index(list_data* list, int index)
     return (const char*)list->list_item[index-1]->name;
 #endif
 }
+
+const char* list_get_complete_path_by_item(list_data* list, list_item* item)
+{
+    qsi_assert(list);
+    qsi_assert(item);
+
+    int done=0;
+    list_item* parent = item->parent;
+
+    while(list->root != parent)
+    {
+        if(parent->parent)
+        {
+            parent = parent->parent;
+        }
+        else
+        {
+            LIST_DBG("item aren't belong to list");
+            return NULL;
+        }
+    }
+
+    memset(list->path, 0, sizeof(list->path));
+    list_compose_name(list->path, item->parent, &done);
+    memcpy(list->path + done, item->name, item->name_len);
+
+    return (const char*)list->path;
+}
+
+const char* list_get_complete_path_in_dirct(list_data* list, extetype exte_type, int dirct_id, int index)
+{
+    qsi_assert(list);
+
+    if((dirct_id != *(int*)dirct_id) || (index <= 0) )
+    {
+        LIST_DBG("id error or index <= 0");
+        return NULL;
+    }
+
+    int max_num = 0;
+    int offset = -1;
+    int done=0;
+    list_item* item=(list_item*)dirct_id;
+
+    switch(exte_type)
+    {
+        case audio: max_num = item->link_num->audio; break;
+        case video: max_num = item->link_num->video; break;
+        case image: max_num = item->link_num->image; break;
+        case dirct: max_num = item->link_num->dirct; break;
+        default:                                     break;;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return NULL;
+    }
+
+    while(index)
+    {
+        if(++offset == list->num.all)
+            return NULL;
+
+        if (list->list_item[offset]->exte_type == exte_type &&
+            list->list_item[offset]->parent == item)
+        {
+            index--;
+        }
+    }
+
+    memset(list->path, 0, sizeof(list->path));
+    list_compose_name(list->path, list->list_item[offset]->parent, &done);
+    memcpy(list->path + done, list->list_item[offset]->name, list->list_item[offset]->name_len);
+
+    return (const char*)list->path;
+}
+
 const char* list_get_file_name_by_index(list_data* list, int index)
 {
     qsi_assert(list);
@@ -439,7 +637,7 @@ list_index* list_get_index(list_data* list, extetype exet_type)
 		case audio: data = (list->num.audio) ? &list->idx.audio : NULL; break;
 		case video: data = (list->num.video) ? &list->idx.video : NULL; break;
 		case image: data = (list->num.image) ? &list->idx.image : NULL; break;
-		case dirct: data = (list->num.directory) ? &list->idx.dirct : NULL; break;
+		case dirct: data = (list->num.dirct) ? &list->idx.dirct : NULL; break;
 		default:	break;
 	}
 	return data;
@@ -658,7 +856,7 @@ int list_peer_prev_index(list_data* list, extetype exet_type, int current_idx)
     if ( !( ((exet_type & audio) && list->num.audio) ||
             ((exet_type & video) && list->num.video) ||
             ((exet_type & image) && list->num.image) ||
-            ((exet_type & dirct) && list->num.directory)) )
+            ((exet_type & dirct) && list->num.dirct)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -682,7 +880,7 @@ int list_peer_next_index(list_data* list, extetype exet_type, int current_idx)
 	if ( !(	((exet_type & audio) && list->num.audio) ||
 			((exet_type & video) && list->num.video) ||
 			((exet_type & image) && list->num.image) ||
-			((exet_type & dirct) && list->num.directory)) )
+			((exet_type & dirct) && list->num.dirct)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -709,7 +907,7 @@ int list_peer_prev_recycle_index(list_data* list, extetype exet_type, int curren
     if ( !( ((exet_type & audio) && list->num.audio) ||
             ((exet_type & video) && list->num.video) ||
             ((exet_type & image) && list->num.image) ||
-            ((exet_type & dirct) && list->num.directory)) )
+            ((exet_type & dirct) && list->num.dirct)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -736,7 +934,7 @@ int list_peer_next_recycle_index(list_data* list, extetype exet_type, int curren
     if ( !( ((exet_type & audio) && list->num.audio) ||
             ((exet_type & video) && list->num.video) ||
             ((exet_type & image) && list->num.image) ||
-            ((exet_type & dirct) && list->num.directory)) )
+            ((exet_type & dirct) && list->num.dirct)) )
 	{
 		LIST_DBG("no file(%s)",list_get_exettype_str(exet_type));
 		return -1 ;
@@ -815,7 +1013,7 @@ int list_bsearch_index(list_data* list, char* name)
     return -1;
 }
 
-int list_get_index_by_name(list_data* list, const char* name)
+int list_get_index_by_name(list_data* list, char* name)
 {
     int index = -1;
     qsi_assert(list);
@@ -850,7 +1048,7 @@ int list_get_index_by_name(list_data* list, const char* name)
         parent = list->list_item[index];
         p=strtok(NULL,"/");
     }
-    return index;
+    return index + 1;
 
 #else
     for(index=0; index<list->num.all; index++)

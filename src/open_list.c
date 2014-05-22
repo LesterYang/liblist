@@ -9,7 +9,7 @@
 #ifdef Time_Measure
 #include <sys/time.h>
 struct timeval tv;
-unsigned long long start_utime, end_utime;
+unsigned long long start_utime, end_utime, tmp_utime;
 #endif
 static list_data* list;
 
@@ -334,6 +334,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
     {
         list=(list_data*)calloc(1, sizeof(list_data));
         list->root=(list_item*)calloc(1, sizeof(list_item));
+        exte_type |= dirct;
 
         if(!list)
         {
@@ -341,11 +342,21 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
             goto close_dir;
         }
 
+#ifdef Time_Measure
+        gettimeofday(&tv,NULL);
+        tmp_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
         if((list->num.all = list_subdir_type_num(path, exte_type)) <= 0)
         {
             LIST_DBG("no files");
             goto free_list_data;
         }
+
+#ifdef Time_Measure
+        gettimeofday(&tv,NULL);
+        LIST_DBG("list_subdir_type_num time : %llu ms", (tv.tv_sec * 1000000 + tv.tv_usec - tmp_utime)/1000);
+#endif
 
         list->list_item=(list_item**)malloc((list->num.all)*sizeof(list_item*));
 
@@ -370,9 +381,18 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	
     list_mutex_new(list, TRUE, TRUE);
 
+#ifdef Time_Measure
+        gettimeofday(&tv,NULL);
+        tmp_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
     if(list->num.all != store_listdata_type_subdir(list, path, 0, exte_type))
         LIST_DBG("stored number less than malloc");
 
+#ifdef Time_Measure
+        gettimeofday(&tv,NULL);
+        LIST_DBG("store_listdata_type_subdir time : %llu ms", (tv.tv_sec * 1000000 + tv.tv_usec - tmp_utime)/1000);
+#endif
     list->root->name_len = strlen(path);
     list->root->name = list_strdup(path);
     list->subdir = 1;

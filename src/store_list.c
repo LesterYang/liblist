@@ -68,6 +68,7 @@ int store_listdata(list_data* list, char* path)
                 break;
             }
 #if TestName
+            item[store_idx]->self = item[store_idx];
             item[store_idx]->name_len = strlen(ent->d_name);
             item[store_idx]->name = list_strdup(ent->d_name);
 #else
@@ -189,6 +190,7 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
         }
 
 #if TestName
+        item[store_idx]->self = item[store_idx];
         item[store_idx]->name_len = strlen(ent->d_name);
         item[store_idx]->name = list_strdup(ent->d_name);
 #else

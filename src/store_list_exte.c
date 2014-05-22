@@ -303,7 +303,8 @@ int store_match_exte_type(extetype exte_type, char* name, int type)
 int store_check_exte_type(int exte_num, const char** exte_str, char* name)
 {
 	int i;
-	for (i=0 ; i < exte_num ; i++){
+	for (i=0 ; i < exte_num ; i++)
+	{
 		if ( (strrchr(name,'.') != 0) && !strcasecmp(exte_str[i], strrchr(name,'.')) )
 			return 1;
 	}
@@ -338,6 +339,7 @@ int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
                 }
 
 #if TestName
+                item[store_idx]->self = item[store_idx];
                 item[store_idx]->name_len = strlen(ent->d_name);
                 item[store_idx]->name = list_strdup(ent->d_name);
 #else
@@ -467,6 +469,7 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
             }
 
 #if TestName
+            item[store_idx]->self = item[store_idx];
             item[store_idx]->name_len = strlen(ent->d_name);
             item[store_idx]->name = list_strdup(ent->d_name);
 #else

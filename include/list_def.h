@@ -8,6 +8,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
+#include <list.h>
 
 #define Time_Measure
 
@@ -35,7 +36,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	0
-#define ReleaseNum	10
+#define ReleaseNum	11
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -89,12 +90,17 @@ typedef struct{
     int all;
     int fifo;
     int character;
-    int directory;
     int block;
     int regular;
     int link;
     int socket;
     int other;
+
+    union
+    {
+        int directory;
+        int dirct;
+    };
 
     int audio;
     int video;
@@ -108,6 +114,11 @@ typedef struct{
 }list_index;
 
 struct list_item{
+    union
+    {
+        struct list_item* self;
+        int id;
+    };
 	filetype file_type;
 	extetype exte_type;
 	list_number* link_num;

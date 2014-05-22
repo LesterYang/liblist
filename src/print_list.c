@@ -104,7 +104,9 @@ void print_listdata(list_data* list)
                 printf("OTHE,      , ");
                 break;
         }
-        printf("name:%30s , folder:%s\n",list->list_item[i]->name,list->list_item[i]->parent->name);
+        //printf("name:%30s , folder:%s\n",list->list_item[i]->name,list->list_item[i]->parent->name);
+
+        printf("name:%s\n", list_get_complete_path_by_index(list, i+1));
     }
 }
 
