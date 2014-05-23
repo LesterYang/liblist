@@ -580,6 +580,13 @@ int list_init(list_data** plist)
     int i;
     list_data* l;
 
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
+    qsi_assert(plist);
+
     if((dir = opendir(USB_PATH)) == NULL)
     {
         liblist_perror("opendir");
@@ -655,7 +662,24 @@ int list_init(list_data** plist)
     l->exte_select = alltype|dirct;
     l->subdir = 1;
 
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+    LIST_DBG("list time : %llu ms", (end_utime - start_utime)/1000);
+#endif
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
     listdata_qsort_alph(l);
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+    LIST_DBG("sort time : %llu ms", (end_utime - start_utime)/1000);
+#endif
 
     return l->root->id;
 

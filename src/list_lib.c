@@ -12,7 +12,7 @@
 #include <list.h>
 #include <list_def.h>
 
-const char* list_get_complete_path_by_item(list_data* list, list_item* item)
+const char* list_get_comp_path_by_item(list_data* list, list_item* item)
 {
     qsi_assert(list);
     qsi_assert(item);
@@ -20,21 +20,25 @@ const char* list_get_complete_path_by_item(list_data* list, list_item* item)
     int done=0;
     list_item* parent = item->parent;
 
-    while(list->root != parent)
+    memset(list->path, 0, sizeof(list->path));
+
+    if(parent)
     {
-        if(parent->parent)
+        while(list->root != parent)
         {
-            parent = parent->parent;
+            if(parent->parent)
+            {
+                parent = parent->parent;
+            }
+            else
+            {
+                LIST_DBG("item aren't belong to list");
+                return NULL;
+            }
         }
-        else
-        {
-            LIST_DBG("item aren't belong to list");
-            return NULL;
-        }
+        list_compose_name(list->path, item->parent, &done);
     }
 
-    memset(list->path, 0, sizeof(list->path));
-    list_compose_name(list->path, item->parent, &done);
     memcpy(list->path + done, item->name, item->name_len);
 
     return (const char*)list->path;

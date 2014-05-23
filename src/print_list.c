@@ -110,6 +110,123 @@ void print_listdata(list_data* list)
     }
 }
 
+void print_list_all(list_data* list)
+{
+    int idx, max;
+    const char* str;
+
+    qsi_assert(list);
+
+    printf("========  List All  ========\n");
+    printf("dirct list:\n");
+    max=list_get_extetype_count(list, dirct);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_comp_path(list, dirct, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("audio list:\n");
+    max=list_get_extetype_count(list, audio);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_comp_path(list, audio, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("video list:\n");
+    max=list_get_extetype_count(list, video);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_comp_path(list, video, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("image list:\n");
+    max=list_get_extetype_count(list, image);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_comp_path(list, image, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+}
+
+void print_list_folder_by_comp_path(list_data* list, char* comp_path)
+{
+    int id;
+    qsi_assert(list);
+    qsi_assert(comp_path);
+
+    if( (id = list_get_id_by_comp_path(list, comp_path)) )
+        print_list_folder_by_id(list, id);
+    else
+        printf("liblist : can't find %s file\n",comp_path);
+}
+
+void print_list_folder_by_id(list_data* list, int id)
+{
+    int idx, max;
+    const char* str;
+
+    qsi_assert(list);
+
+    if(list_check_type_item_id(id, dirct))
+        return;
+
+    str = list_get_comp_path_by_id(list, id);
+    printf("==== List %s ====\n", (str)?str:"null");
+
+    printf("dirct list:\n");
+    max=list_get_extetype_count_folder(list, dirct, id);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_file_name_folder(list, dirct, id, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("audio list:\n");
+    max=list_get_extetype_count_folder(list, audio, id);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_file_name_folder(list, audio, id, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("video list:\n");
+    max=list_get_extetype_count_folder(list, video, id);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_file_name_folder(list, video, id, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+
+    printf("image list:\n");
+    max=list_get_extetype_count_folder(list, image, id);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_file_name_folder(list, image, id, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+}
+
+void print_count_all(list_data* list)
+{
+    printf(" all  file : %d\n",list_get_filetype_count(list, all));
+    printf("dirct file : %d\n",list_get_extetype_count(list, dirct));
+    printf("audio file : %d\n",list_get_extetype_count(list, audio));
+    printf("video file : %d\n",list_get_extetype_count(list, video));
+    printf("image file : %d\n",list_get_extetype_count(list, image));
+}
+
+void print_count_folder_by_id(list_data* list, int id)
+{
+    printf("dirct file : %d\n",list_get_extetype_count_folder(list, dirct, id));
+    printf("audio file : %d\n",list_get_extetype_count_folder(list, audio, id));
+    printf("video file : %d\n",list_get_extetype_count_folder(list, video, id));
+    printf("image file : %d\n",list_get_extetype_count_folder(list, image, id));
+}
+
+
 int range_ls(int* start,int* end, int num){
 	int err=1;
 	if(0 == num){

@@ -79,7 +79,7 @@
         printf("\n");														\
     } while (0)
 #else
-#define LIST_DBG(expr) qsi_nothing()
+#define LIST_DBG(expr, ...) qsi_nothing()
 #endif
 
 struct list_head{
@@ -194,7 +194,7 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx);
 int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
 // list_lib
-const char* list_get_complete_path_by_item(list_data* list, list_item* item);
+const char* list_get_comp_path_by_item(list_data* list, list_item* item);
 void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
 void  list_set_index(list_index* data, int idx);

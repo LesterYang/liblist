@@ -241,6 +241,8 @@ int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, 
 // return id of "/mnt/usb", or 0 if error
 int list_init(list_data** plist);
 
+// ======== Menu Operation ========
+
 // Get files count
 // Get files count only in the id directory
 // error code:
@@ -251,25 +253,35 @@ int list_get_extetype_count(list_data* list, extetype exte_type);
 int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
 int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id);
 
-// Get complete path by index
-// Get complete path only in the id directory by index
+// Get complete path
+// Get file name
+// Get complete path only in the id directory
+// Get file name only in the id directory
+const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_file_name(list_data* list, extetype exte_type, int index);
+const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
 
-// Get id by complete name
-int list_get_id_by_name(list_data* list, char* name);
-int list_get_parent_id_by_name(list_data* list, char* name);
+// Get id, return 0 if errors occur
+int list_get_id_by_comp_path(list_data* list, char* comp_path);
+int list_get_parent_id_by_comp_path(list_data* list, char* comp_path);
+int list_get_root_id_by_comp_path(list_data* list);
 
-// Get list item information by id ,return -1 or NULL for id error
-//    list_get_complete_path_by_index : get complete path
-//    list_get_file_name_by_index     : get file name
-//    list_get_filetype_by_index      : get file type
-//    list_get_extetype_by_index      : get extension type
-const char* list_get_complete_path_by_id(list_data* list, int id);
+// Get complete path, return NULL if errors occur
+const char* list_get_comp_path_by_id(list_data* list, int id);
+const char* list_get_parent_comp_path_by_id(list_data* list, int id);
+
+
 const char* list_get_file_name_by_id(int id);
+int list_get_parent_id_by_id(int id);
+
+// ================================
+
+// Get list item information by complete path ,return -1 for id error
 filetype list_get_filetype_by_id(int id);
 extetype list_get_extetype_by_id(int id);
-
+filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path);
+extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path);
 
 // Sort data by alphanumeric/extension/size/modified_time/folder
 // Sorting algorithm : quick sort
@@ -279,7 +291,16 @@ void listdata_qsort_alph(list_data* list);
 void listdata_qsort_dirt(list_data* list);
 void listdata_qsort_exte(list_data* list);
 
-//print data
+// ======== Print List ========
+// print raw data
 void print_listdata(list_data* list);
+// list all files, print complete path
+void print_list_all(list_data* list);
+// list files in the directory, print file name
+void print_list_folder_by_comp_path(list_data* list, char* comp_path);
+void print_list_folder_by_id(list_data* list, int id);
+// print count of files
+void print_count_all(list_data* list);
+void print_count_folder_by_id(list_data* list, int id);
 
 #endif /* LIST_H_ */
