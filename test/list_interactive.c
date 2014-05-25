@@ -9,18 +9,18 @@
 #include <readline/history.h>
 
 #define _GNU_SOURCE
-#define TEST_DEBUG 1
 
-#if (TEST_DEBUG!=0)
-#define LIST_DBG(expr, ...)                                              	\
-    do {																	\
-    	printf("==debug== ");												\
-    	printf(expr,  ##__VA_ARGS__);										\
-        printf("\n");														\
+#define LIST_DBG(expr, ...)                                              \
+    do {                                                                 \
+        if(g_debug)                                                      \
+        {                                                                \
+        printf("==debug== ");                                            \
+        printf(expr,  ##__VA_ARGS__);                                    \
+        printf("\n");                                                    \
+        }                                                                \
     } while (0)
-#else
-#define LIST_DBG(expr, ...) do {} while(0)
-#endif
+
+#define MAX_ARG_LEN (4096)
 
 struct list_opt
 {
@@ -28,10 +28,16 @@ struct list_opt
   int has_arg;
   int val;
 };
+
+struct list_optarg
+{
+  unsigned int arg_len;
+  char arg[MAX_ARG_LEN];
+};
   
 struct list_opt list_opts[] = {  
     { "all",       1,   'a'},  
-    { "ls",        0,   'l'},  
+    { "ls",        1,   'l'},  
     { "count",     0,   'c'}, 
     { "cd",        1,   't'}, 
     { "get",       1,   'g'}, 
@@ -43,6 +49,9 @@ struct list_opt list_opts[] = {
     { "sort",      1,   's'},  
     {      0,      0,    0 }  
 }; 
+
+static struct list_optarg opt;
+
 
 void declarative()
 {
@@ -58,10 +67,10 @@ void usage()
     printf("cd [NUM]             : change to NUM-th directory of current directory\n");
     printf("up                   : change to up directory of current directory\n");
     printf("root                 : change to /mnt/usb\n");
-    printf("ls                   : list files in the current directory\n");
+    printf("ls [TYPE]            : list files in the current directory\n");
     printf("count                : show count of files in the current directory\n");
     printf("get [TYPE] [NUM]     : get complete path of Num-th TYPE file in the current\n");
-    printf("all ls               : list all of files in the form of complete path\n");
+    printf("all ls [TYPE]        : list all of files in the form of complete path\n");
     printf("all count            : show count of all files in /mnt/usb \n");
     printf("all get [TYPE] [NUM] : get complete path of Num-th TYPE file in usb\n");
     printf("pwd                  : print name of current directory\n");
@@ -84,11 +93,11 @@ int list_getopt(char* cmd)
 
     for(idx=0; list_opts[idx].name != 0; idx++)
     {
-        if(strcmp(cmd, list_opts[idx].name) == 0)
-            return list_opts[idx].val;
-
-        if((strlen(cmd)==1) && (int)cmd[0]==list_opts[idx].val)
-            return list_opts[idx].val;
+        if( (strcmp(cmd, list_opts[idx].name) == 0) ||
+            ( (strlen(cmd)==1) && ((int)cmd[0]==list_opts[idx].val) ) )
+        {
+           return list_opts[idx].val;
+        }
     }
 
     return 0;
@@ -105,12 +114,12 @@ void interactive_list(list_data* list, volatile int id)
     {
         LIST_DBG("address: list %p, id 0x%x",list,id);
 
-    	line = readline("(list) ");
+        line = readline("(list) ");
 
-		if(line && *line)
-		 	add_history(line);
-		else
-			continue;
+        if(line && *line)
+            add_history(line);
+        else
+            continue;
         
         // parse command
         if((cmd = strtok(line," ")))
@@ -128,7 +137,30 @@ void interactive_list(list_data* list, volatile int id)
                         switch(c)
                         {
                             case 'l':
-                                print_list_all(list);
+                                if((cmd = strtok(NULL," ")))
+                                {
+                                    int type = 0;
+
+                                    if(strlen(cmd) == 1)
+                                    {
+                                        switch (cmd[0])
+                                        {
+                                            case 'd': type = dirct; break;
+                                            case 'a': type = audio; break;
+                                            case 'v': type = video; break;
+                                            case 'i': type = image; break;
+                                            default : printf("Invalid options. Try \"help\"\n"); break;
+                                        }
+                                        if(type)
+                                        {
+                                             print_list_type_all(list, type);
+                                        }
+                                    } 
+                                }
+                                else
+                                {
+                                    print_list_all(list);
+                                }  
                                 break;
                             case 'c':
                                 print_count_all(list);
@@ -185,7 +217,30 @@ void interactive_list(list_data* list, volatile int id)
                     } 
                     break;
                 case 'l':
-                    print_list_folder_by_id(list, id);
+                    if((cmd = strtok(NULL," ")))
+                    {
+                        int type = 0;
+
+                        if(strlen(cmd) == 1)
+                        {
+                            switch (cmd[0])
+                            {
+                                case 'd': type = dirct; break;
+                                case 'a': type = audio; break;
+                                case 'v': type = video; break;
+                                case 'i': type = image; break;
+                                default : printf("Invalid options. Try \"help\"\n"); break;
+                            }
+                            if(type)
+                            {
+                                 print_list_type_folder_by_id(list, id, type);
+                            }
+                        } 
+                    }
+                    else
+                    {
+                         print_list_folder_by_id(list, id);
+                    }  
                     break;
                 case 'c':
                     print_count_folder_by_id(list, id);
@@ -333,6 +388,12 @@ int main(int argc, char* argv[])
         return 0;
     }
 
+    if(argc > 1)
+    {
+        if(strcmp(argv[1], "-d") == 0)
+            g_debug = 1;
+    }
+    
     rl_bind_key('\t',rl_abort);
 
     declarative();

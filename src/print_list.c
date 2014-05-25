@@ -151,6 +151,31 @@ void print_list_all(list_data* list)
     }
 }
 
+void print_list_type_all(list_data* list, extetype exte_type)
+{
+    int idx, max;
+    const char* str;
+
+    qsi_assert(list);
+
+    printf("========  List All  ========\n");
+    
+    switch(exte_type)
+    {
+        case audio: printf("audio list:\n");    break;
+        case video: printf("video list:\n");    break;
+        case image: printf("image list:\n");    break;
+        default:    printf("type error\n");     return;
+    }
+
+    max=list_get_extetype_count(list, exte_type);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_comp_path(list, exte_type, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+}
+
 void print_list_folder_by_comp_path(list_data* list, char* comp_path)
 {
     int id;
@@ -205,6 +230,36 @@ void print_list_folder_by_id(list_data* list, int id)
     for(idx=1; idx<max+1; idx++)
     {
         if((str=list_get_file_name_folder(list, image, id, idx)))
+            printf("%5d, %s\n",idx, str);
+    }
+}
+
+void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type)
+{
+    int idx, max;
+    const char* str;
+
+    qsi_assert(list);
+
+    if(list_check_type_item_id(id, dirct))
+        return;
+
+    str = list_get_comp_path_by_id(list, id);
+    printf("==== List %s ====\n", (str)?str:"null");
+
+    switch(exte_type)
+    {
+        case dirct: printf("dirct list:\n");    break;
+        case audio: printf("audio list:\n");    break;
+        case video: printf("video list:\n");    break;
+        case image: printf("image list:\n");    break;
+        default:    printf("type error\n");     return;
+    }
+    
+    max=list_get_extetype_count_folder(list, exte_type, id);
+    for(idx=1; idx<max+1; idx++)
+    {
+        if((str=list_get_file_name_folder(list, exte_type, id, idx)))
             printf("%5d, %s\n",idx, str);
     }
 }

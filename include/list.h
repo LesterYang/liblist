@@ -296,11 +296,14 @@ void listdata_qsort_exte(list_data* list);
 void print_listdata(list_data* list);
 // list all files, print complete path
 void print_list_all(list_data* list);
+void print_list_type_all(list_data* list, extetype exte_type);
 // list files in the directory, print file name
 void print_list_folder_by_comp_path(list_data* list, char* comp_path);
 void print_list_folder_by_id(list_data* list, int id);
+void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type);
 // print count of files
 void print_count_all(list_data* list);
 void print_count_folder_by_id(list_data* list, int id);
+
 
 #endif /* LIST_H_ */
