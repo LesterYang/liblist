@@ -28,9 +28,13 @@ void free_list_item(list_item** item, int num)
                     free(item[i]->name);
                     item[i]->name = NULL;
                 }
-                if((item[i]->file_type == Directory) && (item[i]->file_type))
+                if((item[i]->file_type == Directory))
                 {
-                    free(item[i]->link_num);
+                    if(item[i]->dirct_num)
+                        free(item[i]->dirct_num);
+                    if(item[i]->link_num)
+                        free(item[i]->link_num);
+                    item[i]->dirct_num = NULL;
                     item[i]->link_num = NULL;
                 }
                 free(item[i]);

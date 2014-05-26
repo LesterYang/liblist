@@ -639,6 +639,8 @@ int store_list_usb(list_data* list, char* path, int store_idx)
                     parent_item->link_num->directory++;
                     item[store_idx]->file_type = Directory;
                     item[store_idx]->exte_type = dirct;
+                    item[store_idx]->has_type = allfile;
+                    item[store_idx]->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type));
                     item[store_idx]->link_num = (list_number*)calloc(1, sizeof(list_number));
                     break;
 
@@ -696,10 +698,33 @@ int store_list_usb(list_data* list, char* path, int store_idx)
 
         if(ent->d_type == MODE_DIRT)
         {
+            int b_audio = list->num.audio;
+            int b_video = list->num.video;
+            int b_image = list->num.image;
+            int b_idx = store_idx;
+
+            if(match)
+                b_idx--;
+
             strcpy(ipath,path);
             strcat(ipath,"/");
             strcat(ipath,ent->d_name);
             store_idx = store_list_usb(list, ipath, store_idx);
+
+            if (list->num.audio == b_audio)
+                item[b_idx]->has_type &= (~audio);
+            else
+                parent_item->dirct_num->audio++;
+
+            if (list->num.video == b_video)
+                item[b_idx]->has_type &= (~video);
+            else
+                parent_item->dirct_num->video++;
+
+            if (list->num.image == b_image)
+                item[b_idx]->has_type &= (~image);
+            else
+                parent_item->dirct_num->image++;
         }
     }
     closedir(dir);

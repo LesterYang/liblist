@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <list.h>
 
-#define Time_Measure
+//#define Time_Measure
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
@@ -108,6 +108,12 @@ typedef struct{
 }list_number;
 
 typedef struct{
+    int audio;
+    int video;
+    int image;
+}list_dirct_type;
+
+typedef struct{
     int prev;
     int current;
     int next;
@@ -121,7 +127,9 @@ struct list_item{
     };
 	filetype file_type;
 	extetype exte_type;
+	extetype has_type;
 	list_number* link_num;
+	list_dirct_type* dirct_num;
 	size_t name_len;
 	char* name;
 	struct list_item* parent;
@@ -193,7 +201,9 @@ int list_num(char* path);
 int store_listdata_subdir(list_data* list, char* path, int store_idx);
 int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
 
+// =========
 // list_lib
+// =========
 const char* list_get_comp_path_by_item(list_data* list, list_item* item);
 void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
@@ -206,6 +216,11 @@ void  list_compose_name(char* path, list_item* item, int* done);
 int   list_bsearch_index(list_data* list, char* name);
 void  list_show_index(list_data* list);
 int   list_count_sign(char* str, char sign);
+int   list_get_file_number(list_number* n, filetype file_type);
+int   list_get_exte_number(list_number* n, extetype exte_type);
 
+// Get absolute index
+int   list_get_idx(list_data* list, extetype exte_type, int id, int index);
+int   list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
 
 #endif /* LIST_DEF_H_ */

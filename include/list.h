@@ -33,6 +33,7 @@ typedef enum filetype {
 }filetype;
 
 typedef enum{
+    none_type   = 0,
 	audio		= 1,
 	video		= 1<<1,
 	image		= 1<<2,
@@ -253,24 +254,37 @@ int list_get_extetype_count(list_data* list, extetype exte_type);
 int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
 int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id);
 
+// Get count of directories in the id directory. There are matched files in the directories.
+// error code:
+//    -1 : type error
+//    -2 : id error
+int list_get_exte_dirct_count_folder(list_data* list, extetype exte_type, int id);
+
 // Get complete path
 // Get file name
 // Get complete path only in the id directory
 // Get file name only in the id directory
-const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_file_name(list_data* list, extetype exte_type, int index);
-const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
+// Get complete path only in the id directory. There are matched files in the directories.
+// Get file name only in the id directory. There are matched files in the directories.
+const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
+
 
 // Get id, return 0 if errors occur
 int list_get_id_by_comp_path(list_data* list, char* comp_path);
 int list_get_parent_id_by_comp_path(list_data* list, char* comp_path);
-int list_get_root_id_by_comp_path(list_data* list);
+int list_get_root_id(list_data* list);
 
 // Get complete path, return NULL if errors occur
 const char* list_get_comp_path_by_id(list_data* list, int id);
 const char* list_get_parent_comp_path_by_id(list_data* list, int id);
 
+
+int list_check_drict_has_type(list_data* list, extetype exte_type, int id);
 
 const char* list_get_file_name_by_id(int id);
 int list_get_parent_id_by_id(int id);

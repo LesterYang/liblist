@@ -25,9 +25,12 @@ void close_listdata(list_data* list)
 
 	if(list->root)
 	{
-        if(list->subdir && list->root->link_num)
+        if(list->subdir)
         {
-            free(list->root->link_num);
+            if(list->root->dirct_num)
+                free(list->root->dirct_num);
+            if(list->root->link_num)
+                free(list->root->link_num);
         }
         if(list->root->name)
         {

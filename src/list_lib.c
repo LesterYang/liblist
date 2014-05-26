@@ -217,3 +217,177 @@ int list_count_sign(char* s, char a)
     return n;
 }
 
+// Get absolute index of directory. id = 0 for recursive, id > 0 for the id directory
+int list_get_idx(list_data* list, extetype exte_type, int id, int index)
+{
+    qsi_assert(list);
+
+    int max_num = 0;
+    int offset = -1;
+    list_item* item;
+
+    if(id)
+    {
+        if(list_check_type_item_id(id, dirct))
+            return 0;
+        item=(list_item*)id;
+    }
+    else
+        item = list->root;
+
+    qsi_assert(item->link_num);
+
+
+    if(id)
+    {
+        switch(exte_type)
+        {
+            case audio: max_num = item->link_num->audio; break;
+            case video: max_num = item->link_num->video; break;
+            case image: max_num = item->link_num->image; break;
+            case dirct: max_num = item->link_num->dirct; break;
+            default:                                     break;
+        }
+    }
+    else
+    {
+        switch(exte_type)
+        {
+            case audio: max_num = list->num.audio; break;
+            case video: max_num = list->num.video; break;
+            case image: max_num = list->num.image; break;
+            case dirct: max_num = list->num.dirct; break;
+            default:                               break;
+        }
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return 0;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return 0;
+    }
+
+    while(index)
+    {
+        if(++offset == list->num.all)
+            return 0;
+
+        if (list->list_item[offset]->exte_type == exte_type)
+        {
+            if(id && (list->list_item[offset]->parent != item) )
+                    continue;
+            index--;
+        }
+    }
+
+    return offset;
+}
+
+// Get absolute index of directory. There are matched type files in the directories.
+int list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index)
+{
+    qsi_assert(list);
+
+    if(list_check_type_item_id(id, dirct))
+        return 0;
+
+    int max_num = 0;
+    int offset = -1;
+    list_item* item=(list_item*)id;
+
+    qsi_assert(item->link_num);
+
+    switch(exte_type)
+    {
+        case audio: max_num = item->dirct_num->audio; break;
+        case video: max_num = item->dirct_num->video; break;
+        case image: max_num = item->dirct_num->image; break;
+        case dirct: max_num = list->num.dirct;        break;
+        default:                                      break;
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return 0;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of directories");
+        return 0;
+    }
+
+    while(index)
+    {
+        if(++offset == list->num.all)
+            return 0;
+
+        if (list->list_item[offset]->exte_type == dirct &&
+            list->list_item[offset]->parent == item)
+        {
+            if( (list->list_item[offset]->has_type) && (list->list_item[offset]->has_type & (exte_type)) )
+                index--;
+        }
+    }
+    return offset;
+}
+
+int list_get_file_number(list_number* n, filetype file_type)
+{
+    qsi_assert(n);
+
+    int num = -1;
+
+    switch(file_type)
+    {
+        case all:       num = n->all;        break;
+        case FIFO:      num = n->fifo;       break;
+        case Character: num = n->character;  break;
+        case Directory: num = n->directory;  break;
+        case Block:     num = n->block;      break;
+        case Regular:   num = n->regular;    break;
+        case Link:      num = n->link;       break;
+        case Socket:    num = n->socket;     break;
+        case Other:     num = n->other;      break;
+        default:                             break;
+    }
+
+    return num;
+}
+
+int list_get_exte_number(list_number* n, extetype exte_type)
+{
+    qsi_assert(n);
+
+    int num = -1;
+
+    switch(exte_type)
+    {
+        case audio:             num = n->audio;                                  break;
+        case video:             num = n->video;                                  break;
+        case image:             num = n->image;                                  break;
+        case audio|video:       num = n->audio + n->video;                       break;
+        case audio|image:       num = n->audio + n->image;                       break;
+        case video|image:       num = n->video + n->image;                       break;
+        case alltype:           num = n->audio + n->video + n->image;            break;
+        case dirct:             num = n->dirct;                                  break;
+        case dirct|audio:       num = n->dirct + n->audio;                       break;
+        case dirct|video:       num = n->dirct + n->video;                       break;
+        case dirct|image:       num = n->dirct + n->image;                       break;
+        case dirct|audio|video: num = n->dirct + n->audio + n->video;            break;
+        case dirct|audio|image: num = n->dirct + n->audio + n->image;            break;
+        case dirct|video|image: num = n->dirct + n->video + n->image;            break;
+        case dirct|alltype:     num = n->dirct + n->audio + n->video + n->image; break;
+        case allfile:           num = n->all;                                    break;
+        default:                                                                 break;
+    }
+
+    return num;
+}

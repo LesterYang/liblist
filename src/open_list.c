@@ -612,6 +612,7 @@ int list_init(list_data** plist)
         l->root->self = l->root;
         l->root->file_type = Directory;
         l->root->exte_type = dirct;
+        l->root->has_type = allfile;
         l->root->name_len = strlen(USB_PATH);
 
         if(!( l->root->name = list_strdup(USB_PATH) ))
@@ -620,10 +621,17 @@ int list_init(list_data** plist)
             goto free_list_root;
         }
 
-        if(!( l->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+        if(!( l->root->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type)) ))
         {
             liblist_perror();
             goto free_list_root_name;
+        }
+
+
+        if(!( l->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+        {
+            liblist_perror();
+            goto free_list_drict_num;
         }
 
         if((l->num.all = list_num(USB_PATH)) <= 0)
@@ -662,6 +670,15 @@ int list_init(list_data** plist)
     l->exte_select = alltype|dirct;
     l->subdir = 1;
 
+    if (l->num.audio == 0)
+        l->root->has_type &= (~audio);
+
+    if (l->num.video == 0)
+        l->root->has_type &= (~video);
+
+    if (l->num.image == 0)
+        l->root->has_type &= (~image);
+
 #ifdef Time_Measure
     gettimeofday(&tv,NULL);
     end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
@@ -695,6 +712,10 @@ free_list_item:
 free_list_link_num:
     if(l->root->link_num)
         free(l->root->link_num);
+
+free_list_drict_num:
+    if(l->root->dirct_num)
+        free(l->root->dirct_num);
 
 free_list_root_name:
     if(l->root->name)
