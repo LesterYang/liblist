@@ -65,9 +65,6 @@ int listdata_compare_time(const void* i, const void* j)
     int done_i=0;
     int done_j=0;
 
-    memset(path_i, 0, sizeof(path_i));
-    memset(path_j, 0, sizeof(path_j));
-
     list_compose_name(path_i, item_i->parent, &done_i);
     list_compose_name(path_j, item_j->parent, &done_j);
 

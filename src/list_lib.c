@@ -391,3 +391,116 @@ int list_get_exte_number(list_number* n, extetype exte_type)
 
     return num;
 }
+
+/********************
+ *   list linked    *
+ ********************/
+
+void init_list_head(list_head* head)
+{
+    head->next=NULL;
+    head->prev=NULL;
+}
+
+static inline void __list_add(list_head *new, list_head *prev, list_head *next)
+{
+#if 0 //debug
+    if(next && next->prev != prev)
+        printf("list_add corruption. next->prev should be prev (%p), but was %p. (next=%p).\n",prev, next->prev, next);
+    if(prev && prev->next != next)
+        printf("list_add corruption. next->next should be next (%p), but was %p. (prev=%p).\n",next, prev->next, prev);
+    if(new == prev || new == next)
+        printf("list_add double add: new=%p, prev=%p, next=%p.\n\n",new, prev, next);
+#endif
+
+    if(next)
+        next->prev=new;
+    if(prev)
+        prev->next=new;
+
+    new->next=next;
+    new->prev=prev;
+}
+
+void list_add(list_head *new, list_head* head)
+{
+    __list_add(new, head, head->next);
+}
+
+void list_add_tail(list_head *new, list_head* head)
+{
+    __list_add(new, head->prev, head);
+}
+
+
+int list_get_idx2(list_data* list, extetype exte_type, int id, int index)
+{
+    qsi_assert(list);
+
+    int max_num = 0;
+    int offset = -1;
+    list_item* item;
+
+    if(id)
+    {
+        if(list_check_type_item_id(id, dirct))
+            return 0;
+        item=(list_item*)id;
+    }
+    else
+        item = list->root;
+
+    qsi_assert(item->link_num);
+
+
+    if(id)
+    {
+        switch(exte_type)
+        {
+            case audio: max_num = item->link_num->audio; break;
+            case video: max_num = item->link_num->video; break;
+            case image: max_num = item->link_num->image; break;
+            case dirct: max_num = item->link_num->dirct; break;
+            default:                                     break;
+        }
+    }
+    else
+    {
+        switch(exte_type)
+        {
+            case audio: max_num = list->num.audio; break;
+            case video: max_num = list->num.video; break;
+            case image: max_num = list->num.image; break;
+            case dirct: max_num = list->num.dirct; break;
+            default:                               break;
+        }
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return 0;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return 0;
+    }
+
+    while(index)
+    {
+        if(++offset == list->num.all)
+            return 0;
+
+        if (list->list_item[offset]->exte_type == exte_type)
+        {
+            if(id && (list->list_item[offset]->parent != item) )
+                    continue;
+            index--;
+        }
+    }
+
+    return offset;
+}
+

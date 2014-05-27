@@ -45,3 +45,38 @@ void free_list_item(list_item** item, int num)
         item=NULL;
     }
 }
+
+void free_list_item2(list_head* head)
+{
+    list_item* item;
+
+    while(head != NULL)
+    {
+        item = (list_item*)container_of(head, list_item, head);
+
+        if(item)
+        {
+            if(item->name)
+            {
+                free(item->name);
+                item->name = NULL;
+            }
+            if((item->file_type == Directory))
+            {
+                if(item->dirct_num)
+                    free(item->dirct_num);
+                if(item->link_num)
+                    free(item->link_num);
+                item->dirct_num = NULL;
+                item->link_num = NULL;
+            }
+            free(item);
+            item = NULL;
+        }
+
+        head = head->next;
+    }
+}
+
+
+

@@ -163,6 +163,7 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 
 // Close list_data structure, release memory
 void close_listdata(list_data* list);
+void close_listdata2(list_data* list);
 
 // Get liblist.so version string
 char* list_get_version_number(void);
@@ -241,6 +242,7 @@ int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, 
 // sort = alphanumeric, file type = audio|video|image|directory
 // return id of "/mnt/usb", or 0 if error
 int list_init(list_data** plist);
+int list_init2(list_data** plist);
 
 // ======== Menu Operation ========
 

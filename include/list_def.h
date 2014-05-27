@@ -36,7 +36,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	1
-#define ReleaseNum	0
+#define ReleaseNum	1
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -82,8 +82,18 @@
 #define LIST_DBG(expr, ...) qsi_nothing()
 #endif
 
+#define offsetof(s, m)   (size_t)&(((s *)0)->m)
+
+#define container_of(ptr, type, member)                     \
+({                                                          \
+    const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
+    (type *)( (char *)__mptr - offsetof(type,member) );     \
+})
+
+typedef struct list_head list_head;
+
 struct list_head{
-	struct list_head *next,*prev;
+    list_head *next,*prev;
 };
 
 typedef struct{
@@ -128,6 +138,7 @@ struct list_item{
 	filetype file_type;
 	extetype exte_type;
 	extetype has_type;
+	list_head head;
 	list_number* link_num;
 	list_dirct_type* dirct_num;
 	size_t name_len;
@@ -177,6 +188,7 @@ void print_listo(int* num,char*** list);
 int  store_listdata(list_data* list, char* path);
 int  store_listdata_extetype(list_data* list, char* path, extetype exte_type);
 int  store_list_usb(list_data* list, char* path, int store_idx);
+void store_list_usb2(list_data* list, char* path, list_item* parent_item);
 int  store_get_exte_type(list_item* item);
 int  store_match_type(char* name, int type);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
@@ -186,13 +198,17 @@ void listdata_reset_index(list_data* list);
 void listdata_sort_filetype(list_data* list);
 
 int listdata_compare_alph(const void* i, const void* j);
-int listdata_compare_alph_filename(const void* i, const void* j);
 int listdata_compare_dirt(const void* i, const void* j);
 int listdata_compare_exte(const void* i, const void* j);
 int listdata_compare_sort(const void* i, const void* j);
 int listdata_compare_time(const void* i, const void* j);
 
+list_head* listdata_merge_sort_alph(list_head* head);
+list_head* listdata_merge_alph(list_head* i, list_head* j);
+
+
 void free_list_item(list_item** item, int num);
+void free_list_item2(list_head* head);
 
 //subdir
 int list_subdir_num(char* path);
@@ -218,6 +234,9 @@ void  list_show_index(list_data* list);
 int   list_count_sign(char* str, char sign);
 int   list_get_file_number(list_number* n, filetype file_type);
 int   list_get_exte_number(list_number* n, extetype exte_type);
+
+void  init_list_head(list_head* head);
+void  list_add(list_head *new, list_head* head);
 
 // Get absolute index
 int   list_get_idx(list_data* list, extetype exte_type, int id, int index);

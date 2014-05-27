@@ -734,3 +734,110 @@ close_dir:
 err:
     return 0;
 }
+
+
+int list_init2(list_data** plist)
+{
+    list_data* l;
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
+    qsi_assert(plist);
+
+    if(!( *plist=(list_data*)calloc(1, sizeof(list_data)) ))
+    {
+        liblist_perror();
+        goto err;
+    }
+
+    l = *plist;
+
+    if(!( l->root=(list_item*)calloc(1, sizeof(list_item)) ))
+    {
+        liblist_perror();
+        goto free_list_data;
+    }
+
+    l->root->self = l->root;
+    l->root->file_type = Directory;
+    l->root->exte_type = dirct;
+    l->root->has_type = allfile;
+    l->root->name_len = strlen(USB_PATH);
+    init_list_head(&(l->root->head));
+
+    if(!( l->root->name = list_strdup(USB_PATH) ))
+    {
+        liblist_perror();
+        goto free_list_root;
+    }
+
+    if(!( l->root->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type)) ))
+    {
+        liblist_perror();
+        goto free_list_root_name;
+    }
+
+    if(!( l->root->link_num = (list_number*)calloc(1, sizeof(list_number)) ))
+    {
+        liblist_perror();
+        goto free_list_drict_num;
+    }
+
+    list_mutex_new(l, TRUE, TRUE);
+
+    store_list_usb2(l, USB_PATH, l->root);
+
+    l->exte_select = alltype|dirct;
+    l->subdir = 1;
+
+    if (l->num.audio == 0)
+        l->root->has_type &= (~audio);
+
+    if (l->num.video == 0)
+        l->root->has_type &= (~video);
+
+    if (l->num.image == 0)
+        l->root->has_type &= (~image);
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+    LIST_DBG("list time : %llu ms", (end_utime - start_utime)/1000);
+#endif
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+#endif
+
+    l->root->head.next = listdata_merge_sort_alph(l->root->head.next);
+
+#ifdef Time_Measure
+    gettimeofday(&tv,NULL);
+    end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
+    LIST_DBG("sort time : %llu ms", (end_utime - start_utime)/1000);
+#endif
+
+    return l->root->id;
+
+free_list_drict_num:
+    if(l->root->dirct_num)
+        free(l->root->dirct_num);
+
+free_list_root_name:
+    if(l->root->name)
+        free(l->root->name);
+
+free_list_root:
+    if(l->root)
+        free(l->root);
+
+free_list_data:
+    if(l)
+        free(l);
+err:
+    return 0;
+}

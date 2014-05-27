@@ -43,3 +43,33 @@ void close_listdata(list_data* list)
 
 	list=NULL;
 }
+
+
+void close_listdata2(list_data* list)
+{
+    qsi_assert(list);
+
+    pthread_mutex_destroy(&list->mutex);
+
+    free_list_item2(list->root->head.next);
+
+    if(list->root)
+    {
+        if(list->subdir)
+        {
+            if(list->root->dirct_num)
+                free(list->root->dirct_num);
+            if(list->root->link_num)
+                free(list->root->link_num);
+        }
+        if(list->root->name)
+        {
+            free(list->root->name);
+        }
+        free(list->root);
+    }
+
+    free(list);
+
+    list=NULL;
+}

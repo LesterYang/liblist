@@ -916,3 +916,25 @@ extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path)
 
     return ((list_item*)id)->exte_type;
 }
+
+
+/********************
+ *   list linked    *
+ ********************/
+
+const char* list_get_comp_path2(list_data* list, extetype exte_type, int index)
+{
+    int done = 0;
+    int idx = list_get_idx(list, exte_type, 0, index);
+
+    if(idx > 0)
+    {
+        memset(list->path, 0, sizeof(list->path));
+        list_compose_name(list->path, list->list_item[idx]->parent, &done);
+        memcpy(list->path + done, list->list_item[idx]->name, list->list_item[idx]->name_len);
+        return (const char*)list->path;
+    }
+    else
+        return NULL;
+}
+

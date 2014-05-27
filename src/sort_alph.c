@@ -43,28 +43,18 @@ int listdata_compare_alph(const void* i, const void* j)
 int listdata_compare_dirt(const void* i, const void* j)
 {
     int val;
+    int dirt_i=0, dirt_j=0;
+
+    char p_i[MAX_PATH]={0};
+    char p_j[MAX_PATH]={0};
+    char* path_i = p_i;
+    char* path_j = p_j;
+
+    int done_i=0;
+    int done_j=0;
 
     list_item* item_i = *(list_item**)i;
     list_item* item_j = *(list_item**)j;
-
-#if 0 // old
-    if (item_i->parent == item_j->parent)
-    {
-        val=strcasecmp(item_i->name, item_j->name);
-    }
-    else
-    {
-        val=strcasecmp(item_i->parent->name, item_j->parent->name);
-    }
-
-    if(val > 0)
-        return 1;
-    else if (val < 0)
-        return -1;
-
-    return 0;
-#endif
-#if 1 // old
 
     if (item_i->parent == item_j->parent)
     {
@@ -77,24 +67,8 @@ int listdata_compare_dirt(const void* i, const void* j)
         return 0;
     }
 
-    int dirt_i=0, dirt_j=0;
-
-    char p_i[MAX_PATH]={0};
-    char p_j[MAX_PATH]={0};
-    char* path_i = p_i;
-    char* path_j = p_j;
-
-    int done_i=0;
-    int done_j=0;
-
-    memset(p_i, 0, sizeof(p_i));
-    memset(p_j, 0, sizeof(p_j));
-
     list_compose_name(p_i, item_i->parent, &done_i);
     list_compose_name(p_j, item_j->parent, &done_j);
-
-    memcpy(p_i + done_i, item_i->name, item_i->name_len);
-    memcpy(p_j + done_j, item_j->name, item_j->name_len);
 
     while((val=(int)(*(path_i)-*(path_j)))==0)
     {
@@ -136,7 +110,6 @@ int listdata_compare_dirt(const void* i, const void* j)
     }
 
     return 0;
-#endif
 }
 
 
@@ -167,4 +140,54 @@ void listdata_qsort_dirt(list_data* list)
     listdata_reset_index(list);
     list->sort = sortDirt;
     pthread_mutex_unlock(&list->mutex);
+}
+
+
+
+list_head* listdata_merge_sort_alph(list_head* head)
+{
+    if(head == NULL || head->next == NULL)
+        return head;
+
+    list_head *middle, *end, *half;
+
+    middle = head;
+    end = head;
+
+    while(end->next!=NULL && end->next->next!=NULL)
+    {
+        middle = middle->next;
+        end = end->next->next;
+    }
+
+    half = middle->next;
+    middle->next = NULL;
+
+    return listdata_merge_alph(listdata_merge_sort_alph(head), listdata_merge_sort_alph(half));
+}
+
+list_head* listdata_merge_alph(list_head* i, list_head* j)
+{
+    list_head *curr;
+
+    if(i == NULL)
+        return j;
+    if(j == NULL)
+        return i;
+
+    list_item* item_i = (list_item*)container_of(i, list_item, head);
+    list_item* item_j = (list_item*)container_of(j, list_item, head);
+
+    if(strcasecmp(item_i->name, item_j->name) > 0)
+    {
+        curr = i;
+        curr->next = listdata_merge_alph(i->next, j);
+    }
+    else
+    {
+        curr = j;
+        curr->next = listdata_merge_alph(i, j->next);
+    }
+
+    return curr;
 }
