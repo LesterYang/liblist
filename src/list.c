@@ -692,6 +692,10 @@ int list_check_drict_has_type(list_data* list, extetype exte_type, int id)
 
 const char* list_get_file_name(list_data* list, extetype exte_type, int index)
 {
+#if EnableLink
+    return list_get_file_name2(list, exte_type, index);
+#endif
+
     int idx = list_get_idx(list, exte_type, 0, index);
 
     if(idx > 0)
@@ -702,6 +706,10 @@ const char* list_get_file_name(list_data* list, extetype exte_type, int index)
 
 const char* list_get_comp_path(list_data* list, extetype exte_type, int index)
 {
+#if EnableLink
+    return list_get_comp_path2(list, exte_type, index);
+#endif
+
     int done = 0;
     int idx = list_get_idx(list, exte_type, 0, index);
 
@@ -718,6 +726,10 @@ const char* list_get_comp_path(list_data* list, extetype exte_type, int index)
 
 const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index)
 {
+#if EnableLink
+    return list_get_file_name_folder2(list, exte_type, id, index);
+#endif
+
     int idx = list_get_idx(list, exte_type, id, index);
 
     if(idx > 0)
@@ -728,6 +740,10 @@ const char* list_get_file_name_folder(list_data* list, extetype exte_type, int i
 
 const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index)
 {
+#if EnableLink
+    return list_get_comp_path_folder2(list, exte_type, id, index);
+#endif
+
     int done = 0;
     int idx = list_get_idx(list, exte_type, id, index);
 
@@ -744,6 +760,10 @@ const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int i
 
 const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index)
 {
+#if EnableLink
+    return list_get_dirct_file_name_folder2(list, exte_type, id, index);
+#endif
+
     int idx = list_get_exet_dirct_idx_folder(list, exte_type, id, index);
 
     if(idx > 0)
@@ -754,6 +774,10 @@ const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type,
 
 const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type, int id, int index)
 {
+#if EnableLink
+    return list_get_dirct_comp_path_folder2(list, exte_type, id, index);
+#endif
+
     int done = 0;
     int idx = list_get_exet_dirct_idx_folder(list, exte_type, id, index);
 
@@ -818,6 +842,10 @@ int list_get_exte_dirct_count_folder(list_data* list, extetype exte_type, int id
 
 int list_get_id_by_comp_path(list_data* list, char* comp_path)
 {
+#if EnableLink
+    return list_get_id_by_comp_path2(list, comp_path);
+#endif
+
     qsi_assert(list);
     int index = list_get_index_by_name(list, comp_path);
 
@@ -922,19 +950,127 @@ extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path)
  *   list linked    *
  ********************/
 
+list_item * list_get_item_by_name2(list_data* list, char* name)
+{
+    qsi_assert(list);
+    qsi_assert(name);
+    list_item *parent, *curr=NULL;
+
+    if(memcmp(list->root->name, name, list->root->name_len) != 0)
+        return NULL;
+
+    char str[MAX_NAME] ={0};
+    strcpy(str,name);
+    char *p = strtok(str + list->root->name_len, "/");
+    parent = list->root;
+
+    while(p)
+    {
+        list_for_each_entry(list->root, curr, head)
+        {
+            if(curr->parent != parent)
+                continue;
+
+            if(!strcmp(curr->name, p))
+                break;
+        }
+
+        if(curr == NULL)
+            return NULL;
+
+        parent = curr;
+        p=strtok(NULL,"/");
+    }
+    return curr;
+}
+
+
+const char* list_get_file_name2(list_data* list, extetype exte_type, int index)
+{
+    list_item* item = list_get_idx2(list, exte_type, 0, index);
+
+    if(item)
+        return (const char*)item->name;
+    else
+        return NULL;
+}
+
 const char* list_get_comp_path2(list_data* list, extetype exte_type, int index)
 {
     int done = 0;
-    int idx = list_get_idx(list, exte_type, 0, index);
+    list_item* item = list_get_idx2(list, exte_type, 0, index);
 
-    if(idx > 0)
+    if(item)
     {
         memset(list->path, 0, sizeof(list->path));
-        list_compose_name(list->path, list->list_item[idx]->parent, &done);
-        memcpy(list->path + done, list->list_item[idx]->name, list->list_item[idx]->name_len);
+        list_compose_name(list->path, item->parent, &done);
+        memcpy(list->path + done, item->name, item->name_len);
         return (const char*)list->path;
     }
     else
         return NULL;
 }
 
+const char* list_get_file_name_folder2(list_data* list, extetype exte_type, int id, int index)
+{
+    list_item* item = list_get_idx2(list, exte_type, id, index);
+
+    if(item)
+        return (const char*)item->name;
+    else
+        return NULL;
+}
+
+const char* list_get_comp_path_folder2(list_data* list, extetype exte_type, int id, int index)
+{
+    int done = 0;
+    list_item* item = list_get_idx2(list, exte_type, id, index);
+
+    if(item)
+    {
+        memset(list->path, 0, sizeof(list->path));
+        list_compose_name(list->path, item->parent, &done);
+        memcpy(list->path + done, item->name, item->name_len);
+        return (const char*)list->path;
+    }
+    else
+        return NULL;
+}
+
+int list_get_id_by_comp_path2(list_data* list, char* comp_path)
+{
+    qsi_assert(list);
+
+    list_item *item = list_get_item_by_name2(list, comp_path);
+
+    if(item)
+        return item->id;
+    else
+        return 0;
+}
+
+const char* list_get_dirct_file_name_folder2(list_data* list, extetype exte_type, int id, int index)
+{
+    list_item *item = list_get_exet_dirct_idx_folder2(list, exte_type, id, index);
+
+    if(item)
+        return (const char*)item->name;
+    else
+        return NULL;
+}
+
+const char* list_get_dirct_comp_path_folder2(list_data* list, extetype exte_type, int id, int index)
+{
+    int done = 0;
+    list_item *item = list_get_exet_dirct_idx_folder2(list, exte_type, id, index);
+
+    if(item)
+    {
+        memset(list->path, 0, sizeof(list->path));
+        list_compose_name(list->path, item->parent, &done);
+        memcpy(list->path + done, item->name, item->name_len);
+        return (const char*)list->path;
+    }
+    else
+        return NULL;
+}

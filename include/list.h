@@ -300,12 +300,11 @@ filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path);
 extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path);
 
 // Sort data by alphanumeric/extension/size/modified_time/folder
-// Sorting algorithm : quick sort
-void listdata_qsort_size(list_data* list);
-void listdata_qsort_time(list_data* list);
-void listdata_qsort_alph(list_data* list);
-void listdata_qsort_dirt(list_data* list);
-void listdata_qsort_exte(list_data* list);
+// Sorting algorithm :
+//   quick sort for array
+//   merge sort for list linked
+void listdata_qsort(list_data* list, sorttype sort_type);
+void listdata_msort(list_data* list, sorttype sort_type);
 
 // ======== Print List ========
 // print raw data
@@ -321,5 +320,14 @@ void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type);
 void print_count_all(list_data* list);
 void print_count_folder_by_id(list_data* list, int id);
 
+
+// list linked
+const char* list_get_file_name2(list_data* list, extetype exte_type, int index);
+const char* list_get_comp_path2(list_data* list, extetype exte_type, int index);
+const char* list_get_file_name_folder2(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_comp_path_folder2(list_data* list, extetype exte_type, int id, int index);
+int list_get_id_by_comp_path2(list_data* list, char* comp_path);
+const char* list_get_dirct_file_name_folder2(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_dirct_comp_path_folder2(list_data* list, extetype exte_type, int id, int index);
 
 #endif /* LIST_H_ */

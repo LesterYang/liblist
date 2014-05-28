@@ -198,6 +198,7 @@ void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type)
         }
     }
     else
+
     {
         printf("%s :\n", list_get_exettype_str(exte_type));
         max=list_get_extetype_count_folder(list, exte_type, id);
@@ -229,6 +230,22 @@ void print_count_folder_by_id(list_data* list, int id)
     printf("image file : %d\n",list_get_extetype_count_folder(list, image, id));
 }
 
+// ==========================================================================================
+// list linked structure
+// ==========================================================================================
+
+
+void print_list_folder_by_comp_path2(list_data* list, char* comp_path)
+{
+    int id;
+    qsi_assert(list);
+    qsi_assert(comp_path);
+
+    if( (id = list_get_id_by_comp_path(list, comp_path)) )
+        print_list_folder_by_id(list, id);
+    else
+        printf("liblist : can't find %s file\n",comp_path);
+}
 
 int range_ls(int* start,int* end, int num){
 	int err=1;

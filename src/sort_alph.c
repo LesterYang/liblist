@@ -4,27 +4,33 @@
 #include <list.h>
 #include <list_def.h>
 
+/**********************
+ *  for 0.x.x version *
+ **********************/
 int list_compare_alph(const void* i, const void* j)
 {
-	char* item_i = *(char**)i;
-	char* item_j = *(char**)j;
+    char* item_i = *(char**)i;
+    char* item_j = *(char**)j;
 
-	int val = strcasecmp(item_i, item_j);
+    int val = strcasecmp(item_i, item_j);
 
-	if(val > 0)
-		return 1;
-	else if (val < 0)
-		return -1;
+    if(val > 0)
+        return 1;
+    else if (val < 0)
+        return -1;
 
-	return 0;
+    return 0;
 }
 
 void sort_alph(int num, char **list)
 {
-	qsort(list, num, sizeof(char*), list_compare_alph);
+    qsort(list, num, sizeof(char*), list_compare_alph);
 }
 
 
+/**********************
+ *  compare function  *
+ **********************/
 int listdata_compare_alph(const void* i, const void* j)
 {
     list_item* item_i = *(list_item**)i;
@@ -113,38 +119,76 @@ int listdata_compare_dirt(const void* i, const void* j)
 }
 
 
-void listdata_qsort_alph(list_data* list)
+/**************************
+ *  quick sort for array  *
+ **************************/
+void listdata_qsort(list_data* list, sorttype sort_type)
 {
+#if EnableLink
+    listdata_msort(list, sort_type);
+    return;
+#endif
+
     qsi_assert(list);
+
+    int (*cmp1)(const void *, const void *);
+    int (*cmp2)(const void *, const void *);
+
     pthread_mutex_lock(&list->mutex);
 
     listdata_sort_filetype(list);
 
-    qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph);
-    qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_alph);
+    switch(sort_type)
+    {
+        case sortAlph:
+            cmp1 = listdata_compare_alph;
+            cmp2 = listdata_compare_alph;
+            break;
+        case sortDirt:
+            cmp1 = listdata_compare_alph;
+            cmp2 = listdata_compare_dirt;
+            break;
+        case sortExte:
+            cmp1 = listdata_compare_alph;
+            cmp2 = listdata_compare_dirt;
+            break;
+        case sortSize:
+            cmp1 = listdata_compare_sort;
+            cmp2 = listdata_compare_sort;
+            break;
+        case sortTime:
+            cmp1 = listdata_compare_time;
+            cmp2 = listdata_compare_time;
+            break;
+        default:
+            return;
+    }
+
+    qsort(list->list_item, list->num.directory, sizeof(list_item*), cmp1);
+    qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), cmp2);
 
     listdata_reset_index(list);
-    list->sort = sortAlph;
+    list->sort = sort_type;
     pthread_mutex_unlock(&list->mutex);
 }
 
-void listdata_qsort_dirt(list_data* list)
+
+
+/*********************************
+ *  merge sort  for linked list  *
+ *********************************/
+void listdata_msort(list_data* list, sorttype sort_type)
 {
     qsi_assert(list);
+    qsi_assert(list->root);
+
     pthread_mutex_lock(&list->mutex);
-
-    listdata_sort_filetype(list);
-    qsort(list->list_item, list->num.directory, sizeof(list_item*), listdata_compare_alph);
-    qsort(&list->list_item[list->num.directory], list->num.all - list->num.directory, sizeof(list_item*), listdata_compare_dirt);
-
-    listdata_reset_index(list);
-    list->sort = sortDirt;
+    list->root->head.next = listdata_merge_sort(list->root->head.next, sort_type);
+    list->sort = sort_type;
     pthread_mutex_unlock(&list->mutex);
 }
 
-
-
-list_head* listdata_merge_sort_alph(list_head* head)
+list_head* listdata_merge_sort(list_head* head, sorttype sort_type)
 {
     if(head == NULL || head->next == NULL)
         return head;
@@ -163,10 +207,26 @@ list_head* listdata_merge_sort_alph(list_head* head)
     half = middle->next;
     middle->next = NULL;
 
-    return listdata_merge_alph(listdata_merge_sort_alph(head), listdata_merge_sort_alph(half));
+    switch(sort_type)
+    {
+        case sortAlph:
+            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_alph);
+        case sortDirt:
+            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_dirt);
+        case sortExte:
+            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_exte);
+        case sortSize:
+            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_sort);
+        case sortTime:
+            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_time);
+        default:
+            break;
+    }
+
+    return head;
 }
 
-list_head* listdata_merge_alph(list_head* i, list_head* j)
+list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, const void *))
 {
     list_head *curr;
 
@@ -178,15 +238,15 @@ list_head* listdata_merge_alph(list_head* i, list_head* j)
     list_item* item_i = (list_item*)container_of(i, list_item, head);
     list_item* item_j = (list_item*)container_of(j, list_item, head);
 
-    if(strcasecmp(item_i->name, item_j->name) > 0)
+    if(cmp(&item_i, &item_j) < 0)
     {
         curr = i;
-        curr->next = listdata_merge_alph(i->next, j);
+        curr->next = listdata_merge(i->next, j, cmp);
     }
     else
     {
         curr = j;
-        curr->next = listdata_merge_alph(i, j->next);
+        curr->next = listdata_merge(i, j->next, cmp);
     }
 
     return curr;

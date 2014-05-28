@@ -10,7 +10,9 @@
 #include <pthread.h>
 #include <list.h>
 
-//#define Time_Measure
+#define EnableLink 0
+
+#define Time_Measure
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
@@ -84,11 +86,30 @@
 
 #define offsetof(s, m)   (size_t)&(((s *)0)->m)
 
-#define container_of(ptr, type, member)                     \
-({                                                          \
-    const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
-    (type *)( (char *)__mptr - offsetof(type,member) );     \
+#define container_of(ptr, type, member)                                     \
+({                                                                          \
+    const typeof( ((type *)0)->member ) *__mptr = (ptr);                    \
+    (type *)( (char *)__mptr - offsetof(type,member) );                     \
 })
+
+// get next element in list
+// @pos    : the type * to cursor
+// @member : the name of the list_struct within the structure.
+#define list_next_entry(pos, member)                                       \
+        container_of((pos)->member.next, typeof(*(pos)), member)
+
+#define list_next_entry_or_null(pos, member)                               \
+        ((pos)->member.next) ? list_next_entry(pos, member) : NULL
+
+// iterate over a list
+// @first  : the head for list.
+// @pos    : the type * to use as a loop cursor.
+// @member : the name of the list_struct within the structure.
+#define list_for_each_entry(first, pos, member)                            \
+     for (pos = list_next_entry_or_null(first, member);                    \
+          pos != NULL;                                                     \
+          pos = list_next_entry_or_null(pos, member))
+
 
 typedef struct list_head list_head;
 
@@ -203,8 +224,8 @@ int listdata_compare_exte(const void* i, const void* j);
 int listdata_compare_sort(const void* i, const void* j);
 int listdata_compare_time(const void* i, const void* j);
 
-list_head* listdata_merge_sort_alph(list_head* head);
-list_head* listdata_merge_alph(list_head* i, list_head* j);
+list_head* listdata_merge_sort(list_head* head, sorttype sort_type);
+list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, const void *));
 
 
 void free_list_item(list_item** item, int num);
@@ -241,5 +262,11 @@ void  list_add(list_head *new, list_head* head);
 // Get absolute index
 int   list_get_idx(list_data* list, extetype exte_type, int id, int index);
 int   list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
+list_item * list_get_item_by_name2(list_data* list, char* name);
+list_item* list_get_idx2(list_data* list, extetype exte_type, int id, int index);
+list_item* list_get_exet_dirct_idx_folder2(list_data* list, extetype exte_type, int id, int index);
+
+
+
 
 #endif /* LIST_DEF_H_ */

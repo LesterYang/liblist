@@ -18,6 +18,11 @@ void close_list(int* num,char*** list)
 
 void close_listdata(list_data* list)
 {
+#if EnableLink
+    close_listdata2(list);
+    return;
+#endif
+
 	qsi_assert(list);
 
 	pthread_mutex_destroy(&list->mutex);

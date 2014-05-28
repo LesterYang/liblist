@@ -256,14 +256,7 @@ list_data* open_listdata_type(char* path, extetype exte_type, sorttype sort_type
 	list->exte_select = exte_type;
 	list->subdir = 0;
 
-	switch(sort_type)
-	{
-		case sortAlph:	listdata_qsort_alph(list);	break;
-		case sortExte:	listdata_qsort_exte(list);	break;
-		case sortSize:	listdata_qsort_size(list);	break;
-		case sortTime:	listdata_qsort_time(list);	break;
-		default: 		listdata_qsort_alph(list);	break;
-	}
+	listdata_qsort(list, sort_type);
 
 	return list;
 
@@ -526,15 +519,8 @@ list_data* open_listdata_type_subdir(char* path, extetype exte_type, sorttype so
 	start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 
-	switch(sort_type)
-	{
-		case sortAlph:	listdata_qsort_alph(list);	break;
-		case sortDirt:  listdata_qsort_dirt(list);  break;
-		case sortExte:	listdata_qsort_exte(list);	break;
-		case sortSize:	listdata_qsort_size(list);	break;
-		case sortTime:	listdata_qsort_time(list);	break;
-		default: 		listdata_qsort_alph(list);	break;
-	}
+	listdata_qsort(list, sort_type);
+
 #ifdef Time_Measure
 	gettimeofday(&tv,NULL);
 	end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
@@ -576,6 +562,10 @@ err:
 
 int list_init(list_data** plist)
 {
+#if EnableLink
+    return list_init2(plist);
+#endif
+
     DIR *dir;
     int i;
     list_data* l;
@@ -690,7 +680,7 @@ int list_init(list_data** plist)
     start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 
-    listdata_qsort_alph(l);
+    listdata_qsort(l, sortAlph);
 
 #ifdef Time_Measure
     gettimeofday(&tv,NULL);
@@ -813,7 +803,7 @@ int list_init2(list_data** plist)
     start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 
-    l->root->head.next = listdata_merge_sort_alph(l->root->head.next);
+    listdata_msort(l, sortAlph);
 
 #ifdef Time_Measure
     gettimeofday(&tv,NULL);
