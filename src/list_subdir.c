@@ -6,6 +6,7 @@
 
 #include <list.h>
 #include <list_def.h>
+#if !EnableLink
 
 void list_subdir(char* path, int indent){
 	DIR *dir;
@@ -123,3 +124,4 @@ int list_num(char* path)
     closedir(dir);
     return num;
 }
+#endif

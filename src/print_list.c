@@ -2,7 +2,7 @@
 
 #include <list.h>
 #include <list_def.h>
-
+#if !EnableLink
 void print_list(int* num,char*** list){
 	int i,j;
 	printf("==========List==========\n");
@@ -43,9 +43,14 @@ void print_list(int* num,char*** list){
 		}
 	}
 }
+#endif
 
 void print_listdata(list_data* list)
 {
+#if EnableLink
+    print_listdata2(list);
+#else
+
     qsi_assert(list);
 
     int i;
@@ -107,6 +112,74 @@ void print_listdata(list_data* list)
         //printf("name:%30s , folder:%s\n",list->list_item[i]->name,list->list_item[i]->parent->name);
 
         printf("name:%s\n", list_get_complete_path_by_index(list, i+1));
+    }
+#endif
+}
+
+void print_listdata2(list_data* list)
+{
+    qsi_assert(list);
+
+    int i=0;
+    list_item *curr;
+
+    printf("Index  File   Exte  FileName\n");
+
+    list_for_each_entry(list->root, curr, head)
+    {
+
+        printf("%5d: ", ++i);
+        switch(curr->file_type)
+        {
+            case FIFO:
+                printf("FIFO,      , ");
+                break;
+
+            case Character:
+                printf("CHAR,      , ");
+                break;
+
+            case Directory:
+                printf("DIRT, ");
+                switch(curr->exte_type)
+                {
+                    case dirct: printf("dirct, "); break;
+                    default:    printf("     , "); break;
+                }
+                break;
+
+            case Block:
+                printf("BLCK,      , ");
+                break;
+
+            case Regular:
+                printf("REGL, ");
+                switch(curr->exte_type)
+                {
+                    case audio: printf("audio, "); break;
+                    case video: printf("video, "); break;
+                    case image: printf("image, "); break;
+                    case dirct: printf("dirct, "); break;
+                    default:    printf("     , "); break;
+                }
+                break;
+
+            case Link:
+                printf("LINK,      , ");
+                break;
+
+            case Socket:
+                printf("SOCK,      , ");
+                break;
+
+            case Other:
+                //break;
+
+            default:
+                printf("OTHE,      , ");
+                break;
+        }
+        printf("name:%s\n", list_get_comp_path_by_item(list, curr));
     }
 }
 
@@ -247,6 +320,7 @@ void print_list_folder_by_comp_path2(list_data* list, char* comp_path)
         printf("liblist : can't find %s file\n",comp_path);
 }
 
+#if !EnableLink
 int range_ls(int* start,int* end, int num){
 	int err=1;
 	if(0 == num){
@@ -348,3 +422,4 @@ void print_lists(int* num,char*** list){
 	printf("=========List(socket type)=========\n");
 	for (i = st ; i < fi ; i++)		printf("%d: %s\n",i+1,list[Socket][i]);
 }
+#endif

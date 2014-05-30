@@ -10,10 +10,14 @@
 #include <pthread.h>
 #include <list.h>
 
-#define EnableLink 0
-
+#define _GNU_SOURCE
+#ifndef __GNUC__
+#define __GNUC__
+#endif
 #define Time_Measure
 
+
+#define EnableLink  1
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
@@ -38,12 +42,12 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	1
-#define ReleaseNum	1
+#define ReleaseNum	2
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
 #ifdef __GNUC__
-#define QSI_LIKELY(x) (__builtin_expect(!!(x),1))
+#define QLIST_IKELY(x) (__builtin_expect(!!(x),1))
 #define QSI_UNLIKELY(x) (__builtin_expect(!!(x),0))
 #define QSI_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #else
@@ -51,6 +55,7 @@
 #define QSI_UNLIKELY(x) (x)
 #define QSI_PRETTY_FUNCTION ""
 #endif
+
 #define qsi_nothing() do {} while (FALSE)
 
 #if (QSI_ASSERT!=0)
@@ -83,6 +88,34 @@
 #else
 #define LIST_DBG(expr, ...) qsi_nothing()
 #endif
+
+#ifdef __GNUC__
+#define LIST_MAX(a,b)                           \
+    __extension__ ({                            \
+            typeof(a) _a = (a);                 \
+            typeof(b) _b = (b);                 \
+            _a > _b ? _a : _b;                  \
+        })
+#define LIST_MIN(a,b)                           \
+    __extension__ ({                            \
+            typeof(a) _a = (a);                 \
+            typeof(b) _b = (b);                 \
+            _a < _b ? _a : _b;                  \
+        })
+#else
+#define LIST_MAX(a, b)           ((a) > (b) ? (a) : (b))
+#define LIST_MIN(a, b)           ((a) < (b) ? (a) : (b))
+#endif
+
+#define LIST_ABS(a)              ((a) < 0 ? -(a) : (a))
+
+#define LIST_BIT_SET(var, bits)  ((var) |= (bits))
+#define LIST_BIT_CLR(var, bits)  ((var) &= ~(bits))
+#define LIST_BIT_AND(var, bits)  ((var) &= (bits))
+#define LIST_BIT_VAL(var, bits)  ((var) & (bits))
+#define LIST_GET_BITS(var, bits) ((var) & ((1ULL << bits)-1)
+
+#define LIST_ELEMENTSOF(x) (sizeof(x)/sizeof((x)[0]))
 
 #define offsetof(s, m)   (size_t)&(((s *)0)->m)
 
@@ -168,7 +201,6 @@ struct list_item{
 };
 
 struct list_data{
-	list_item** list_item;
 	list_number num;
 	list_item* root;
 
@@ -176,18 +208,22 @@ struct list_data{
 	sorttype sort;
 	char subdir;
 
+#if !EnableLink
+	list_item** list_item;
 	struct {
 		list_index dirct;
 		list_index audio;
 		list_index video;
 		list_index image;
 	}idx;
+#endif
+
 	pthread_mutex_t mutex;
 	char path[MAX_PATH];
 };
 
 
-int  store_fid(int num,char** list,char* namelist);
+//int  store_fid(int num,char** list,char* namelist);
 //determine the range of list
 int  range_ls(int* sttart,int* end,int num);
 
@@ -221,7 +257,7 @@ void listdata_sort_filetype(list_data* list);
 int listdata_compare_alph(const void* i, const void* j);
 int listdata_compare_dirt(const void* i, const void* j);
 int listdata_compare_exte(const void* i, const void* j);
-int listdata_compare_sort(const void* i, const void* j);
+int listdata_compare_size(const void* i, const void* j);
 int listdata_compare_time(const void* i, const void* j);
 
 list_head* listdata_merge_sort(list_head* head, sorttype sort_type);
@@ -229,7 +265,7 @@ list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, c
 
 
 void free_list_item(list_item** item, int num);
-void free_list_item2(list_head* head);
+void free_list_item2(list_item* start);
 
 //subdir
 int list_subdir_num(char* path);
@@ -255,6 +291,8 @@ void  list_show_index(list_data* list);
 int   list_count_sign(char* str, char sign);
 int   list_get_file_number(list_number* n, filetype file_type);
 int   list_get_exte_number(list_number* n, extetype exte_type);
+
+char* list_dump_append(const char* dest, const char* src);
 
 void  init_list_head(list_head* head);
 void  list_add(list_head *new, list_head* head);

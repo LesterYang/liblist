@@ -11,6 +11,8 @@ unsigned int audio_exte_num = (sizeof(audio_exte_str)/sizeof(char*));
 unsigned int video_exte_num = (sizeof(video_exte_str)/sizeof(char*));
 unsigned int image_exte_num = (sizeof(image_exte_str)/sizeof(char*));
 
+#if !EnableLink
+
 int* store_list_exte(char*** list,char* path,char* extension){
 	DIR *dir;
 	struct dirent *ent;
@@ -241,6 +243,7 @@ int* store_reg_exte_type(char*** list,char* path,int exte_type){
 
 	return num;
 }
+#endif
 
 int store_get_exte_type(list_item* item)
 {
@@ -334,6 +337,8 @@ int store_check_exte_type(int exte_num, const char** exte_str, char* name)
 	}
 	return 0;
 }
+
+#if !EnableLink
 
 int store_listdata_extetype(list_data* list, char* path, extetype exte_type)
 {
@@ -731,14 +736,13 @@ int store_list_usb(list_data* list, char* path, int store_idx)
 
     return store_idx;
 }
-
+#endif
 
 void store_list_usb2(list_data* list, char* path, list_item* parent_item)
 {
     DIR *dir;
     struct dirent *ent;
     list_item* item = NULL;
-    char ipath[MAX_PATH];
 
     qsi_assert(path);
 
@@ -850,23 +854,30 @@ void store_list_usb2(list_data* list, char* path, list_item* parent_item)
             int b_video = list->num.video;
             int b_image = list->num.image;
 
+#if 0
+            char ipath[MAX_PATH];
             strcpy(ipath,path);
             strcat(ipath,"/");
             strcat(ipath,ent->d_name);
             store_list_usb2(list, ipath, item);
+#else
+            char* new_path = list_dump_append(path, ent->d_name);
+            store_list_usb2(list, new_path, item);
+            free(new_path);
+#endif
 
             if (list->num.audio == b_audio)
-                item->has_type &= (~audio);
+                LIST_BIT_CLR(item->has_type, audio);
             else
                 parent_item->dirct_num->audio++;
 
             if (list->num.video == b_video)
-                item->has_type &= (~video);
+                LIST_BIT_CLR(item->has_type, video);
             else
                 parent_item->dirct_num->video++;
 
             if (list->num.image == b_image)
-                item->has_type &= (~image);
+                LIST_BIT_CLR(item->has_type, image);
             else
                 parent_item->dirct_num->image++;
         }

@@ -11,8 +11,12 @@
 struct timeval tv;
 unsigned long long start_utime, end_utime, tmp_utime;
 #endif
-static list_data* list;
 
+#if !EnableLink
+static list_data* list;
+#endif
+
+#if !EnableLink
 char*** open_list(char* path){
 	DIR *dir;
 	struct dirent *ent;
@@ -53,7 +57,9 @@ char*** open_list(char* path){
 	closedir (dir);
 	return list;
 }
+#endif
 
+#if !EnableLink
 list_data* open_listdata(char* path)
 {
 	DIR *dir;
@@ -559,12 +565,13 @@ close_dir:
 err:
     return NULL;
 }
+#endif
 
 int list_init(list_data** plist)
 {
 #if EnableLink
     return list_init2(plist);
-#endif
+#else
 
     DIR *dir;
     int i;
@@ -723,6 +730,7 @@ close_dir:
     closedir(dir);
 err:
     return 0;
+#endif
 }
 
 
@@ -784,31 +792,20 @@ int list_init2(list_data** plist)
     l->subdir = 1;
 
     if (l->num.audio == 0)
-        l->root->has_type &= (~audio);
+        LIST_BIT_CLR(l->root->has_type, audio);
 
     if (l->num.video == 0)
-        l->root->has_type &= (~video);
+        LIST_BIT_CLR(l->root->has_type, video);
 
     if (l->num.image == 0)
-        l->root->has_type &= (~image);
-
-#ifdef Time_Measure
-    gettimeofday(&tv,NULL);
-    end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
-    LIST_DBG("list time : %llu ms", (end_utime - start_utime)/1000);
-#endif
-
-#ifdef Time_Measure
-    gettimeofday(&tv,NULL);
-    start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
-#endif
+        LIST_BIT_CLR(l->root->has_type, image);
 
     listdata_msort(l, sortAlph);
 
 #ifdef Time_Measure
     gettimeofday(&tv,NULL);
     end_utime = tv.tv_sec * 1000000 + tv.tv_usec;
-    LIST_DBG("sort time : %llu ms", (end_utime - start_utime)/1000);
+    LIST_DBG("init time : %llu ms", (end_utime - start_utime)/1000);
 #endif
 
     return l->root->id;

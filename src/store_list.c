@@ -6,6 +6,7 @@
 #include <list.h>
 #include <list_def.h>
 
+#if !EnableLink
 int store_fid(int num,char **list,char* namelist){
 	list[num]=(char*)malloc(MAX_NAME*sizeof(char));
 	strcpy(list[num],namelist);
@@ -42,6 +43,10 @@ int* store_list(char*** list,char* path){
 	closedir (dir);
 	return num;
 }
+#endif
+
+
+#if !EnableLink
 
 int store_listdata(list_data* list, char* path)
 {
@@ -261,3 +266,4 @@ int store_listdata_subdir(list_data* list, char* path, int store_idx)
     closedir(dir);
     return store_idx;
 }
+#endif

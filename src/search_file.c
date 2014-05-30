@@ -7,8 +7,6 @@
 #include <list.h>
 #include <list_def.h>
 
-static int search_index;
-
 int search_file(char* path,char* filename)
 {
 	DIR *dir;
@@ -41,10 +39,15 @@ int search_file(char* path,char* filename)
 	return err;
 }
 
+#if !EnableLink
+static int search_index;
+
 int search_index_by_keyword_name(list_data* list, char* name)
 {
     qsi_assert(list);
     qsi_assert(name);
+
+
 
     for(; search_index<list->num.all; search_index++)
     {
@@ -74,7 +77,7 @@ void search_index_reset(void)
 {
 	search_index = 0;
 }
-
+#endif
 
 int search_exact_file(char* path,char* filename){
 	DIR *dir;
@@ -102,14 +105,16 @@ int search_exact_file(char* path,char* filename){
 	return err;
 }
 
-int search_mp3(char* path,char* filename,char** list_mp3){
+int search_mp3(char* path,char* filename,char** list_mp3)
+{
+
 	DIR *dir;
 	struct dirent *ent;
 	int idx=0,shift=0;
 	char extension[]={".mp3"};
 	char dirbuf[MAX_PATH];
 	char ipath[MAX_PATH];
-
+#if !EnableLink
 	while (list_mp3[shift]!=NULL
 			&& 0 != strstr(list_mp3[shift],filename))
 	{
@@ -141,6 +146,6 @@ int search_mp3(char* path,char* filename,char** list_mp3){
 		}
 	}
 	closedir(dir);
-
+#endif
 	return idx;
 }

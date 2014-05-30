@@ -230,8 +230,8 @@ void search_index_reset(void);
 //    -1 : type error or the item doesn't allocate memory to save
 //    -2 : can't find the folder
 //    -3 : it's not a folder
-int list_get_filetype_count_folder_by_name(list_data* list, filetype file_type, char* folder);
-int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, char* folder);
+//int list_get_filetype_count_folder_by_name(list_data* list, filetype file_type, char* folder);
+//int list_get_extetype_count_folder_by_name(list_data* list, extetype exte_type, char* folder);
 
 
 //=======================================================================
@@ -329,5 +329,7 @@ const char* list_get_comp_path_folder2(list_data* list, extetype exte_type, int 
 int list_get_id_by_comp_path2(list_data* list, char* comp_path);
 const char* list_get_dirct_file_name_folder2(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_dirct_comp_path_folder2(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_parent_path_by_name2(list_data* list, char* name);
+void print_listdata2(list_data* list);
 
 #endif /* LIST_H_ */

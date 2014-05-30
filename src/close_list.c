@@ -3,6 +3,7 @@
 #include <list.h>
 #include <list_def.h>
 
+#if !EnableLink
 void close_list(int* num,char*** list)
 {
 	int i;
@@ -15,13 +16,14 @@ void close_list(int* num,char*** list)
 	free(num);
 	num=NULL;
 }
+#endif
 
 void close_listdata(list_data* list)
 {
 #if EnableLink
     close_listdata2(list);
     return;
-#endif
+#else
 
 	qsi_assert(list);
 
@@ -47,6 +49,7 @@ void close_listdata(list_data* list)
 	free(list);
 
 	list=NULL;
+#endif
 }
 
 
@@ -56,7 +59,7 @@ void close_listdata2(list_data* list)
 
     pthread_mutex_destroy(&list->mutex);
 
-    free_list_item2(list->root->head.next);
+    free_list_item2(list->root);
 
     if(list->root)
     {
