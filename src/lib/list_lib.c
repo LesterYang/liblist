@@ -82,46 +82,6 @@ char* list_strdup(const char *s)
     return r;
 }
 
-void list_set_index(list_index* data, int idx)
-{
-    if(data->current == 0)
-        data->current = idx;    // first set
-    else
-        data->next = idx;       // second set
-}
-
-#if !EnableLink
-list_index* list_get_index(list_data* list, extetype exet_type)
-{
-    static list_index* data = NULL;
-    switch(exet_type)
-    {
-        case audio: data = (list->num.audio) ? &list->idx.audio : NULL; break;
-        case video: data = (list->num.video) ? &list->idx.video : NULL; break;
-        case image: data = (list->num.image) ? &list->idx.image : NULL; break;
-        case dirct: data = (list->num.dirct) ? &list->idx.dirct : NULL; break;
-        default:    break;
-    }
-    return data;
-}
-#endif
-
-int list_check_index_error(list_data* list, int index)
-{
-    qsi_assert(list);
-
-    if (!list->num.all)
-    {
-        LIST_DBG("empty data");
-        return 1;
-    }
-    if(index <= 0 || index > list->num.all)
-    {
-        LIST_DBG("error index %d", index);
-        return 1;
-    }
-    return 0;
-}
 
 int list_check_item_id(int id)
 {
@@ -155,9 +115,9 @@ void list_compose_name(char* path, list_item* item, int* done)
 }
 
 
-#if !EnableLink
 int list_bsearch_index(list_data* list, char* name)
 {
+#if 0
     int base = list->num.directory;
     int size = list->num.all -list->num.directory;
     int idx, cmp;
@@ -179,32 +139,9 @@ int list_bsearch_index(list_data* list, char* name)
             size--;
         }
     }
+#endif
     return -1;
 }
-
-
-void list_show_index(list_data* list)
-{
-    qsi_assert(list);
-
-    LIST_DBG("directory index:");
-    LIST_DBG("  prev    :%3d",list->idx.dirct.prev);
-    LIST_DBG("  current :%3d",list->idx.dirct.current);
-    LIST_DBG("  next    :%3d",list->idx.dirct.next);
-    LIST_DBG("audio index:");
-    LIST_DBG("  prev    :%3d",list->idx.audio.prev);
-    LIST_DBG("  current :%3d",list->idx.audio.current);
-    LIST_DBG("  next    :%3d",list->idx.audio.next);
-    LIST_DBG("video index:");
-    LIST_DBG("  prev    :%3d",list->idx.video.prev);
-    LIST_DBG("  current :%3d",list->idx.video.current);
-    LIST_DBG("  next    :%3d",list->idx.video.next);
-    LIST_DBG("image index:");
-    LIST_DBG("  prev    :%3d",list->idx.image.prev);
-    LIST_DBG("  current :%3d",list->idx.image.current);
-    LIST_DBG("  next    :%3d",list->idx.image.next);
-}
-#endif
 
 int list_count_sign(char* s, char a)
 {
@@ -222,144 +159,6 @@ int list_count_sign(char* s, char a)
     }
     return n;
 }
-
-#if !EnableLink
-// Get absolute index of directory. id = 0 for recursive, id > 0 for the id directory
-int list_get_idx(list_data* list, extetype exte_type, int id, int index)
-{
-    qsi_assert(list);
-
-    int max_num = 0;
-    int offset = -1;
-    list_item* item;
-
-    if(index <=0)
-    {
-        LIST_DBG("index must be a positive number");
-        return 0;
-    }
-
-    if(id)
-    {
-        if(list_check_type_item_id(id, dirct))
-            return 0;
-        item=(list_item*)id;
-    }
-    else
-        item = list->root;
-
-    qsi_assert(item->link_num);
-
-
-    if(id)
-    {
-        switch(exte_type)
-        {
-            case audio: max_num = item->link_num->audio; break;
-            case video: max_num = item->link_num->video; break;
-            case image: max_num = item->link_num->image; break;
-            case dirct: max_num = item->link_num->dirct; break;
-            default:                                     break;
-        }
-    }
-    else
-    {
-        switch(exte_type)
-        {
-            case audio: max_num = list->num.audio; break;
-            case video: max_num = list->num.video; break;
-            case image: max_num = list->num.image; break;
-            case dirct: max_num = list->num.dirct; break;
-            default:                               break;
-        }
-    }
-
-    if(max_num == 0)
-    {
-        LIST_DBG("no matched files");
-        return 0;
-    }
-
-    if(index > max_num)
-    {
-        LIST_DBG("index is greater than the count of matched files");
-        return 0;
-    }
-
-    while(index)
-    {
-        if(++offset == list->num.all)
-            return 0;
-
-        if (list->list_item[offset]->exte_type == exte_type)
-        {
-            if(id && (list->list_item[offset]->parent != item) )
-                    continue;
-            index--;
-        }
-    }
-
-    return offset;
-}
-
-// Get absolute index of directory. There are matched type files in the directories.
-int list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index)
-{
-
-    qsi_assert(list);
-
-    if(list_check_type_item_id(id, dirct))
-        return 0;
-
-    int max_num = 0;
-    int offset = -1;
-    list_item* item=(list_item*)id;
-
-    qsi_assert(item->dirct_num);
-
-    if(index <=0)
-    {
-        LIST_DBG("index must be a positive number");
-        return 0;
-    }
-
-    switch(exte_type)
-    {
-        case audio: max_num = item->dirct_num->audio; break;
-        case video: max_num = item->dirct_num->video; break;
-        case image: max_num = item->dirct_num->image; break;
-        case dirct: max_num = list->num.dirct;        break;
-        default:                                      break;
-    }
-
-    if(max_num == 0)
-    {
-        LIST_DBG("no matched files");
-        return 0;
-    }
-
-    if(index > max_num)
-    {
-        LIST_DBG("index is greater than the count of directories");
-        return 0;
-    }
-
-    while(index)
-    {
-        if(++offset == list->num.all)
-            return 0;
-
-        if (list->list_item[offset]->exte_type == dirct &&
-            list->list_item[offset]->parent == item)
-        {
-            if( (list->list_item[offset]->has_type) && (list->list_item[offset]->has_type & (exte_type)) )
-                index--;
-        }
-    }
-    return offset;
-}
-#endif
-
 
 int list_get_file_number(list_number* n, filetype file_type)
 {
@@ -478,7 +277,7 @@ void list_del(list_head *entry)
     entry->prev = (list_head*)LIST_POISON2;
 }
 
-list_item* list_get_idx2(list_data* list, extetype exte_type, int id, int index)
+list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
 {
     qsi_assert(list);
 
@@ -556,7 +355,7 @@ list_item* list_get_idx2(list_data* list, extetype exte_type, int id, int index)
 }
 
 
-list_item* list_get_exet_dirct_idx_folder2(list_data* list, extetype exte_type, int id, int index)
+list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index)
 {
     qsi_assert(list);
 

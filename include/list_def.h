@@ -17,7 +17,7 @@
 #define Time_Measure
 
 
-#define EnableLink  0
+#define EnableLink  1
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
@@ -44,8 +44,8 @@
 
 // Version information
 #define MajorVerNum	1
-#define MinorVerNum	1
-#define ReleaseNum	2
+#define MinorVerNum	2
+#define ReleaseNum	0
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -179,12 +179,6 @@ typedef struct{
     int image;
 }list_dirct_type;
 
-typedef struct{
-    int prev;
-    int current;
-    int next;
-}list_index;
-
 struct list_item{
     union
     {
@@ -210,51 +204,23 @@ struct list_data{
 	sorttype sort;
 	char subdir;
 
-#if !EnableLink
-	list_item** list_item;
-	struct {
-		list_index dirct;
-		list_index audio;
-		list_index video;
-		list_index image;
-	}idx;
-#endif
-
 	pthread_mutex_t mutex;
 	char path[MAX_PATH];
 };
 
+//============================================
+// need to do
+void store_list(list_data* list, char* path);
+void store_list_subdir(list_data* list, char* path, list_item* parent_item);
+void store_list_type(list_data* list, char* path, extetype exte_type);
+void store_list_type_subdir(list_data* list, char* path, list_item* parent_item, extetype exte_type);
+//===========================================
 
-//int  store_fid(int num,char** list,char* namelist);
-//determine the range of list
-int  range_ls(int* sttart,int* end,int num);
-
-// Print list all/FIFO/.../other files
-void print_list(int* num,char*** list);
-void print_listf(int* num,char*** list);
-void print_listc(int* num,char*** list);
-void print_listd(int* num,char*** list);
-void print_listb(int* num,char*** list);
-void print_listr(int* num,char*** list);
-void print_listl(int* num,char*** list);
-void print_lists(int* num,char*** list);
-void print_listo(int* num,char*** list);
-
-//=======================================================================
-// New for version 1.x.x
-//=======================================================================
-
-int  store_listdata(list_data* list, char* path);
-int  store_listdata_extetype(list_data* list, char* path, extetype exte_type);
-int  store_list_usb(list_data* list, char* path, int store_idx);
-void store_list_usb2(list_data* list, char* path, list_item* parent_item);
+void store_list_usb(list_data* list, char* path, list_item* parent_item);
 int  store_get_exte_type(list_item* item);
 int  store_match_type(char* name, int type);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
-
-void listdata_reset_index(list_data* list);
-void listdata_sort_filetype(list_data* list);
 
 int listdata_compare_alph(const void* i, const void* j);
 int listdata_compare_dirt(const void* i, const void* j);
@@ -265,16 +231,7 @@ int listdata_compare_time(const void* i, const void* j);
 list_head* listdata_merge_sort(list_head* head);
 list_head* listdata_merge(list_head* i, list_head* j);
 
-
-void free_list_item(list_item** item, int num);
-void free_list_item2(list_item* start);
-
-//subdir
-int list_subdir_num(char* path);
-int list_subdir_type_num(char* path, extetype exte_type);
-int list_num(char* path);
-int store_listdata_subdir(list_data* list, char* path, int store_idx);
-int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extetype exte_type);
+void free_list_item(list_item* start);
 
 // =========
 // list_lib
@@ -282,14 +239,10 @@ int store_listdata_type_subdir(list_data* list, char* path, int store_idx, extet
 const char* list_get_comp_path_by_item(list_data* list, list_item* item);
 void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
-void  list_set_index(list_index* data, int idx);
-list_index* list_get_index(list_data* list, extetype exet_type);
-int   list_check_index_error(list_data* list, int index);
 int   list_check_item_id(int id);
 int   list_check_type_item_id(int id, extetype exet_type);
 void  list_compose_name(char* path, list_item* item, int* done);
 int   list_bsearch_index(list_data* list, char* name);
-void  list_show_index(list_data* list);
 int   list_count_sign(char* str, char sign);
 int   list_get_file_number(list_number* n, filetype file_type);
 int   list_get_exte_number(list_number* n, extetype exte_type);
@@ -299,14 +252,9 @@ char* list_dump_append(const char* dest, const char* src);
 void  init_list_head(list_head* head);
 void  list_add(list_head *new, list_head* head);
 
-// Get absolute index
-int   list_get_idx(list_data* list, extetype exte_type, int id, int index);
-int   list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
-list_item * list_get_item_by_name2(list_data* list, char* name);
-list_item* list_get_idx2(list_data* list, extetype exte_type, int id, int index);
-list_item* list_get_exet_dirct_idx_folder2(list_data* list, extetype exte_type, int id, int index);
-
-
+list_item* list_get_item_by_name(list_data* list, char* name);
+list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index);
+list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
 
 
 #endif /* LIST_DEF_H_ */
