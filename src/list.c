@@ -778,7 +778,7 @@ const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type,
 
     int idx = list_get_exet_dirct_idx_folder(list, exte_type, id, index);
 
-    if(idx > 0)
+    if(idx >= 0)
         return (const char*)list->list_item[idx]->name;
     else
         return NULL;
@@ -794,7 +794,7 @@ const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type,
     int done = 0;
     int idx = list_get_exet_dirct_idx_folder(list, exte_type, id, index);
 
-    if(idx > 0)
+    if(idx >= 0)
     {
         memset(list->path, 0, sizeof(list->path));
         list_compose_name(list->path, list->list_item[idx]->parent, &done);

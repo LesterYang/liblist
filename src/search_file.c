@@ -107,14 +107,14 @@ int search_exact_file(char* path,char* filename){
 
 int search_mp3(char* path,char* filename,char** list_mp3)
 {
-
+#if !EnableLink
 	DIR *dir;
 	struct dirent *ent;
 	int idx=0,shift=0;
 	char extension[]={".mp3"};
 	char dirbuf[MAX_PATH];
 	char ipath[MAX_PATH];
-#if !EnableLink
+
 	while (list_mp3[shift]!=NULL
 			&& 0 != strstr(list_mp3[shift],filename))
 	{
@@ -146,6 +146,8 @@ int search_mp3(char* path,char* filename,char** list_mp3)
 		}
 	}
 	closedir(dir);
-#endif
+
 	return idx;
+#endif
+	return 0;
 }

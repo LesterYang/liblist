@@ -52,16 +52,22 @@ void free_list_item(list_item** item, int num)
 
 void free_list_item2(list_item* start)
 {
-    qsi_assert(NULL);
-#if 0
-    list_item* item = start;
+    list_item *curr, *item;
 
-    list_for_each_entry(start, item, head)
+    if((curr=list_next_entry_or_null(start, head)) == NULL)
+        return;
+
+    for(item=NULL;;curr=list_next_entry_or_null(curr, head))
     {
-        if(item->name)
+        if(item == NULL)
         {
-            free(item->name);
+            item = curr;
+            continue;
         }
+
+        if(item->name)
+            free(item->name);
+
         if((item->file_type == Directory))
         {
             if(item->dirct_num)
@@ -70,9 +76,12 @@ void free_list_item2(list_item* start)
                 free(item->link_num);
         }
         free(item);
-        item = NULL;
+
+        if(curr == NULL)
+            break;
+
+        item = curr;
     }
-#endif
 }
 
 

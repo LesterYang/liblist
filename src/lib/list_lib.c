@@ -455,6 +455,12 @@ static inline void __list_add(list_head *new, list_head *prev, list_head *next)
     new->prev=prev;
 }
 
+static inline void __list_del(list_head *prev, list_head *next)
+{
+    next->prev = prev;
+    prev->next = next;
+}
+
 void list_add(list_head *new, list_head* head)
 {
     __list_add(new, head, head->next);
@@ -465,8 +471,12 @@ void list_add_tail(list_head *new, list_head* head)
     __list_add(new, head->prev, head);
 }
 
-
-
+void list_del(list_head *entry)
+{
+    __list_del(entry->prev, entry->next);
+    entry->next = (list_head*)LIST_POISON1;
+    entry->prev = (list_head*)LIST_POISON2;
+}
 
 list_item* list_get_idx2(list_data* list, extetype exte_type, int id, int index)
 {

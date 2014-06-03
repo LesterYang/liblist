@@ -9,6 +9,8 @@
 #include <list.h>
 #include <list_def.h>
 
+static int (*g_compare_func)(const void *, const void *) = listdata_compare_alph;
+
 /**********************
  *  for 0.x.x version *
  **********************/
@@ -432,12 +434,23 @@ void listdata_msort(list_data* list, sorttype sort_type)
     qsi_assert(list->root);
 
     pthread_mutex_lock(&list->mutex);
-    list->root->head.next = listdata_merge_sort(list->root->head.next, sort_type);
+
+    switch(sort_type)
+    {
+        case sortAlph: g_compare_func = listdata_compare_alph;  break;
+        case sortDirt: g_compare_func = listdata_compare_dirt;  break;
+        case sortExte: g_compare_func = listdata_compare_exte;  break;
+        case sortSize: g_compare_func = listdata_compare_size;  break;
+        case sortTime: g_compare_func = listdata_compare_time;  break;
+        default:                                                break;
+    }
+    list->root->head.next = listdata_merge_sort(list->root->head.next);
     list->sort = sort_type;
+
     pthread_mutex_unlock(&list->mutex);
 }
 
-list_head* listdata_merge_sort(list_head* head, sorttype sort_type)
+list_head* listdata_merge_sort(list_head* head)
 {
     if(head == NULL || head->next == NULL)
         return head;
@@ -456,26 +469,10 @@ list_head* listdata_merge_sort(list_head* head, sorttype sort_type)
     half = middle->next;
     middle->next = NULL;
 
-    switch(sort_type)
-    {
-        case sortAlph:
-            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_alph);
-        case sortDirt:
-            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_dirt);
-        case sortExte:
-            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_exte);
-        case sortSize:
-            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_size);
-        case sortTime:
-            return listdata_merge(listdata_merge_sort(head, sort_type), listdata_merge_sort(half, sort_type), listdata_compare_time);
-        default:
-            break;
-    }
-
-    return head;
+    return listdata_merge(listdata_merge_sort(head), listdata_merge_sort(half));
 }
 
-list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, const void *))
+list_head* listdata_merge(list_head* i, list_head* j)
 {
     list_head *curr;
 
@@ -487,16 +484,16 @@ list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, c
     list_item* item_i = (list_item*)container_of(i, list_item, head);
     list_item* item_j = (list_item*)container_of(j, list_item, head);
 
-    if(cmp(&item_i, &item_j) < 0)
+    if(g_compare_func(&item_i, &item_j) < 0)
     {
         curr = i;
-        curr->next = listdata_merge(i->next, j, cmp);
+        curr->next = listdata_merge(i->next, j);
         curr->next->prev = curr;
     }
     else
     {
         curr = j;
-        curr->next = listdata_merge(i, j->next, cmp);
+        curr->next = listdata_merge(i, j->next);
         curr->next->prev = curr;
     }
 

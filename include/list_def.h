@@ -17,7 +17,7 @@
 #define Time_Measure
 
 
-#define EnableLink  1
+#define EnableLink  0
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
@@ -35,6 +35,9 @@
 #define MODE_REGR   8
 #define MODE_LINK   10
 #define MODE_SOCK   12
+
+#define LIST_POISON1  ((void*)0x00100100)
+#define LIST_POISON2  ((void*)0x00200200)
 
 #define _STR(s) #s
 #define STR(s) _STR(s)
@@ -142,7 +145,6 @@
      for (pos = list_next_entry_or_null(first, member);                    \
           pos != NULL;                                                     \
           pos = list_next_entry_or_null(pos, member))
-
 
 typedef struct list_head list_head;
 
@@ -260,8 +262,8 @@ int listdata_compare_exte(const void* i, const void* j);
 int listdata_compare_size(const void* i, const void* j);
 int listdata_compare_time(const void* i, const void* j);
 
-list_head* listdata_merge_sort(list_head* head, sorttype sort_type);
-list_head* listdata_merge(list_head* i, list_head* j, int (*cmp)(const void *, const void *));
+list_head* listdata_merge_sort(list_head* head);
+list_head* listdata_merge(list_head* i, list_head* j);
 
 
 void free_list_item(list_item** item, int num);
