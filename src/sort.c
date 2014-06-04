@@ -10,6 +10,7 @@
 #include <list_def.h>
 
 static int (*g_compare_func)(const void *, const void *) = listdata_compare_alph;
+static extetype g_exte_type = none_type;
 
 /**********************
  *  compare function  *
@@ -213,6 +214,8 @@ void listdata_msort(list_data* list, sorttype sort_type)
 
     pthread_mutex_lock(&list->mutex);
 
+    g_exte_type = none_type;
+    
     switch(sort_type)
     {
         case sortAlph: g_compare_func = listdata_compare_alph;  break;
@@ -259,9 +262,28 @@ list_head* listdata_merge(list_head* i, list_head* j)
     if(j == NULL)
         return i;
 
-    list_item* item_i = (list_item*)container_of(i, list_item, head);
-    list_item* item_j = (list_item*)container_of(j, list_item, head);
-
+    list_item *item_i, *item_j;
+    
+    switch(g_exte_type)
+    {
+        case audio:
+            item_i = (list_item*)container_of(i, list_item, audio_head);
+            item_j = (list_item*)container_of(j, list_item, audio_head);
+            break;
+        case video:
+            break;
+            item_i = (list_item*)container_of(i, list_item, video_head);
+            item_j = (list_item*)container_of(j, list_item, video_head);
+        case image:
+            item_i = (list_item*)container_of(i, list_item, image_head);
+            item_j = (list_item*)container_of(j, list_item, image_head);
+            break;
+        default:
+            item_i = (list_item*)container_of(i, list_item, head);
+            item_j = (list_item*)container_of(j, list_item, head);
+            break;
+    }
+	
     if(g_compare_func(&item_i, &item_j) < 0)
     {
         curr = i;

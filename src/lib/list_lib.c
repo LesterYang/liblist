@@ -286,11 +286,18 @@ list_item * list_get_item_by_name(list_data* list, char* name)
     if(memcmp(list->root->name, name, list->root->name_len) != 0)
         return NULL;
 
+#if 0
     char str[MAX_NAME] ={0};
     strcpy(str,name);
     char *p = strtok(str + list->root->name_len, "/");
     parent = list->root;
-
+#else
+    char *p = name;
+    if((*p = strtok(p + list->root->name_len, "/")))
+        parent = list->root;
+    else
+        return list->root;
+#endif
     while(p)
     {
         list_for_each_entry(list->root, curr, head)
