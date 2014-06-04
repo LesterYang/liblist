@@ -12,26 +12,39 @@ struct timeval tv;
 unsigned long long start_utime, end_utime, tmp_utime;
 #endif
 
-
-
-#if !EnableLink
-list_data* open_listdata(char* path, list_data** plist)
-{
-}
-
-list_data* open_listdata_type(char* path, list_data** plist, extetype exte_type, sorttype sort_type)
-{
-}
-
-list_data* open_listdata_subdir(char* path, list_data** plist)
-{
-}
-
-list_data* open_listdata_type_subdir(char* path, list_data** plist,extetype exte_type, sorttype sort_type)
-{
-}
+#if 0
+// ===========================================
+// need to do
+// ===========================================
+// Open list_data structure by path, allocate memory, return NULL if open error:
+//    open_listdata        : save all file type.
+//    open_listdata_type   : save directory and matched regular file. default sorting is alphanumeric.
+//    open_listdata_subdir : save all file type recursively.
+int open_listdata(char* path, list_data** plist);
+int open_listdata_type(char* path, list_data** plist, extetype exte_type, sorttype sort_type);
+int open_listdata_subdir(char* path, list_data** plist);
+int open_listdata_type_subdir(char* path, list_data** plist,extetype exte_type, sorttype sort_type);
 #endif
 
+int open_listdata(char* path, list_data** plist)
+{
+    return 0;
+}
+
+int open_listdata_type(char* path, list_data** plist, extetype exte_type, sorttype sort_type)
+{
+    return 0;
+}
+
+int open_listdata_subdir(char* path, list_data** plist)
+{
+    return 0;
+}
+
+int open_listdata_type_subdir(char* path, list_data** plist,extetype exte_type, sorttype sort_type)
+{
+    return 0;
+}
 
 int list_init(list_data** plist)
 {

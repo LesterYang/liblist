@@ -7,17 +7,6 @@
 #ifndef LIST_H_
 #define LIST_H_
 
-#define MAX_EXTE_LEN	(8)
-#define MAX_NAME		(255)
-
-typedef int list_bool_t;
-#ifndef FALSE
-#define FALSE ((list_bool_t) 0)
-#endif
-#ifndef TRUE
-#define TRUE (!FALSE)
-#endif
-
 typedef enum filetype {
 	all,
 	FIFO,
@@ -64,7 +53,7 @@ typedef struct list_item list_item;
 typedef struct list_data list_data;
 
 #ifdef List_Exte_Type
-// Length of extension must be less than MAX_EXTE_LEN(8)
+// Length of extension must be less than 8 bytes
 const char* audio_exte_str[]=
 {
     ".mp3",
@@ -104,43 +93,38 @@ const char* image_exte_str[]=
 };
 #endif
 
-// open "/mnt/usb" to initialize list structure
+
+// ==============================
+// Initialize/Open (open_list.c)
+// ==============================
+// open "/mnt/usb" to initialize list structure.
 // sort = alphanumeric, file type = audio|video|image|directory
-// return id of "/mnt/usb", or 0 if error
+// return id of "/mnt/usb", or 0 if error.
 int list_init(list_data** plist);
 
-// ===========================================
-// need to do
-// ===========================================
-// Open list_data structure by path, allocate memory, return NULL if open error:
-//    open_listdata        : save all file type.
-//    open_listdata_type   : save directory and matched regular file. default sorting is alphanumeric.
-//    open_listdata_subdir : save all file type recursively.
-list_data* open_listdata(char* path, list_data** plist);
-list_data* open_listdata_type(char* path, list_data** plist, extetype exte_type, sorttype sort_type);
-list_data* open_listdata_subdir(char* path, list_data** plist);
-list_data* open_listdata_type_subdir(char* path, list_data** plist,extetype exte_type, sorttype sort_type);
-// ===========================================
+// =============================
+// Release/Close (clode_list.c)
+// =============================
+// Close list_data structure, release memory.
+void close_list(list_data* list);
 
 
-
-// Close list_data structure, release memory
-void close_listdata(list_data* list);
-
-// Get liblist.so version string
+// ================================
+// APIs for 1.2.x version (list.c)
+// ================================
+// Get liblist.so version string / extension type string.
 char* list_get_version_number(void);
+char* list_get_exettype_str(extetype exet_type);
 
-// Get list structure information
+// Get list structure information about opened path name, extension type, sort type.
 const char* list_get_info_open_path(list_data* list);
-
 extetype list_get_info_filter(list_data* list);
 sorttype list_get_info_sorttype(list_data* list);
-char*    list_get_exettype_str(extetype exet_type);
 
-
-
-// Get files count
-// Get files count only in the id directory
+// Get count of the matched type files.
+// list_get_xxx_count            : Get files count.
+// list_get_xxx_count_folder     : Get files count only in the id directory.
+// list_get_exte_dirct_count_xxx : Get count of directories in the id directory. There are matched files in the directories.
 // error code:
 //    -1 : type error
 //    -2 : id error
@@ -148,57 +132,62 @@ int list_get_filetype_count(list_data* list, filetype file_type);
 int list_get_extetype_count(list_data* list, extetype exte_type);
 int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
 int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id);
-
-// Get count of directories in the id directory. There are matched files in the directories.
-// error code:
-//    -1 : type error
-//    -2 : id error
 int list_get_exte_dirct_count_folder(list_data* list, extetype exte_type, int id);
 
-// Get complete path
-// Get file name
-// Get complete path only in the id directory
-// Get file name only in the id directory
+// Get id.
+// return 0 if complete path error.
+int list_get_id_by_comp_path(list_data* list, char* comp_path);
+int list_get_parent_id_by_comp_path(list_data* list, char* comp_path);
+int list_get_parent_id_by_id(int id);
+int list_get_root_id(list_data* list);
+
+// Get information string by relative index with extension type.
+// list_get_file_name              : Get file name.
+// list_get_comp_path              : Get complete path.
+// list_get_file_name_folder       : Get file name only in the id directory.
+// list_get_comp_path_folder       : Get complete path only in the id directory.
+// list_get_dirct_file_name_folder : Get complete path of a directory that have matched files only in the id directory.
+// list_get_dirct_comp_path_folder : Get file name of a directory that have matched files only in the id directory.
+// return NULL if
+//     1. index isn't a a positive number or
+//     2. index is larger than count
+//     3. id error
 const char* list_get_file_name(list_data* list, extetype exte_type, int index);
 const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
-
-// Get complete path only in the id directory. There are matched files in the directories.
-// Get file name only in the id directory. There are matched files in the directories.
 const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
 
-
-// Get id, return 0 if errors occur
-int list_get_id_by_comp_path(list_data* list, char* comp_path);
-int list_get_parent_id_by_comp_path(list_data* list, char* comp_path);
-int list_get_root_id(list_data* list);
-
-// Get complete path, return NULL if errors occur
-const char* list_get_comp_path_by_id(list_data* list, int id);
-const char* list_get_parent_comp_path_by_id(list_data* list, int id);
-const char* list_get_parent_path_by_name(list_data* list, char* name);
-
-int list_check_drict_has_type(list_data* list, extetype exte_type, int id);
-
+// Get information string by id.
+// list_get_file_name_by_id        : Get complete path.
+// list_get_comp_path_by_id        : Get file name.
+// list_get_parent_file_name_by_id : Get complete path of parent.
+// list_get_parent_comp_path_by_id : Get file name of parent.
+// return NULL if id error
 const char* list_get_file_name_by_id(int id);
-int list_get_parent_id_by_id(int id);
+const char* list_get_comp_path_by_id(list_data* list, int id);
+const char* list_get_parent_file_name_by_id(list_data* list, int id);
+const char* list_get_parent_comp_path_by_id(list_data* list, int id);
 
-// Get list item information by complete path ,return -1 for id error
+// Get list item information by complete path ,return -1 for id error.
 filetype list_get_filetype_by_id(int id);
 extetype list_get_extetype_by_id(int id);
 filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path);
 extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path);
 
+
+// ==============
+// Sort (sort.c)
+// ==============
 // Sort data by alphanumeric/extension/size/modified_time/folder
-// Sorting algorithm :
-//   quick sort for array
-//   merge sort for list linked
+// Sorting algorithm : merge sort
 void listdata_msort(list_data* list, sorttype sort_type);
 
 
-// ======== Print List ========
+// ================================
+// List information (print_list.c)
+// ================================
 // print raw data
 void print_listdata(list_data* list);
 // list all files, print complete path
@@ -213,7 +202,9 @@ void print_count_all(list_data* list);
 void print_count_folder_by_id(list_data* list, int id);
 
 
-// ========= Other =========
+// =================
+// Other (search.c)
+// =================
 // Search files by key words/exact words/mp3
 int search_file(char* path, char* filename);
 // Search index of POI in the local

@@ -4,19 +4,19 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../src/lib/free2.c \
 ../src/lib/list_lib.c \
-../src/lib/sort_listdata.c 
+../src/lib/store_list.c \
+../src/lib/store_list_exte.c 
 
 OBJS += \
-./src/lib/free2.o \
 ./src/lib/list_lib.o \
-./src/lib/sort_listdata.o 
+./src/lib/store_list.o \
+./src/lib/store_list_exte.o 
 
 C_DEPS += \
-./src/lib/free2.d \
 ./src/lib/list_lib.d \
-./src/lib/sort_listdata.d 
+./src/lib/store_list.d \
+./src/lib/store_list_exte.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

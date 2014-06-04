@@ -16,17 +16,16 @@
 #endif
 #define Time_Measure
 
-
-#define EnableLink  1
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
 
-#define MAX_PATH	(4096)
-#define MAX_NAME    (255)
-#define MAX_FILES	(65536)
-#define BUF_SIZE	(256)
+#define MAX_EXTE_LEN    (8)
+#define MAX_NAME        (255)
+#define MAX_PATH	    (4096)
+#define MAX_FILES	    (65536)
+#define BUF_SIZE	    (256)
 
-#define USB_PATH    "/mnt/usb"
+#define USB_PATH        "/mnt/usb"
 
 #define MODE_FIFO   1
 #define MODE_CHAR   2
@@ -62,13 +61,13 @@
 #define qsi_nothing() do {} while (FALSE)
 
 #if (QSI_ASSERT!=0)
-#define qsi_assert(expr)                                              		\
-    do {                                                                	\
-        if (QSI_UNLIKELY(!(expr))) {                                     	\
-        	printf("Expr '%s' failed at %s:%u, function '%s'. Aborting\n",	\
-						#expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);	\
-            abort();                                                    	\
-        }                                                              		\
+#define qsi_assert(expr)                                              	            	\
+    do {                                                                            	\
+        if (QSI_UNLIKELY(!(expr))) {                                     	            \
+        	printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Aborting\n",	\
+						#expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);	            \
+            abort();                                                                	\
+        }                                                              	            	\
     } while (0)
 #else
 #define qsi_assert(expr) qsi_nothing()
@@ -145,6 +144,14 @@
      for (pos = list_next_entry_or_null(first, member);                    \
           pos != NULL;                                                     \
           pos = list_next_entry_or_null(pos, member))
+
+typedef int list_bool_t;
+#ifndef FALSE
+#define FALSE ((list_bool_t) 0)
+#endif
+#ifndef TRUE
+#define TRUE (!FALSE)
+#endif
 
 typedef struct list_head list_head;
 

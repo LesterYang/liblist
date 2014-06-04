@@ -9,6 +9,11 @@
 #include <list.h>
 #include <list_def.h>
 
+char* list_get_version_number(void)
+{
+    return VerNum(MajorVerNum, MinorVerNum, ReleaseNum);
+}
+
 char* list_get_exettype_str(extetype exet_type)
 {
     switch(exet_type)
@@ -34,49 +39,36 @@ char* list_get_exettype_str(extetype exet_type)
     return "unknown";
 }
 
-int list_get_extetype_count(list_data* list, extetype exte_type)
+const char* list_get_info_open_path(list_data* list)
 {
-	qsi_assert(list);
-
-	return list_get_exte_number(&list->num, exte_type);
-}
-
-int list_get_filetype_count(list_data* list, filetype file_type)
-{
-	qsi_assert(list);
-
-	return list_get_file_number(&list->num, file_type);
+    qsi_assert(list);
+    return (const char*)list->root->name;
 }
 
 extetype list_get_info_filter(list_data* list)
 {
-	qsi_assert(list);
-	return list->exte_select;
+    qsi_assert(list);
+    return list->exte_select;
 }
 
 sorttype list_get_info_sorttype(list_data* list)
 {
-	qsi_assert(list);
-	return list->sort;
+    qsi_assert(list);
+    return list->sort;
 }
 
-const char* list_get_info_open_path(list_data* list)
-{
-	qsi_assert(list);
-	return (const char*)list->root->name;
-}
-
-int list_check_drict_has_type(list_data* list, extetype exte_type, int id)
+int list_get_filetype_count(list_data* list, filetype file_type)
 {
     qsi_assert(list);
 
-    if(list_check_type_item_id(id, dirct))
-        return -1;
+    return list_get_file_number(&list->num, file_type);
+}
 
-    if(( ((list_item*)id)->has_type & exte_type ))
-        return 1;
-    else
-        return 0;
+int list_get_extetype_count(list_data* list, extetype exte_type)
+{
+    qsi_assert(list);
+
+    return list_get_exte_number(&list->num, exte_type);
 }
 
 int list_get_filetype_count_folder(list_data* list, filetype file_type, int id)
@@ -127,6 +119,17 @@ int list_get_exte_dirct_count_folder(list_data* list, extetype exte_type, int id
     return num;
 }
 
+int list_get_id_by_comp_path(list_data* list, char* comp_path)
+{
+    qsi_assert(list);
+
+    list_item *item = list_get_item_by_name(list, comp_path);
+
+    if(item)
+        return item->id;
+    else
+        return 0;
+}
 
 int list_get_parent_id_by_comp_path(list_data* list, char* comp_path)
 {
@@ -145,128 +148,10 @@ int list_get_parent_id_by_id(int id)
 
 int list_get_root_id(list_data* list)
 {
+    qsi_assert(list);
+
     return list->root->id;
 }
-
-const char* list_get_comp_path_by_id(list_data* list, int id)
-{
-    if(list_check_item_id(id))
-        return NULL;
-
-    return list_get_comp_path_by_item(list, (list_item*)id);
-}
-
-const char* list_get_parent_comp_path_by_id(list_data* list, int id)
-{
-    if(list_check_item_id(id))
-        return NULL;
-
-    return list_get_comp_path_by_item(list, ((list_item*)id)->parent->self);
-}
-
-const char* list_get_file_name_by_id(int id)
-{
-    if(list_check_item_id(id))
-        return NULL;
-
-    return (const char*)(((list_item*)id)->name);
-}
-
-filetype list_get_filetype_by_id(int id)
-{
-    if(list_check_item_id(id))
-        return -1;
-
-    return ((list_item*)id)->file_type;
-}
-
-extetype list_get_extetype_by_id(int id)
-{
-    if(list_check_item_id(id))
-        return -1;
-
-    return ((list_item*)id)->exte_type;
-}
-
-filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path)
-{
-    int id;
-
-    qsi_assert(comp_path);
-
-    if(!(id=list_get_id_by_comp_path(list, comp_path)))
-        return -1;
-
-    if(list_check_item_id(id))
-        return -1;
-
-    return ((list_item*)id)->file_type;
-}
-
-extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path)
-{
-    int id;
-
-    qsi_assert(comp_path);
-
-    if(!(id=list_get_id_by_comp_path(list, comp_path)))
-        return -1;
-
-    if(list_check_item_id(id))
-        return -1;
-
-    return ((list_item*)id)->exte_type;
-}
-
-
-/********************
- *   list linked    *
- ********************/
-
-const char* list_get_parent_path_by_name(list_data* list, char* name)
-{
-    int id = list_get_id_by_comp_path(list, name);
-
-    if(id)
-        return ((list_item*)id)->parent->name;
-    else
-        return NULL;
-}
-
-list_item * list_get_item_by_name(list_data* list, char* name)
-{
-    qsi_assert(list);
-    qsi_assert(name);
-    list_item *parent, *curr=NULL;
-
-    if(memcmp(list->root->name, name, list->root->name_len) != 0)
-        return NULL;
-
-    char str[MAX_NAME] ={0};
-    strcpy(str,name);
-    char *p = strtok(str + list->root->name_len, "/");
-    parent = list->root;
-
-    while(p)
-    {
-        list_for_each_entry(list->root, curr, head)
-        {
-            if(curr->parent != parent)
-                continue;
-
-            if(!strcmp(curr->name, p))
-                break;
-        }
-
-        if(curr == NULL)
-            return NULL;
-
-        parent = curr;
-        p=strtok(NULL,"/");
-    }
-    return curr;
-}
-
 
 const char* list_get_file_name(list_data* list, extetype exte_type, int index)
 {
@@ -320,18 +205,6 @@ const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int i
         return NULL;
 }
 
-int list_get_id_by_comp_path(list_data* list, char* comp_path)
-{
-    qsi_assert(list);
-
-    list_item *item = list_get_item_by_name(list, comp_path);
-
-    if(item)
-        return item->id;
-    else
-        return 0;
-}
-
 const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index)
 {
     list_item *item = list_get_exet_dirct_idx_folder(list, exte_type, id, index);
@@ -356,4 +229,87 @@ const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type,
     }
     else
         return NULL;
+}
+
+const char* list_get_file_name_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return NULL;
+
+    return (const char*)(((list_item*)id)->name);
+}
+
+const char* list_get_comp_path_by_id(list_data* list, int id)
+{
+    if(list_check_item_id(id))
+        return NULL;
+
+    return list_get_comp_path_by_item(list, (list_item*)id);
+}
+
+const char* list_get_parent_file_name_by_id(list_data* list, int id)
+{
+    if(list_check_item_id(id))
+         return NULL;
+
+    if(id)
+        return ((list_item*)id)->parent->name;
+    else
+        return NULL;
+}
+
+const char* list_get_parent_comp_path_by_id(list_data* list, int id)
+{
+    if(list_check_item_id(id))
+        return NULL;
+
+    return list_get_comp_path_by_item(list, ((list_item*)id)->parent->self);
+}
+
+
+
+filetype list_get_filetype_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->file_type;
+}
+
+extetype list_get_extetype_by_id(int id)
+{
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->exte_type;
+}
+
+filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path)
+{
+    int id;
+
+    qsi_assert(comp_path);
+
+    if(!(id=list_get_id_by_comp_path(list, comp_path)))
+        return -1;
+
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->file_type;
+}
+
+extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path)
+{
+    int id;
+
+    qsi_assert(comp_path);
+
+    if(!(id=list_get_id_by_comp_path(list, comp_path)))
+        return -1;
+
+    if(list_check_item_id(id))
+        return -1;
+
+    return ((list_item*)id)->exte_type;
 }

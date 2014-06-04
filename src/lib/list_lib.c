@@ -85,7 +85,7 @@ char* list_strdup(const char *s)
 
 int list_check_item_id(int id)
 {
-    if((id != *(int*)id) )
+    if((id == 0) || (id != *(int*)id) )
     {
         LIST_DBG("id error");
         return 1;
@@ -277,6 +277,40 @@ void list_del(list_head *entry)
     entry->prev = (list_head*)LIST_POISON2;
 }
 
+list_item * list_get_item_by_name(list_data* list, char* name)
+{
+    qsi_assert(list);
+    qsi_assert(name);
+    list_item *parent, *curr=NULL;
+
+    if(memcmp(list->root->name, name, list->root->name_len) != 0)
+        return NULL;
+
+    char str[MAX_NAME] ={0};
+    strcpy(str,name);
+    char *p = strtok(str + list->root->name_len, "/");
+    parent = list->root;
+
+    while(p)
+    {
+        list_for_each_entry(list->root, curr, head)
+        {
+            if(curr->parent != parent)
+                continue;
+
+            if(!strcmp(curr->name, p))
+                break;
+        }
+
+        if(curr == NULL)
+            return NULL;
+
+        parent = curr;
+        p=strtok(NULL,"/");
+    }
+    return curr;
+}
+
 list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
 {
     qsi_assert(list);
@@ -287,13 +321,13 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     if(index <=0)
     {
         LIST_DBG("index must be a positive number");
-        return 0;
+        return NULL;
     }
 
     if(id)
     {
         if(list_check_type_item_id(id, dirct))
-            return 0;
+            return NULL;
         item=(list_item*)id;
     }
     else
@@ -328,13 +362,13 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     if(max_num == 0)
     {
         LIST_DBG("no matched files");
-        return 0;
+        return NULL;
     }
 
     if(index > max_num)
     {
         LIST_DBG("index is greater than the count of matched files");
-        return 0;
+        return NULL;
     }
 
 
