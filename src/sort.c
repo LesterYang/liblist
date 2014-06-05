@@ -209,6 +209,8 @@ int listdata_compare_time(const void* i, const void* j)
  *********************************/
 void listdata_msort(list_data* list, sorttype sort_type)
 {
+    list_item *curr;
+
     qsi_assert(list);
     qsi_assert(list->root);
 
@@ -227,6 +229,28 @@ void listdata_msort(list_data* list, sorttype sort_type)
     }
     list->root->head.next = listdata_merge_sort(list->root->head.next);
     list->sort = sort_type;
+
+#if 0 // test
+    g_compare_func = listdata_compare_alph;
+
+    list_for_each_entry(list->root, curr, head)
+    {
+        if(curr->exte_type == dirct)
+        {
+            curr->audio_head.next = listdata_merge_sort(curr->audio_head.next);
+            if(curr->name[0] == 't')
+            {
+                list_item * v1=container_of(curr->video_head.next, list_item, video_head);
+                list_item * v2=container_of(curr->video_head.next->next, list_item, video_head);
+                printf("%s\n",curr->name);
+                printf("video %d : %s\n",v1->name_len,v1->name);
+                printf("video %d : %s\n",v2->name_len,v2->name);
+            }
+            curr->video_head.next = listdata_merge_sort(curr->video_head.next);
+            curr->image_head.next = listdata_merge_sort(curr->image_head.next);
+        }
+    }
+#endif
 
     pthread_mutex_unlock(&list->mutex);
 }

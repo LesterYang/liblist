@@ -178,6 +178,9 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                     item->has_type = allfile;
                     item->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type));
                     item->link_num = (list_number*)calloc(1, sizeof(list_number));
+                    init_list_head(&(item->audio_head));
+                    init_list_head(&(item->video_head));
+                    init_list_head(&(item->image_head));
                     break;
 
                 case MODE_BLCK:
@@ -195,14 +198,17 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                         case audio:
                             list->num.audio++;
                             parent_item->link_num->audio++;
+                            list_add(&item->audio_head, &parent_item->audio_head);
                             break;
                         case video:
                             list->num.video++;
                             parent_item->link_num->video++;
+                            list_add(&item->video_head, &parent_item->video_head);
                             break;
                         case image:
                             list->num.image++;
                             parent_item->link_num->image++;
+                            list_add(&item->image_head, &parent_item->image_head);
                             break;
                         default:
                             break;

@@ -196,6 +196,9 @@ struct list_item{
 	extetype exte_type;
 	extetype has_type;
 	list_head head;
+	list_head audio_head;
+	list_head video_head;
+	list_head image_head;
 	list_number* link_num;
 	list_dirct_type* dirct_num;
 	size_t name_len;
