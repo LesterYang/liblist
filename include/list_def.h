@@ -127,28 +127,18 @@
     (type *)( (char *)__mptr - offsetof(type,member) );                     \
 })
 
-// get next element in list
-// @pos    : the type * to cursor
-// @member : the name of the list_struct within the structure.
 #define list_next_entry(pos, member)                                       \
         container_of((pos)->member.next, typeof(*(pos)), member)
 
 #define list_next_entry_or_null(pos, member)                               \
         ((pos)->member.next) ? list_next_entry(pos, member) : NULL
 
-// get prev element in list
-// @pos    : the type * to cursor
-// @member : the name of the list_struct within the structure.
 #define list_prev_entry(pos, member)                                       \
         container_of((pos)->member.prev, typeof(*(pos)), member)
 
 #define list_prev_entry_or_null(pos, member)                               \
         ((pos)->member.prev) ? list_prev_entry(pos, member) : NULL
 
-// iterate over a list
-// @first  : the head for list.
-// @pos    : the type * to use as a loop cursor.
-// @member : the name of the list_struct within the structure.
 #define list_for_each_entry(first, pos, member)                            \
      for (pos = list_next_entry_or_null(first, member);                    \
           pos != NULL;                                                     \
