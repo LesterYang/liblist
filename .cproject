@@ -926,7 +926,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.2.0" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
+				<configuration artifactExtension="so.1.2.1" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
 					<folderInfo id="0.308064247.98712758." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.702764346" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.53587341" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -1840,7 +1840,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.2.0" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactExtension="so.1.2.1" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
 					<folderInfo id="0.308064247.1058103554." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.942075436" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1860653471" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>

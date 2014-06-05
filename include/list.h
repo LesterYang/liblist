@@ -156,6 +156,8 @@ const char* list_get_file_name(list_data* list, extetype exte_type, int index);
 const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_dirct_file_name(list_data* list, extetype exte_type, int index);
+const char* list_get_dirct_comp_path(list_data* list, extetype exte_type, int index);
 const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index);
 const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
 
@@ -175,6 +177,19 @@ filetype list_get_filetype_by_id(int id);
 extetype list_get_extetype_by_id(int id);
 filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path);
 extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path);
+
+// Get index by id
+// error code:
+//     -1 : id error or it's not a folder for list_get_dirct_xxx()
+//      0 : it's /mnt/usb or the folder doesn't have matched type file for list_get_dirct_xxx()
+int list_get_index_by_id(list_data* list, int id);
+int list_get_index_folder_by_id(list_data* list, int id);
+int list_get_dirct_index_by_id(list_data* list, extetype exte_type, int id);
+int list_get_dirct_index_folder_by_id(list_data* list, extetype exte_type, int id);
+int list_get_index_by_comp_path(list_data* list, char* comp_path);
+int list_get_index_folder_by_comp_path(list_data* list, char* comp_path);
+int list_get_dirct_index_by_comp_path(list_data* list, extetype exte_type, char* comp_path);
+int list_get_dirct_index_folder_by_comp_path(list_data* list, extetype exte_type, char* comp_path);
 
 
 // ==============

@@ -173,14 +173,18 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                 case MODE_DIRT:
                     list->num.directory++;
                     parent_item->link_num->directory++;
+
                     item->file_type = Directory;
                     item->exte_type = dirct;
                     item->has_type = allfile;
                     item->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type));
                     item->link_num = (list_number*)calloc(1, sizeof(list_number));
+                    init_list_head(&(item->Directory_head));
                     init_list_head(&(item->audio_head));
                     init_list_head(&(item->video_head));
                     init_list_head(&(item->image_head));
+
+                    list_add(&item->dirct_head, &parent_item->Directory_head);
                     break;
 
                 case MODE_BLCK:
@@ -234,7 +238,7 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                     break;
             }
         }
-#end
+#endif
         if(ent->d_type == MODE_DIRT)
         {
 #if TestInit

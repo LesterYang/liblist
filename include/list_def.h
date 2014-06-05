@@ -44,7 +44,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	2
-#define ReleaseNum	0
+#define ReleaseNum	1
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -136,6 +136,15 @@
 #define list_next_entry_or_null(pos, member)                               \
         ((pos)->member.next) ? list_next_entry(pos, member) : NULL
 
+// get prev element in list
+// @pos    : the type * to cursor
+// @member : the name of the list_struct within the structure.
+#define list_prev_entry(pos, member)                                       \
+        container_of((pos)->member.prev, typeof(*(pos)), member)
+
+#define list_prev_entry_or_null(pos, member)                               \
+        ((pos)->member.prev) ? list_prev_entry(pos, member) : NULL
+
 // iterate over a list
 // @first  : the head for list.
 // @pos    : the type * to use as a loop cursor.
@@ -144,6 +153,11 @@
      for (pos = list_next_entry_or_null(first, member);                    \
           pos != NULL;                                                     \
           pos = list_next_entry_or_null(pos, member))
+
+#define list_for_each_entry_reverse(last, pos, member)                     \
+     for (pos = list_prev_entry_or_null(last, member);                     \
+          pos != NULL;                                                     \
+          pos = list_prev_entry_or_null(pos, member))
 
 typedef int list_bool_t;
 #ifndef FALSE
@@ -196,9 +210,11 @@ struct list_item{
 	extetype exte_type;
 	extetype has_type;
 	list_head head;
+	list_head Directory_head;
 	list_head audio_head;
 	list_head video_head;
 	list_head image_head;
+	list_head dirct_head;
 	list_number* link_num;
 	list_dirct_type* dirct_num;
 	size_t name_len;
@@ -213,6 +229,7 @@ struct list_data{
 	extetype exte_select;
 	sorttype sort;
 	char subdir;
+	char init;
 
 	pthread_mutex_t mutex;
 	char path[MAX_PATH];
@@ -266,5 +283,8 @@ list_item* list_get_item_by_name(list_data* list, char* name);
 list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index);
 list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
 
+
+list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int index);
+list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int id, int index);
 
 #endif /* LIST_DEF_H_ */

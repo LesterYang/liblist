@@ -9,8 +9,8 @@
 #include <list.h>
 #include <list_def.h>
 
-static int (*g_compare_func)(const void *, const void *) = listdata_compare_alph;
-static extetype g_exte_type = none_type;
+static int (*volatile g_compare_func)(const void *, const void *) = listdata_compare_alph;
+static volatile extetype g_exte_type = none_type;
 
 /**********************
  *  compare function  *
@@ -207,17 +207,70 @@ int listdata_compare_time(const void* i, const void* j)
 /*********************************
  *  merge sort  for linked list  *
  *********************************/
-void listdata_msort(list_data* list, sorttype sort_type)
+void listdata_msort_init(list_data* list)
 {
     list_item *curr;
 
+    g_compare_func = listdata_compare_alph;
+
+    g_exte_type = audio;
+    list->root->audio_head.next = listdata_merge_sort(list->root->audio_head.next);
+
+    g_exte_type = video;
+    list->root->video_head.next = listdata_merge_sort(list->root->video_head.next);
+
+    g_exte_type = image;
+    list->root->image_head.next = listdata_merge_sort(list->root->image_head.next);
+
+    g_exte_type = dirct;
+    list->root->Directory_head.next = listdata_merge_sort(list->root->Directory_head.next);
+
+    if(list->root->audio_head.next)
+        list->root->audio_head.next->prev = &list->root->audio_head;
+    if(list->root->video_head.next)
+        list->root->video_head.next->prev = &list->root->video_head;
+    if(list->root->image_head.next)
+        list->root->image_head.next->prev = &list->root->image_head;
+    if(list->root->Directory_head.next)
+        list->root->Directory_head.next->prev = &list->root->Directory_head;
+
+    list_for_each_entry(list->root, curr, head)
+    {
+        if(curr->exte_type == dirct)
+        {
+            g_exte_type = audio;
+            curr->audio_head.next = listdata_merge_sort(curr->audio_head.next);
+
+            g_exte_type = video;
+            curr->video_head.next = listdata_merge_sort(curr->video_head.next);
+
+            g_exte_type = image;
+            curr->image_head.next = listdata_merge_sort(curr->image_head.next);
+
+            g_exte_type = dirct;
+            curr->Directory_head.next = listdata_merge_sort(curr->Directory_head.next);
+
+            if(curr->audio_head.next)
+                curr->audio_head.next->prev = &curr->audio_head;
+            if(curr->video_head.next)
+                curr->video_head.next->prev = &curr->video_head;
+            if(curr->image_head.next)
+                curr->image_head.next->prev = &curr->image_head;
+            if(curr->Directory_head.next)
+                curr->Directory_head.next->prev = &curr->Directory_head;
+        }
+    }
+}
+
+void listdata_msort(list_data* list, sorttype sort_type)
+{
     qsi_assert(list);
     qsi_assert(list->root);
 
     pthread_mutex_lock(&list->mutex);
 
     g_exte_type = none_type;
-    
+
     switch(sort_type)
     {
         case sortAlph: g_compare_func = listdata_compare_alph;  break;
@@ -230,27 +283,11 @@ void listdata_msort(list_data* list, sorttype sort_type)
     list->root->head.next = listdata_merge_sort(list->root->head.next);
     list->sort = sort_type;
 
-#if 0 // test
-    g_compare_func = listdata_compare_alph;
+    if(list->root->head.next)
+        list->root->head.next->prev = &list->root->head;
 
-    list_for_each_entry(list->root, curr, head)
-    {
-        if(curr->exte_type == dirct)
-        {
-            curr->audio_head.next = listdata_merge_sort(curr->audio_head.next);
-            if(curr->name[0] == 't')
-            {
-                list_item * v1=container_of(curr->video_head.next, list_item, video_head);
-                list_item * v2=container_of(curr->video_head.next->next, list_item, video_head);
-                printf("%s\n",curr->name);
-                printf("video %d : %s\n",v1->name_len,v1->name);
-                printf("video %d : %s\n",v2->name_len,v2->name);
-            }
-            curr->video_head.next = listdata_merge_sort(curr->video_head.next);
-            curr->image_head.next = listdata_merge_sort(curr->image_head.next);
-        }
-    }
-#endif
+    if(list->init)
+        listdata_msort_init(list);
 
     pthread_mutex_unlock(&list->mutex);
 }
@@ -301,6 +338,10 @@ list_head* listdata_merge(list_head* i, list_head* j)
         case image:
             item_i = (list_item*)container_of(i, list_item, image_head);
             item_j = (list_item*)container_of(j, list_item, image_head);
+            break;
+        case dirct:
+            item_i = (list_item*)container_of(i, list_item, dirct_head);
+            item_j = (list_item*)container_of(j, list_item, dirct_head);
             break;
         default:
             item_i = (list_item*)container_of(i, list_item, head);

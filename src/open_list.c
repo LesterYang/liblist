@@ -71,12 +71,17 @@ int list_init(list_data** plist)
         goto free_list_data;
     }
 
+    l->init = 1;
     l->root->self = l->root;
     l->root->file_type = Directory;
     l->root->exte_type = dirct;
     l->root->has_type = allfile;
     l->root->name_len = strlen(USB_PATH);
     init_list_head(&(l->root->head));
+    init_list_head(&(l->root->audio_head));
+    init_list_head(&(l->root->video_head));
+    init_list_head(&(l->root->image_head));
+    init_list_head(&(l->root->Directory_head));
 
     if(!( l->root->name = list_strdup(USB_PATH) ))
     {
@@ -113,6 +118,7 @@ int list_init(list_data** plist)
 
     l->exte_select = alltype|dirct;
     l->subdir = 1;
+    l->init = 0;
 
     if (l->num.audio == 0)
         LIST_BIT_CLR(l->root->has_type, audio);

@@ -292,8 +292,9 @@ list_item * list_get_item_by_name(list_data* list, char* name)
     char *p = strtok(str + list->root->name_len, "/");
     parent = list->root;
 #else
-    char *p = name;
-    if((*p = strtok(p + list->root->name_len, "/")))
+    char str[MAX_NAME] ={0}, *p;
+    strcpy(str,name);
+    if((p = strtok(str + list->root->name_len, "/")))
         parent = list->root;
     else
         return list->root;
@@ -335,7 +336,7 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     {
         if(list_check_type_item_id(id, dirct))
             return NULL;
-        item=(list_item*)id;
+        item = (list_item*)id;
     }
     else
         item = list->root;
@@ -395,7 +396,6 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     return curr;
 }
 
-
 list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index)
 {
     qsi_assert(list);
@@ -404,7 +404,7 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
         return NULL;
 
     int max_num = 0;
-    list_item *item=(list_item*)id, *curr;
+    list_item *item = (list_item*)id, *curr;
 
     qsi_assert(item->dirct_num);
 
@@ -445,6 +445,202 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
 
         if(index == 0)
             break;
+    }
+
+    return curr;
+}
+
+list_item* list_get_idx_all(list_data* list, extetype exte_type, int index)
+{
+    qsi_assert(list);
+
+    int max_num = 0;
+    list_item *curr = NULL;
+
+    switch(exte_type)
+    {
+        case audio: max_num = list->num.audio;  break;
+        case video: max_num = list->num.video;  break;
+        case image: max_num = list->num.image;  break;
+        case dirct: max_num = list->num.dirct;  break;
+        default:                                break;
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return NULL;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return NULL;
+    }
+
+    list_for_each_entry(list->root, curr, head)
+    {
+        if(curr->exte_type == exte_type) index--;
+        if(index == 0) break;
+    }
+
+    return curr;
+}
+
+list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int index)
+{
+    qsi_assert(list);
+
+    int max_num = 0;
+    list_item *item, *curr = NULL;
+    list_head *head = NULL;
+
+    if(index <=0)
+    {
+        LIST_DBG("index must be a positive number");
+        return NULL;
+    }
+
+    if(id)
+    {
+        if(list_check_type_item_id(id, dirct))
+            return NULL;
+        item = (list_item*)id;
+    }
+    else
+        return list_get_idx_all(list, exte_type, index);
+
+    qsi_assert(item->link_num);
+
+    switch(exte_type)
+    {
+        case audio: max_num = item->link_num->audio; head = item->audio_head.next;      break;
+        case video: max_num = item->link_num->video; head = item->video_head.next;      break;
+        case image: max_num = item->link_num->image; head = item->image_head.next;      break;
+        case dirct: max_num = item->link_num->dirct; head = item->Directory_head.next;  break;
+        default:                                                                        break;
+    }
+
+    if(max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return NULL;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of matched files");
+        return NULL;
+    }
+
+    while(head != NULL)
+    {
+        if(--index == 0)
+        {
+            switch(exte_type)
+            {
+                case audio: curr = container_of(head, list_item, audio_head);  break;
+                case video: curr = container_of(head, list_item, video_head);  break;
+                case image: curr = container_of(head, list_item, image_head);  break;
+                case dirct: curr = container_of(head, list_item, dirct_head);  break;
+                default:                                                       break;
+            }
+            break;
+        }
+        head = head->next;
+    }
+
+    return curr;
+}
+
+list_item* list_get_exet_dirct_idx_all(list_data* list, extetype exte_type, int index)
+{
+    qsi_assert(list);
+
+    int max_num = list->num.dirct;
+    list_item *curr = NULL;
+
+    if(index <=0)
+    {
+        LIST_DBG("index must be a positive number");
+        return NULL;
+    }
+
+    if(list->root->head.next == NULL || max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return NULL;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of directories");
+        return NULL;
+    }
+
+    list_for_each_entry(list->root, curr, head)
+    {
+        if( (curr->has_type) && (curr->has_type & (exte_type)) ) index--;
+        if(index == 0) break;
+    }
+
+    return curr;
+}
+
+
+list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int id, int index)
+{
+    qsi_assert(list);
+
+    int max_num = 0;
+    list_item *item, *curr = NULL;
+
+    if(id)
+    {
+        if(list_check_type_item_id(id, dirct))
+            return NULL;
+        item = (list_item*)id;
+    }
+    else
+        return list_get_exet_dirct_idx_all(list, exte_type, index);
+
+
+    qsi_assert(item->dirct_num);
+
+    if(index <=0)
+    {
+        LIST_DBG("index must be a positive number");
+        return NULL;
+    }
+
+    switch(exte_type)
+    {
+        case audio: max_num = item->dirct_num->audio; break;
+        case video: max_num = item->dirct_num->video; break;
+        case image: max_num = item->dirct_num->image; break;
+        case dirct: max_num = list->num.dirct;        break;
+        default:                                      break;
+    }
+
+    if(item->Directory_head.next == NULL || max_num == 0)
+    {
+        LIST_DBG("no matched files");
+        return NULL;
+    }
+
+    if(index > max_num)
+    {
+        LIST_DBG("index is greater than the count of directories");
+        return NULL;
+    }
+
+
+    for (curr = container_of(item->Directory_head.next, list_item, dirct_head);
+         curr != NULL;
+         curr = list_next_entry_or_null(curr, dirct_head))
+    {
+        if( (curr->has_type) && (curr->has_type & (exte_type)) ) index--;
+        if(index == 0) break;
     }
 
     return curr;
