@@ -19,6 +19,7 @@ typedef enum filetype {
 	Other,
 
 	FileTypeCount,
+	FileTypeError = -1
 }filetype;
 
 typedef enum{
@@ -32,7 +33,9 @@ typedef enum{
 	dirct		= 1<<3,
 	unknown		= 1<<4,
 
-	allfile		= (1<<5)-1
+	allfile		= (1<<5)-1,
+
+	ExteTypeError = -1
 }extetype;
 
 typedef enum sorttype{
@@ -106,15 +109,30 @@ int list_init(list_data** plist);
 // Release/Close (clode_list.c)
 // =============================
 // Close list_data structure, release memory.
-void close_list(list_data* list);
+void list_close(list_data* list);
 
 
 // ================================
 // APIs for 1.2.x version (list.c)
 // ================================
+
+//==================================================
+//==================================================
+
+//int list_init(list_data** plist, list_table* table_all);
+
+// Get directory id by complete path
+//int list_open_dir(list_table_* table, list_config* config);
+//int list_open_parent_dir(list_table_* table, list_config* config);
+//void list_close_dir(list_table_* table);
+
+
+//==================================================
+//==================================================
+
 // Get liblist.so version string / extension type string.
-char* list_get_version_number(void);
-char* list_get_exettype_str(extetype exet_type);
+const char* list_get_version_number(void);
+const char* list_get_exettype_str(extetype exet_type);
 
 // Get list structure information about opened path name, extension type, sort type.
 const char* list_get_info_open_path(list_data* list);

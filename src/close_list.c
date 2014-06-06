@@ -3,7 +3,7 @@
 #include <list.h>
 #include <list_def.h>
 
-void close_list(list_data* list)
+void list_close(list_data* list)
 {
     qsi_assert(list);
 

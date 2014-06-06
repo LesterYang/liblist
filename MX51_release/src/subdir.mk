@@ -32,7 +32,7 @@ C_DEPS += \
 src/%.o: ../src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-gcc -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist" -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist/include" -O2 -Wall -pipe -c -fPIC -fmessage-length=0 -march=armv7-a -mfpu=neon -std=gnu99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++ -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist" -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist/include" -O2 -Wall -pipe -c -fPIC -fmessage-length=0 -march=armv7-a -mfpu=neon -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

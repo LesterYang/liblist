@@ -8,13 +8,14 @@
 
 #include <list.h>
 #include <list_def.h>
+#include <CListTable.h>
 
-char* list_get_version_number(void)
+const char* list_get_version_number(void)
 {
     return VerNum(MajorVerNum, MinorVerNum, ReleaseNum);
 }
 
-char* list_get_exettype_str(extetype exet_type)
+const char* list_get_exettype_str(extetype exet_type)
 {
     switch(exet_type)
     {
@@ -266,12 +267,6 @@ const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type,
         return NULL;
 }
 
-int list_get_item_folder(list_data* list, extetype exte_type, int id, int index)
-{
-
-}
-
-
 const char* list_get_file_name_by_id(int id)
 {
     if(list_check_item_id(id))
@@ -312,7 +307,7 @@ const char* list_get_parent_comp_path_by_id(list_data* list, int id)
 filetype list_get_filetype_by_id(int id)
 {
     if(list_check_item_id(id))
-        return -1;
+        return FileTypeError;
 
     return ((list_item*)id)->file_type;
 }
@@ -320,7 +315,7 @@ filetype list_get_filetype_by_id(int id)
 extetype list_get_extetype_by_id(int id)
 {
     if(list_check_item_id(id))
-        return -1;
+        return ExteTypeError;
 
     return ((list_item*)id)->exte_type;
 }
@@ -332,10 +327,10 @@ filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path)
     qsi_assert(comp_path);
 
     if(!(id=list_get_id_by_comp_path(list, comp_path)))
-        return -1;
+        return FileTypeError;
 
     if(list_check_item_id(id))
-        return -1;
+        return FileTypeError;
 
     return ((list_item*)id)->file_type;
 }
@@ -347,10 +342,10 @@ extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path)
     qsi_assert(comp_path);
 
     if(!(id=list_get_id_by_comp_path(list, comp_path)))
-        return -1;
+        return ExteTypeError;
 
     if(list_check_item_id(id))
-        return -1;
+        return ExteTypeError;
 
     return ((list_item*)id)->exte_type;
 }
@@ -461,21 +456,41 @@ int list_get_dirct_index_folder_by_id(list_data* list, extetype exte_type, int i
 
 int list_get_index_by_comp_path(list_data* list, char* comp_path)
 {
+    int id = list_get_id_by_comp_path(list, comp_path);
 
+    if(id)
+        return list_get_index_by_id(list, id);
+
+    return -1;
 }
 
 int list_get_index_folder_by_comp_path(list_data* list, char* comp_path)
 {
+    int id = list_get_id_by_comp_path(list, comp_path);
 
+    if(id)
+        return list_get_index_folder_by_id(list, id);
+
+    return -1;
 }
 
 int list_get_dirct_index_by_comp_path(list_data* list, extetype exte_type, char* comp_path)
 {
+    int id = list_get_id_by_comp_path(list, comp_path);
 
+    if(id)
+        return list_get_dirct_index_by_id(list, exte_type, id);
+
+    return -1;
 }
 
 int list_get_dirct_index_folder_by_comp_path(list_data* list, extetype exte_type, char* comp_path)
 {
+    int id = list_get_id_by_comp_path(list, comp_path);
 
+    if(id)
+        return list_get_dirct_index_folder_by_id(list, exte_type, id);
+
+    return -1;
 }
 

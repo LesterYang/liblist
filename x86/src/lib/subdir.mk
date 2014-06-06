@@ -23,7 +23,7 @@ C_DEPS += \
 src/lib/%.o: ../src/lib/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -I/mnt/hgfs/Win_7/workspace-cpp2/Liblist -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist/include" -O2 -g3 -pg -Wall -c -fPIC -fmessage-length=0  -std=gnu99 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
+	g++ -I/mnt/hgfs/Win_7/workspace-cpp2/Liblist -I/usr/include/c++/4.4 -I/usr/include/c++/4.4/backward -I/usr/include/c++/4.4/i486-linux-gnu -I/usr/lib/gcc/i486-linux-gnu/4.4/include -I/usr/lib/gcc/i486-linux-gnu/4.4/include-fixed -I"/mnt/hgfs/Win_7/workspace-cpp2/Liblist/include" -O2 -g3 -pg -Wall -c -fPIC -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o"$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

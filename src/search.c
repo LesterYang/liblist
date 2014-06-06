@@ -43,7 +43,8 @@ int search_file(char* path,char* filename)
 }
 
 int search_POI(char* index,char* POI,city local){
-    int len, i;
+    int i;
+    size_t len;
     char buf[BUF_SIZE]={0};
     char path[BUF_SIZE]={0};
 

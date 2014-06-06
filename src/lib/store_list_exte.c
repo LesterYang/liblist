@@ -11,14 +11,13 @@ unsigned int audio_exte_num = (sizeof(audio_exte_str)/sizeof(char*));
 unsigned int video_exte_num = (sizeof(video_exte_str)/sizeof(char*));
 unsigned int image_exte_num = (sizeof(image_exte_str)/sizeof(char*));
 
-#define TestInit 1 // 0 : only read file, 1 : normal
 
-int store_get_exte_type(list_item* item)
+extetype store_get_exte_type(list_item* item)
 {
     if(!item)
-        return -1;
+        return ExteTypeError;
 
-    int i;
+    unsigned int i;
 
     if ( (strrchr(item->name,'.')) )
     {
@@ -78,7 +77,7 @@ int store_match_type(char* name, int type)
 	switch(type)
 	{
 		case MODE_DIRT:
-			ret=1;
+		    ret=1;
 			break;
 		case MODE_REGR:
 			if(store_check_exte_type(audio_exte_num, audio_exte_str, name))
@@ -136,7 +135,7 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
     {
         if (0 == strcmp(".",ent->d_name) || 0 == strcmp("..",ent->d_name))
             continue;
-#if TestInit
+
         if(store_match_type(ent->d_name, ent->d_type))
         {
             item=(list_item*)malloc(sizeof(list_item));
@@ -238,18 +237,18 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                     break;
             }
         }
-#endif
+
         if(ent->d_type == MODE_DIRT)
         {
-#if TestInit
+
             int b_audio = list->num.audio;
             int b_video = list->num.video;
             int b_image = list->num.image;
-#endif
+
             char* new_path = list_dump_append(path, ent->d_name);
             store_list_usb(list, new_path, item);
             free(new_path);
-#if TestInit
+
             if (list->num.audio == b_audio)
                 LIST_BIT_CLR(item->has_type, audio);
             else
@@ -264,7 +263,7 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                 LIST_BIT_CLR(item->has_type, image);
             else
                 parent_item->dirct_num->image++;
-#endif
+
         }
     }
     closedir(dir);

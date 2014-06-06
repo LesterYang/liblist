@@ -4,7 +4,10 @@
  *  Created on: May 22, 2014
  *      Author: root
  */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/errno.h>
@@ -234,7 +237,7 @@ void init_list_head(list_head* head)
     head->prev=NULL;
 }
 
-static inline void __list_add(list_head *new, list_head *prev, list_head *next)
+static inline void __list_add(list_head *_new, list_head *prev, list_head *next)
 {
 #if 0 //debug
     if(next && next->prev != prev)
@@ -246,12 +249,12 @@ static inline void __list_add(list_head *new, list_head *prev, list_head *next)
 #endif
 
     if(next)
-        next->prev=new;
+        next->prev=_new;
     if(prev)
-        prev->next=new;
+        prev->next=_new;
 
-    new->next=next;
-    new->prev=prev;
+    _new->next=next;
+    _new->prev=prev;
 }
 
 static inline void __list_del(list_head *prev, list_head *next)
@@ -260,14 +263,14 @@ static inline void __list_del(list_head *prev, list_head *next)
     prev->next = next;
 }
 
-void list_add(list_head *new, list_head* head)
+void list_add(list_head *_new, list_head* head)
 {
-    __list_add(new, head, head->next);
+    __list_add(_new, head, head->next);
 }
 
-void list_add_tail(list_head *new, list_head* head)
+void list_add_tail(list_head *_new, list_head* head)
 {
-    __list_add(new, head->prev, head);
+    __list_add(_new, head->prev, head);
 }
 
 void list_del(list_head *entry)

@@ -103,20 +103,9 @@ int list_init(list_data** plist)
 
     list_mutex_new(list, TRUE, TRUE);
 	
-#ifdef Time_Measure
-	struct timeval t;
-	unsigned long long s,e;
-    gettimeofday(&t,NULL);
-    s = t.tv_sec * 1000000 + t.tv_usec;
-#endif
-    store_list_usb(list, USB_PATH, list->root);
-#ifdef Time_Measure
-    gettimeofday(&tv,NULL);
-    e = t.tv_sec * 1000000 + t.tv_usec;
-    LIST_DBG("store time: %llu ms", (e - s)/1000);
-#endif
+    store_list_usb(list, (char*)USB_PATH, list->root);
 
-    list->exte_select = alltype|dirct;
+    list->exte_select = (extetype)(alltype|dirct);
     list->subdir = 1;
     list->init = 0;
 

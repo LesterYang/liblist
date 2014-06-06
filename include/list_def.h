@@ -10,10 +10,14 @@
 #include <pthread.h>
 #include <list.h>
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
+
 #ifndef __GNUC__
 #define __GNUC__
 #endif
+
 #define Time_Measure
 
 #define QSI_ASSERT	1
@@ -111,20 +115,20 @@
 
 #define LIST_ABS(a)              ((a) < 0 ? -(a) : (a))
 
-#define LIST_BIT_SET(var, bits)  ((var) |= (bits))
-#define LIST_BIT_CLR(var, bits)  ((var) &= ~(bits))
-#define LIST_BIT_AND(var, bits)  ((var) &= (bits))
+#define LIST_BIT_SET(var, bits)  ((var) = (typeof(var)) ((var) | (bits)))
+#define LIST_BIT_CLR(var, bits)  ((var) = (typeof(var)) ((var) & ~(bits)))
+#define LIST_BIT_AND(var, bits)  ((var) = (typeof(var)) ((var) & (bits)))
 #define LIST_BIT_VAL(var, bits)  ((var) & (bits))
 #define LIST_GET_BITS(var, bits) ((var) & ((1ULL << bits)-1)
 
 #define LIST_ELEMENTSOF(x) (sizeof(x)/sizeof((x)[0]))
 
-#define offsetof(s, m)   (size_t)&(((s *)0)->m)
+#define _offsetof(s, m)   (size_t)&(((s *)0)->m)
 
 #define container_of(ptr, type, member)                                     \
 ({                                                                          \
     const typeof( ((type *)0)->member ) *__mptr = (ptr);                    \
-    (type *)( (char *)__mptr - offsetof(type,member) );                     \
+    (type *)( (char *)__mptr - _offsetof(type,member) );                    \
 })
 
 #define list_next_entry(pos, member)                                       \
@@ -162,6 +166,10 @@ typedef struct list_head list_head;
 struct list_head{
     list_head *next,*prev;
 };
+
+typedef struct {
+        int *file;
+}list_table;
 
 typedef struct{
     int all;
@@ -234,7 +242,7 @@ void store_list_type_subdir(list_data* list, char* path, list_item* parent_item,
 //===========================================
 
 void store_list_usb(list_data* list, char* path, list_item* parent_item);
-int  store_get_exte_type(list_item* item);
+extetype  store_get_exte_type(list_item* item);
 int  store_match_type(char* name, int type);
 int  store_match_exte_type(extetype exte_type, char* name, int type);
 int  store_check_exte_type(int exte_num, const char** exte_str, char* name);
@@ -267,7 +275,7 @@ int   list_get_exte_number(list_number* n, extetype exte_type);
 char* list_dump_append(const char* dest, const char* src);
 
 void  init_list_head(list_head* head);
-void  list_add(list_head *new, list_head* head);
+void  list_add(list_head *_new, list_head* _head);
 
 list_item* list_get_item_by_name(list_data* list, char* name);
 list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index);
