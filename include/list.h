@@ -188,10 +188,10 @@ void print_list_type_all(list_data* list, extetype exte_type);
 // list files in the directory, print file name
 void print_list_folder_by_path(list_data* list, char* path);
 void print_list_folder_by_id(list_data* list, int id);
-void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type);
+void print_list_type_in_folder_by_id(list_data* list, int id, extetype exte_type);
 // print count of files
 void print_count_all(list_data* list);
-void print_count_folder_by_id(list_data* list, int id);
+void print_count_in_folder_by_id(list_data* list, int id);
 
 
 // =================

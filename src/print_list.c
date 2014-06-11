@@ -126,13 +126,13 @@ void print_list_folder_by_id(list_data* list, int id)
     const char* str = list_get_path_by_id(list, id);
 
     printf("==== List %s ====\n", (str)?str:"unknown");
-    print_list_type_folder_by_id(list, id, dirct);
-    print_list_type_folder_by_id(list, id, audio);
-    print_list_type_folder_by_id(list, id, video);
-    print_list_type_folder_by_id(list, id, image);
+    print_list_type_in_folder_by_id(list, id, dirct);
+    print_list_type_in_folder_by_id(list, id, audio);
+    print_list_type_in_folder_by_id(list, id, video);
+    print_list_type_in_folder_by_id(list, id, image);
 }
 
-void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type)
+void print_list_type_in_folder_by_id(list_data* list, int id, extetype exte_type)
 {
     int idx, max;
     const char* str;
@@ -189,7 +189,7 @@ void print_count_all(list_data* list)
     printf("image file : %d\n",list_get_count(list, image));
 }
 
-void print_count_folder_by_id(list_data* list, int id)
+void print_count_in_folder_by_id(list_data* list, int id)
 {
     printf("dirct file : %d\n",list_get_count_in_folder(list, dirct, id));
     printf("d_has_audio: %d\n",list_get_dirct_count_in_folder(list, audio, id));
