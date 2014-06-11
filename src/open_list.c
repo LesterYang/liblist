@@ -3,8 +3,7 @@
 #include <dirent.h>
 #include <string.h>
 
-#include <list.h>
-#include <list_def.h>
+#include "../include/list_def.h"
 
 #ifdef Time_Measure
 #include <sys/time.h>
@@ -72,16 +71,16 @@ int list_init(list_data** plist)
     }
 
     list->init = 1;
+    list->subdir = 1;
     list->root->self = list->root;
-    list->root->file_type = Directory;
     list->root->exte_type = dirct;
     list->root->has_type = allfile;
     list->root->name_len = strlen(USB_PATH);
-    init_list_head(&(list->root->head));
-    init_list_head(&(list->root->audio_head));
-    init_list_head(&(list->root->video_head));
-    init_list_head(&(list->root->image_head));
-    init_list_head(&(list->root->Directory_head));
+    init_list_head(&(list->root->head[eHeadAll]));
+    init_list_head(&(list->root->head[eHeadDirct]));
+    init_list_head(&(list->root->head[eHeadAudio]));
+    init_list_head(&(list->root->head[eHeadVideo]));
+    init_list_head(&(list->root->head[eHeadImage]));
 
     if(!( list->root->name = list_strdup(USB_PATH) ))
     {
@@ -89,7 +88,7 @@ int list_init(list_data** plist)
         goto free_list_root;
     }
 
-    if(!( list->root->dirct_num = (list_dirct_type*)calloc(1, sizeof(list_dirct_type)) ))
+    if(!( list->root->dirct_num = (list_dirct_num*)calloc(1, sizeof(list_dirct_num)) ))
     {
         liblist_perror();
         goto free_list_root_name;
@@ -106,7 +105,6 @@ int list_init(list_data** plist)
     store_list_usb(list, (char*)USB_PATH, list->root);
 
     list->exte_select = (extetype)(alltype|dirct);
-    list->subdir = 1;
     list->init = 0;
 
     if (list->num.audio == 0)

@@ -7,21 +7,6 @@
 #ifndef LIST_H_
 #define LIST_H_
 
-typedef enum filetype {
-	all,
-	FIFO,
-	Character,
-	Directory,
-	Block,
-	Regular,
-	Link,
-	Socket,
-	Other,
-
-	FileTypeCount,
-	FileTypeError = -1
-}filetype;
-
 typedef enum{
     none_type   = 0,
 	audio		= 1,
@@ -111,33 +96,16 @@ int list_init(list_data** plist);
 // Close list_data structure, release memory.
 void list_close(list_data* list);
 
-
 // ================================
 // APIs for 1.2.x version (list.c)
 // ================================
-
-//==================================================
-//==================================================
-
-//int list_init(list_data** plist, list_table* table_all);
-
-// Get directory id by complete path
-//int list_open_dir(list_table_* table, list_config* config);
-//int list_open_parent_dir(list_table_* table, list_config* config);
-//void list_close_dir(list_table_* table);
-
-
-//==================================================
-//==================================================
 
 // Get liblist.so version string / extension type string.
 const char* list_get_version_number(void);
 const char* list_get_exettype_str(extetype exet_type);
 
 // Get list structure information about opened path name, extension type, sort type.
-const char* list_get_info_open_path(list_data* list);
-extetype list_get_info_filter(list_data* list);
-sorttype list_get_info_sorttype(list_data* list);
+sorttype list_get_info_sort_type(list_data* list);
 
 // Get count of the matched type files.
 // list_get_xxx_count            : Get files count.
@@ -146,16 +114,14 @@ sorttype list_get_info_sorttype(list_data* list);
 // error code:
 //    -1 : type error
 //    -2 : id error
-int list_get_filetype_count(list_data* list, filetype file_type);
-int list_get_extetype_count(list_data* list, extetype exte_type);
-int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
-int list_get_extetype_count_folder(list_data* list, extetype exte_type, int id);
-int list_get_exte_dirct_count_folder(list_data* list, extetype exte_type, int id);
+int list_get_count(list_data* list, extetype exte_type);
+int list_get_count_in_folder(list_data* list, extetype exte_type, int id);
+int list_get_dirct_count_in_folder(list_data* list, extetype exte_type, int id);
 
 // Get id.
 // return 0 if complete path error.
-int list_get_id_by_comp_path(list_data* list, char* comp_path);
-int list_get_parent_id_by_comp_path(list_data* list, char* comp_path);
+int list_get_id_by_path(list_data* list, char* path);
+int list_get_parent_id_by_path(list_data* list, char* path);
 int list_get_parent_id_by_id(int id);
 int list_get_root_id(list_data* list);
 
@@ -170,14 +136,14 @@ int list_get_root_id(list_data* list);
 //     1. index isn't a a positive number or
 //     2. index is larger than count
 //     3. id error
-const char* list_get_file_name(list_data* list, extetype exte_type, int index);
-const char* list_get_comp_path(list_data* list, extetype exte_type, int index);
-const char* list_get_file_name_folder(list_data* list, extetype exte_type, int id, int index);
-const char* list_get_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
-const char* list_get_dirct_file_name(list_data* list, extetype exte_type, int index);
-const char* list_get_dirct_comp_path(list_data* list, extetype exte_type, int index);
-const char* list_get_dirct_file_name_folder(list_data* list, extetype exte_type, int id, int index);
-const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_name(list_data* list, extetype exte_type, int index);
+const char* list_get_path(list_data* list, extetype exte_type, int index);
+const char* list_get_name_in_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_path_in_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_dirct_name(list_data* list, extetype exte_type, int index);
+const char* list_get_dirct_path(list_data* list, extetype exte_type, int index);
+const char* list_get_dirct_name_in_folder(list_data* list, extetype exte_type, int id, int index);
+const char* list_get_dirct_path_in_folder(list_data* list, extetype exte_type, int id, int index);
 
 // Get information string by id.
 // list_get_file_name_by_id        : Get complete path.
@@ -185,30 +151,23 @@ const char* list_get_dirct_comp_path_folder(list_data* list, extetype exte_type,
 // list_get_parent_file_name_by_id : Get complete path of parent.
 // list_get_parent_comp_path_by_id : Get file name of parent.
 // return NULL if id error
-const char* list_get_file_name_by_id(int id);
-const char* list_get_comp_path_by_id(list_data* list, int id);
-const char* list_get_parent_file_name_by_id(list_data* list, int id);
-const char* list_get_parent_comp_path_by_id(list_data* list, int id);
+const char* list_get_name_by_id(int id);
+const char* list_get_path_by_id(list_data* list, int id);
+const char* list_get_parent_name_by_id(list_data* list, int id);
+const char* list_get_parent_path_by_id(list_data* list, int id);
 
 // Get list item information by complete path ,return -1 for id error.
-filetype list_get_filetype_by_id(int id);
 extetype list_get_extetype_by_id(int id);
-filetype list_get_filetype_by_comp_path(list_data* list, char* comp_path);
-extetype list_get_extetype_by_comp_path(list_data* list, char* comp_path);
+extetype list_get_extetype_by_path(list_data* list, char* path);
 
 // Get index by id
 // error code:
 //     -1 : id error or it's not a folder for list_get_dirct_xxx()
 //      0 : it's /mnt/usb or the folder doesn't have matched type file for list_get_dirct_xxx()
 int list_get_index_by_id(list_data* list, int id);
-int list_get_index_folder_by_id(list_data* list, int id);
-int list_get_dirct_index_by_id(list_data* list, extetype exte_type, int id);
-int list_get_dirct_index_folder_by_id(list_data* list, extetype exte_type, int id);
-int list_get_index_by_comp_path(list_data* list, char* comp_path);
-int list_get_index_folder_by_comp_path(list_data* list, char* comp_path);
-int list_get_dirct_index_by_comp_path(list_data* list, extetype exte_type, char* comp_path);
-int list_get_dirct_index_folder_by_comp_path(list_data* list, extetype exte_type, char* comp_path);
-
+int list_get_index_in_folder_by_id(list_data* list, int id);
+int list_get_index_by_path(list_data* list, char* path);
+int list_get_index_in_folder_by_path(list_data* list, char* path);
 
 // ==============
 // Sort (sort.c)
@@ -227,7 +186,7 @@ void print_listdata(list_data* list);
 void print_list_all(list_data* list);
 void print_list_type_all(list_data* list, extetype exte_type);
 // list files in the directory, print file name
-void print_list_folder_by_comp_path(list_data* list, char* comp_path);
+void print_list_folder_by_path(list_data* list, char* path);
 void print_list_folder_by_id(list_data* list, int id);
 void print_list_type_folder_by_id(list_data* list, int id, extetype exte_type);
 // print count of files
@@ -242,5 +201,6 @@ void print_count_folder_by_id(list_data* list, int id);
 int search_file(char* path, char* filename);
 // Search index of POI in the local
 int search_POI(char* index, char* POI, city local);
+
 
 #endif /* LIST_H_ */

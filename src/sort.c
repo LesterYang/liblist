@@ -6,11 +6,10 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#include <list.h>
-#include <list_def.h>
+#include "../include/list_def.h"
 
 static int (*volatile g_compare_func)(const void *, const void *) = listdata_compare_alph;
-static volatile extetype g_exte_type = none_type;
+static volatile headtype g_head_type = eHeadAll;
 
 /**********************
  *  compare function  *
@@ -213,51 +212,55 @@ void listdata_msort_init(list_data* list)
 
     g_compare_func = listdata_compare_alph;
 
-    g_exte_type = audio;
-    list->root->audio_head.next = listdata_merge_sort(list->root->audio_head.next);
+#if 0
+    list_head* head = list->root->head;
+#else
+    g_head_type = eHeadAudio;
+    list->root->head[eHeadAudio].next = listdata_merge_sort(list->root->head[eHeadAudio].next);
 
-    g_exte_type = video;
-    list->root->video_head.next = listdata_merge_sort(list->root->video_head.next);
+    g_head_type = eHeadVideo;
+    list->root->head[eHeadVideo].next = listdata_merge_sort(list->root->head[eHeadVideo].next);
 
-    g_exte_type = image;
-    list->root->image_head.next = listdata_merge_sort(list->root->image_head.next);
+    g_head_type = eHeadImage;
+    list->root->head[eHeadImage].next = listdata_merge_sort(list->root->head[eHeadImage].next);
 
-    g_exte_type = dirct;
-    list->root->Directory_head.next = listdata_merge_sort(list->root->Directory_head.next);
+    g_head_type = eHeadFolder;
+    list->root->head[eHeadDirct].next = listdata_merge_sort(list->root->head[eHeadDirct].next);
 
-    if(list->root->audio_head.next)
-        list->root->audio_head.next->prev = &list->root->audio_head;
-    if(list->root->video_head.next)
-        list->root->video_head.next->prev = &list->root->video_head;
-    if(list->root->image_head.next)
-        list->root->image_head.next->prev = &list->root->image_head;
-    if(list->root->Directory_head.next)
-        list->root->Directory_head.next->prev = &list->root->Directory_head;
+    if(list->root->head[eHeadAudio].next)
+        list->root->head[eHeadAudio].next->prev = &list->root->head[eHeadAudio];
+    if(list->root->head[eHeadVideo].next)
+        list->root->head[eHeadVideo].next->prev = &list->root->head[eHeadVideo];
+    if(list->root->head[eHeadImage].next)
+        list->root->head[eHeadImage].next->prev = &list->root->head[eHeadImage];
+    if(list->root->head[eHeadDirct].next)
+        list->root->head[eHeadDirct].next->prev = &list->root->head[eHeadDirct];
+#endif
 
-    list_for_each_entry(list->root, curr, head)
+    list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if(curr->exte_type == dirct)
         {
-            g_exte_type = audio;
-            curr->audio_head.next = listdata_merge_sort(curr->audio_head.next);
+            g_head_type = eHeadAudio;
+            curr->head[eHeadAudio].next = listdata_merge_sort(curr->head[eHeadAudio].next);
 
-            g_exte_type = video;
-            curr->video_head.next = listdata_merge_sort(curr->video_head.next);
+            g_head_type = eHeadVideo;
+            curr->head[eHeadVideo].next = listdata_merge_sort(curr->head[eHeadVideo].next);
 
-            g_exte_type = image;
-            curr->image_head.next = listdata_merge_sort(curr->image_head.next);
+            g_head_type = eHeadImage;
+            curr->head[eHeadImage].next = listdata_merge_sort(curr->head[eHeadImage].next);
 
-            g_exte_type = dirct;
-            curr->Directory_head.next = listdata_merge_sort(curr->Directory_head.next);
+            g_head_type = eHeadFolder;
+            curr->head[eHeadDirct].next = listdata_merge_sort(curr->head[eHeadDirct].next);
 
-            if(curr->audio_head.next)
-                curr->audio_head.next->prev = &curr->audio_head;
-            if(curr->video_head.next)
-                curr->video_head.next->prev = &curr->video_head;
-            if(curr->image_head.next)
-                curr->image_head.next->prev = &curr->image_head;
-            if(curr->Directory_head.next)
-                curr->Directory_head.next->prev = &curr->Directory_head;
+            if(curr->head[eHeadAudio].next)
+                curr->head[eHeadAudio].next->prev = &curr->head[eHeadAudio];
+            if(curr->head[eHeadVideo].next)
+                curr->head[eHeadVideo].next->prev = &curr->head[eHeadVideo];
+            if(curr->head[eHeadImage].next)
+                curr->head[eHeadImage].next->prev = &curr->head[eHeadImage];
+            if(curr->head[eHeadDirct].next)
+                curr->head[eHeadDirct].next->prev = &curr->head[eHeadDirct];
         }
     }
 }
@@ -269,7 +272,7 @@ void listdata_msort(list_data* list, sorttype sort_type)
 
     pthread_mutex_lock(&list->mutex);
 
-    g_exte_type = none_type;
+    g_head_type = eHeadAll;
 
     switch(sort_type)
     {
@@ -280,11 +283,11 @@ void listdata_msort(list_data* list, sorttype sort_type)
         case sortTime: g_compare_func = listdata_compare_time;  break;
         default:                                                break;
     }
-    list->root->head.next = listdata_merge_sort(list->root->head.next);
+    list->root->head[eHeadAll].next = listdata_merge_sort(list->root->head[eHeadAll].next);
     list->sort = sort_type;
 
-    if(list->root->head.next)
-        list->root->head.next->prev = &list->root->head;
+    if(list->root->head[eHeadAll].next)
+        list->root->head[eHeadAll].next->prev = &list->root->head[eHeadAll];
 
     if(list->init)
         listdata_msort_init(list);
@@ -325,29 +328,8 @@ list_head* listdata_merge(list_head* i, list_head* j)
 
     list_item *item_i, *item_j;
     
-    switch(g_exte_type)
-    {
-        case audio:
-            item_i = (list_item*)container_of(i, list_item, audio_head);
-            item_j = (list_item*)container_of(j, list_item, audio_head);
-            break;
-        case video:
-            break;
-            item_i = (list_item*)container_of(i, list_item, video_head);
-            item_j = (list_item*)container_of(j, list_item, video_head);
-        case image:
-            item_i = (list_item*)container_of(i, list_item, image_head);
-            item_j = (list_item*)container_of(j, list_item, image_head);
-            break;
-        case dirct:
-            item_i = (list_item*)container_of(i, list_item, dirct_head);
-            item_j = (list_item*)container_of(j, list_item, dirct_head);
-            break;
-        default:
-            item_i = (list_item*)container_of(i, list_item, head);
-            item_j = (list_item*)container_of(j, list_item, head);
-            break;
-    }
+    item_i = (list_item*)l_container_of(i, list_item, head[g_head_type]);
+    item_j = (list_item*)l_container_of(j, list_item, head[g_head_type]);
 	
     if(g_compare_func(&item_i, &item_j) < 0)
     {

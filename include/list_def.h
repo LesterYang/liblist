@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 #include <pthread.h>
-#include <list.h>
+#include "list.h"
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -22,6 +22,7 @@
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
+#define ENABLE_FILETYPE 0
 
 #define MAX_EXTE_LEN    (8)
 #define MAX_NAME        (255)
@@ -123,22 +124,22 @@
 
 #define LIST_ELEMENTSOF(x) (sizeof(x)/sizeof((x)[0]))
 
-#define _offsetof(s, m)   (size_t)&(((s *)0)->m)
+#define l_offsetof(s, m)   (size_t)&(((s *)0)->m)
 
-#define container_of(ptr, type, member)                                     \
-({                                                                          \
-    const typeof( ((type *)0)->member ) *__mptr = (ptr);                    \
-    (type *)( (char *)__mptr - _offsetof(type,member) );                    \
+#define l_container_of(ptr, type, member)                                 \
+({                                                                        \
+    const typeof( ((type *)0)->member ) *__mptr = (ptr);                  \
+    (type *)( (char *)__mptr - l_offsetof(type,member) );                   \
 })
 
 #define list_next_entry(pos, member)                                       \
-        container_of((pos)->member.next, typeof(*(pos)), member)
+        l_container_of((pos)->member.next, typeof(*(pos)), member)
 
 #define list_next_entry_or_null(pos, member)                               \
         ((pos)->member.next) ? list_next_entry(pos, member) : NULL
 
 #define list_prev_entry(pos, member)                                       \
-        container_of((pos)->member.prev, typeof(*(pos)), member)
+        l_container_of((pos)->member.prev, typeof(*(pos)), member)
 
 #define list_prev_entry_or_null(pos, member)                               \
         ((pos)->member.prev) ? list_prev_entry(pos, member) : NULL
@@ -161,17 +162,40 @@ typedef int list_bool_t;
 #define TRUE (!FALSE)
 #endif
 
+typedef enum filetype {
+    all,
+    FIFO,
+    Character,
+    Directory,
+    Block,
+    Regular,
+    Link,
+    Socket,
+    Other,
+
+    FileTypeCount,
+    FileTypeError = -1
+}filetype;
+
+typedef enum headtype{
+    eHeadAll,
+    eHeadFolder,
+    eHeadAudio,
+    eHeadVideo,
+    eHeadImage,
+    eHeadDirct,
+    eHeadMax,
+}headtype;
+
+
 typedef struct list_head list_head;
 
 struct list_head{
     list_head *next,*prev;
 };
 
-typedef struct {
-        int *file;
-}list_table;
-
 typedef struct{
+#if 0
     int all;
     int fifo;
     int character;
@@ -186,6 +210,10 @@ typedef struct{
         int directory;
         int dirct;
     };
+#else
+    int all;
+    int dirct;
+#endif
 
     int audio;
     int video;
@@ -193,10 +221,10 @@ typedef struct{
 }list_number;
 
 typedef struct{
-    int audio;
-    int video;
-    int image;
-}list_dirct_type;
+    int audio_dirct;
+    int video_dirct;
+    int image_dirct;
+}list_dirct_num;
 
 struct list_item{
     union
@@ -204,17 +232,15 @@ struct list_item{
         struct list_item* self;
         int id;
     };
-	filetype file_type;
-	extetype exte_type;
+#if ENABLE_FILETYPE
+    filetype file_type;
+#endif
+
+    extetype exte_type;
 	extetype has_type;
-	list_head head;
-	list_head Directory_head;
-	list_head audio_head;
-	list_head video_head;
-	list_head image_head;
-	list_head dirct_head;
+	list_head head[eHeadMax];
 	list_number* link_num;
-	list_dirct_type* dirct_num;
+	list_dirct_num* dirct_num;
 	size_t name_len;
 	char* name;
 	struct list_item* parent;
@@ -222,7 +248,7 @@ struct list_item{
 
 struct list_data{
 	list_number num;
-	list_item* root;
+	list_item *root;
 
 	extetype exte_select;
 	sorttype sort;
@@ -240,6 +266,21 @@ void store_list_subdir(list_data* list, char* path, list_item* parent_item);
 void store_list_type(list_data* list, char* path, extetype exte_type);
 void store_list_type_subdir(list_data* list, char* path, list_item* parent_item, extetype exte_type);
 //===========================================
+
+// ===========================================
+// hide APIs
+const char* list_get_info_open_path(list_data* list);
+extetype list_get_info_filter(list_data* list);
+int list_get_filetype_count(list_data* list, filetype file_type);
+int list_get_filetype_count_folder(list_data* list, filetype file_type, int id);
+filetype list_get_filetype_by_id(int id);
+filetype list_get_filetype_by_path(list_data* list, char* path);
+int list_get_dirct_index_by_id(list_data* list, extetype exte_type, int id);
+int list_get_dirct_index_in_folder_by_id(list_data* list, extetype exte_type, int id);
+int list_get_dirct_index_by_path(list_data* list, extetype exte_type, char* path);
+int list_get_dirct_index_in_folder_by_path(list_data* list, extetype exte_type, char* path);
+
+// ===========================================
 
 void store_list_usb(list_data* list, char* path, list_item* parent_item);
 extetype  store_get_exte_type(list_item* item);
@@ -261,7 +302,7 @@ void free_list_item(list_item* start);
 // =========
 // list_lib
 // =========
-const char* list_get_comp_path_by_item(list_data* list, list_item* item);
+const char* list_get_path_by_item(list_data* list, list_item* item);
 void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
 char* list_strdup(const char *str);
 int   list_check_item_id(int id);
@@ -284,5 +325,49 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
 
 list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int index);
 list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int id, int index);
+
+
+#if 0
+typedef struct {
+        int id;
+        char* name;
+}list_file;
+
+typedef struct {
+        int id;
+        unsigned int item_count;
+        unsigned int file_count;
+        list_file** item;
+        list_file** file;
+        extetype type;
+}list_table;
+
+
+//=======================================
+//#include <vector>
+//#include <string>
+
+//using namespace std;
+
+list_table* list_vec_open_table(list_data* list, extetype type, int id);
+list_table* list_vec_open_parent_table(list_data* list, extetype type, int id);
+void        list_vec_close_table(list_table* table);
+
+
+
+
+int         list_vec_get_id_by_full_path(list_data* list, const char* full_path);
+
+void        list_vec_sort(list_data* list, sorttype sort_type);
+
+//
+
+list_table* list_vec_alloc_table(list_data* list, extetype type, list_item* item);
+int         list_vec_qsort_compare_alph(const void* i, const void* j);
+bool        list_vec_msort_compare_dirt(const list_item* item_i, const list_item* item_j);
+bool        list_vec_msort_compare_alph(const list_item* item_i, const list_item* item_j);
+void        list_vec_move_folder_to_begin(list_table* table);
+void        list_vec_show(list_data* list);
+#endif
 
 #endif /* LIST_DEF_H_ */

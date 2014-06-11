@@ -12,10 +12,9 @@
 #include <string.h>
 #include <sys/errno.h>
 
-#include <list.h>
-#include <list_def.h>
+#include "../include/list_def.h"
 
-const char* list_get_comp_path_by_item(list_data* list, list_item* item)
+const char* list_get_path_by_item(list_data* list, list_item* item)
 {
     qsi_assert(list);
     qsi_assert(item);
@@ -98,7 +97,7 @@ int list_check_item_id(int id)
 
 int list_check_type_item_id(int id, extetype exet_type)
 {
-    if( (id != *(int*)id) || (((list_item*)id)->exte_type != exet_type) )
+    if( (id == 0) || (id != *(int*)id) || (((list_item*)id)->exte_type != exet_type) )
     {
         LIST_DBG("id error");
         return 1;
@@ -163,6 +162,7 @@ int list_count_sign(char* s, char a)
     return n;
 }
 
+#if ENABLE_FILETYPE
 int list_get_file_number(list_number* n, filetype file_type)
 {
     qsi_assert(n);
@@ -185,6 +185,7 @@ int list_get_file_number(list_number* n, filetype file_type)
 
     return num;
 }
+#endif
 
 int list_get_exte_number(list_number* n, extetype exte_type)
 {
@@ -298,7 +299,7 @@ list_item * list_get_item_by_name(list_data* list, char* name)
 
     while(p)
     {
-        list_for_each_entry(list->root, curr, head)
+        list_for_each_entry(list->root, curr, head[eHeadAll])
         {
             if(curr->parent != parent)
                 continue;
@@ -377,7 +378,7 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     }
 
 
-    list_for_each_entry(list->root, curr, head)
+    list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if (curr->exte_type == exte_type)
         {
@@ -413,11 +414,11 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
 
     switch(exte_type)
     {
-        case audio: max_num = item->dirct_num->audio; break;
-        case video: max_num = item->dirct_num->video; break;
-        case image: max_num = item->dirct_num->image; break;
-        case dirct: max_num = list->num.dirct;        break;
-        default:                                      break;
+        case audio: max_num = item->dirct_num->audio_dirct; break;
+        case video: max_num = item->dirct_num->video_dirct; break;
+        case image: max_num = item->dirct_num->image_dirct; break;
+        case dirct: max_num = list->num.dirct;              break;
+        default:                                            break;
     }
 
     if(max_num == 0)
@@ -432,7 +433,7 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
         return NULL;
     }
 
-    list_for_each_entry(list->root, curr, head)
+    list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if (curr->exte_type == dirct && curr->parent == item)
         {
@@ -475,7 +476,7 @@ list_item* list_get_idx_all(list_data* list, extetype exte_type, int index)
         return NULL;
     }
 
-    list_for_each_entry(list->root, curr, head)
+    list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if(curr->exte_type == exte_type) index--;
         if(index == 0) break;
@@ -511,10 +512,10 @@ list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int in
 
     switch(exte_type)
     {
-        case audio: max_num = item->link_num->audio; head = item->audio_head.next;      break;
-        case video: max_num = item->link_num->video; head = item->video_head.next;      break;
-        case image: max_num = item->link_num->image; head = item->image_head.next;      break;
-        case dirct: max_num = item->link_num->dirct; head = item->Directory_head.next;  break;
+        case audio: max_num = item->link_num->audio; head = item->head[eHeadAudio].next;      break;
+        case video: max_num = item->link_num->video; head = item->head[eHeadVideo].next;      break;
+        case image: max_num = item->link_num->image; head = item->head[eHeadImage].next;      break;
+        case dirct: max_num = item->link_num->dirct; head = item->head[eHeadDirct].next;  break;
         default:                                                                        break;
     }
 
@@ -536,11 +537,11 @@ list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int in
         {
             switch(exte_type)
             {
-                case audio: curr = container_of(head, list_item, audio_head);  break;
-                case video: curr = container_of(head, list_item, video_head);  break;
-                case image: curr = container_of(head, list_item, image_head);  break;
-                case dirct: curr = container_of(head, list_item, dirct_head);  break;
-                default:                                                       break;
+                case audio: curr = l_container_of(head, list_item, head[eHeadAudio]);   break;
+                case video: curr = l_container_of(head, list_item, head[eHeadVideo]);   break;
+                case image: curr = l_container_of(head, list_item, head[eHeadImage]);   break;
+                case dirct: curr = l_container_of(head, list_item, head[eHeadFolder]);  break;
+                default:                                                                break;
             }
             break;
         }
@@ -563,7 +564,7 @@ list_item* list_get_exet_dirct_idx_all(list_data* list, extetype exte_type, int 
         return NULL;
     }
 
-    if(list->root->head.next == NULL || max_num == 0)
+    if(list->root->head[eHeadAll].next == NULL || max_num == 0)
     {
         LIST_DBG("no matched files");
         return NULL;
@@ -575,7 +576,7 @@ list_item* list_get_exet_dirct_idx_all(list_data* list, extetype exte_type, int 
         return NULL;
     }
 
-    list_for_each_entry(list->root, curr, head)
+    list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if( (curr->has_type) && (curr->has_type & (exte_type)) ) index--;
         if(index == 0) break;
@@ -612,14 +613,14 @@ list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int
 
     switch(exte_type)
     {
-        case audio: max_num = item->dirct_num->audio; break;
-        case video: max_num = item->dirct_num->video; break;
-        case image: max_num = item->dirct_num->image; break;
-        case dirct: max_num = list->num.dirct;        break;
-        default:                                      break;
+        case audio: max_num = item->dirct_num->audio_dirct; break;
+        case video: max_num = item->dirct_num->video_dirct; break;
+        case image: max_num = item->dirct_num->image_dirct; break;
+        case dirct: max_num = list->num.dirct;              break;
+        default:                                            break;
     }
 
-    if(item->Directory_head.next == NULL || max_num == 0)
+    if(item->head[eHeadDirct].next == NULL || max_num == 0)
     {
         LIST_DBG("no matched files");
         return NULL;
@@ -632,9 +633,9 @@ list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int
     }
 
 
-    for (curr = container_of(item->Directory_head.next, list_item, dirct_head);
+    for (curr = l_container_of(item->head[eHeadDirct].next, list_item, head[eHeadFolder]);
          curr != NULL;
-         curr = list_next_entry_or_null(curr, dirct_head))
+         curr = list_next_entry_or_null(curr, head[eHeadFolder]))
     {
         if( (curr->has_type) && (curr->has_type & (exte_type)) ) index--;
         if(index == 0) break;

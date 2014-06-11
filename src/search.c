@@ -4,9 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <list.h>
-#include <list_def.h>
-
+#include "../include/list_def.h"
 
 int search_file(char* path,char* filename)
 {

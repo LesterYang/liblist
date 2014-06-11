@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-#include <list.h>
-#include <list_def.h>
+#include "../include/list_def.h"
 
 void list_close(list_data* list)
 {
@@ -36,10 +35,10 @@ void free_list_item(list_item* start)
 {
     list_item *curr, *item;
 
-    if((curr=list_next_entry_or_null(start, head)) == NULL)
+    if((curr=list_next_entry_or_null(start, head[eHeadAll])) == NULL)
         return;
 
-    for(item=NULL;;curr=list_next_entry_or_null(curr, head))
+    for(item=NULL;;curr=list_next_entry_or_null(curr, head[eHeadAll]))
     {
         if(item == NULL)
         {
@@ -50,7 +49,7 @@ void free_list_item(list_item* start)
         if(item->name)
             free(item->name);
 
-        if((item->file_type == Directory))
+        if((item->exte_type == dirct))
         {
             if(item->dirct_num)
                 free(item->dirct_num);
