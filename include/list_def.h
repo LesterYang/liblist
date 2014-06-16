@@ -49,7 +49,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	2
-#define ReleaseNum	1
+#define ReleaseNum	2
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 

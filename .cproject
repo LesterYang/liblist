@@ -20,7 +20,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247" name="x86" parent="org.eclipse.cdt.build.core.prefbase.cfg" postannouncebuildStep="" postbuildStep="cp ${BuildArtifactFilePrefix}${BuildArtifactFileName} &quot;/usr/lib/liblist.so&quot;">
+				<configuration artifactExtension="so.1.2.2" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247" name="x86" parent="org.eclipse.cdt.build.core.prefbase.cfg" postannouncebuildStep="" postbuildStep="cp ${workspace_loc:/${ProjName}/x86}/${BuildArtifactFilePrefix}${BuildArtifactFileName} &quot;${workspace_loc:/${ProjName}/x86}/liblist.so&quot;">
 					<folderInfo id="0.308064247." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.1342553371" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.380782272" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -928,7 +928,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.2.1" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
+				<configuration artifactExtension="so.1.2.2_gdb" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.98712758" name="MX51_g3" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="">
 					<folderInfo id="0.308064247.98712758." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.702764346" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.53587341" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -965,6 +965,7 @@
 								<option defaultValue="true" id="gnu.cpp.link.option.shared.1520241985" name="Shared (-shared)" superClass="gnu.cpp.link.option.shared" valueType="boolean"/>
 								<option id="gnu.cpp.link.option.libs.1349666378" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="tcmalloc"/>
+									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.586009086" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>
@@ -1842,7 +1843,7 @@
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactExtension="so.1.2.1" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg">
+				<configuration artifactExtension="so.1.2.2" artifactName="list" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" description="" id="0.308064247.1058103554" name="MX51_release" parent="org.eclipse.cdt.build.core.prefbase.cfg" postbuildStep="cp ${workspace_loc:/${ProjName}/MX51_release}/${BuildArtifactFilePrefix}${BuildArtifactFileName} &quot;${workspace_loc:/${ProjName}/MX51_release}/liblist.so&quot;">
 					<folderInfo id="0.308064247.1058103554." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.base.942075436" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.base">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.target.gnu.platform.base.1860653471" name="Debug Platform" osList="linux,hpux,aix,qnx" superClass="cdt.managedbuild.target.gnu.platform.base"/>
@@ -1878,6 +1879,7 @@
 								<option id="gnu.cpp.link.option.soname.810191429" name="Shared object name (-Wl,-soname=)" superClass="gnu.cpp.link.option.soname" value="liblist.so.1" valueType="string"/>
 								<option id="gnu.cpp.link.option.libs.543827827" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="tcmalloc"/>
+									<listOptionValue builtIn="false" value="pthread"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.1680188465" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/Space/ltib2/ltib/rootfs/usr/lib"/>

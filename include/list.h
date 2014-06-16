@@ -88,8 +88,8 @@ const char* image_exte_str[]=
 // open "/mnt/usb" to initialize list structure.
 // sort = alphanumeric, file type = audio|video|image|directory
 // return id of "/mnt/usb", or 0 if error.
-int list_init(list_data** plist);
-
+//int list_init(list_data** plist);
+int list_init(list_data** plist, void (*callback)(void));
 // =============================
 // Release/Close (clode_list.c)
 // =============================

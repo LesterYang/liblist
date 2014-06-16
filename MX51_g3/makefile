@@ -39,27 +39,22 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: liblist.so.1.2.2
+all: liblist.so.1.2.1_gdb
 
 # Tool invocations
-liblist.so.1.2.2: $(OBJS) $(USER_OBJS)
+liblist.so.1.2.1_gdb: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	gcc -shared -o"liblist.so.1.2.2" $(OBJS) $(USER_OBJS) $(LIBS)
+	/opt/freescale/usr/local/gcc-4.4.4-glibc-2.11.1-multilib-1.0/arm-fsl-linux-gnueabi/bin/arm-fsl-linux-gnueabi-g++ -L/Space/ltib2/ltib/rootfs/usr/lib -shared -pg -o"liblist.so.1.2.1_gdb" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
-	$(MAKE) --no-print-directory post-build
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) liblist.so.1.2.2
-	-@echo ' '
-
-post-build:
-	-cp /mnt/hgfs/Win_7/workspace-cpp2/Liblist/x86/liblist.so.1.2.2 "/mnt/hgfs/Win_7/workspace-cpp2/Liblist/x86/liblist.so"
+	-$(RM) $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(LIBRARIES)$(CPP_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS) liblist.so.1.2.1_gdb
 	-@echo ' '
 
 .PHONY: all clean dependents
-.SECONDARY: post-build
+.SECONDARY:
 
 -include ../makefile.targets

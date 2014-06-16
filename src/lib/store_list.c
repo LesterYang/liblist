@@ -188,6 +188,7 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
                 init_list_head(&(item->head[eHeadVideo]));
                 init_list_head(&(item->head[eHeadImage]));
                 list->num.dirct++;
+                parent_item->link_num->dirct++;
 
                 list_add(&item->head[eHeadFolder], &parent_item->head[eHeadDirct]);
             }

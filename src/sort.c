@@ -209,33 +209,30 @@ int listdata_compare_time(const void* i, const void* j)
 void listdata_msort_init(list_data* list)
 {
     list_item *curr;
+    list_head* head = list->root->head;
 
     g_compare_func = listdata_compare_alph;
 
-#if 0
-    list_head* head = list->root->head;
-#else
     g_head_type = eHeadAudio;
-    list->root->head[eHeadAudio].next = listdata_merge_sort(list->root->head[eHeadAudio].next);
+    head[eHeadAudio].next = listdata_merge_sort(head[eHeadAudio].next);
 
     g_head_type = eHeadVideo;
-    list->root->head[eHeadVideo].next = listdata_merge_sort(list->root->head[eHeadVideo].next);
+    head[eHeadVideo].next = listdata_merge_sort(head[eHeadVideo].next);
 
     g_head_type = eHeadImage;
-    list->root->head[eHeadImage].next = listdata_merge_sort(list->root->head[eHeadImage].next);
+    head[eHeadImage].next = listdata_merge_sort(head[eHeadImage].next);
 
     g_head_type = eHeadFolder;
-    list->root->head[eHeadDirct].next = listdata_merge_sort(list->root->head[eHeadDirct].next);
+    head[eHeadDirct].next = listdata_merge_sort(head[eHeadDirct].next);
 
-    if(list->root->head[eHeadAudio].next)
-        list->root->head[eHeadAudio].next->prev = &list->root->head[eHeadAudio];
-    if(list->root->head[eHeadVideo].next)
-        list->root->head[eHeadVideo].next->prev = &list->root->head[eHeadVideo];
+    if(head[eHeadAudio].next)
+        head[eHeadAudio].next->prev = &head[eHeadAudio];
+    if(head[eHeadVideo].next)
+        head[eHeadVideo].next->prev = &head[eHeadVideo];
     if(list->root->head[eHeadImage].next)
-        list->root->head[eHeadImage].next->prev = &list->root->head[eHeadImage];
+        head[eHeadImage].next->prev = &head[eHeadImage];
     if(list->root->head[eHeadDirct].next)
-        list->root->head[eHeadDirct].next->prev = &list->root->head[eHeadDirct];
-#endif
+        head[eHeadDirct].next->prev = &head[eHeadDirct];
 
     list_for_each_entry(list->root, curr, head[eHeadAll])
     {

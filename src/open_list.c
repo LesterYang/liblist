@@ -11,6 +11,14 @@ struct timeval tv;
 unsigned long long start_utime, end_utime, tmp_utime;
 #endif
 
+typedef struct list_thread {
+        pthread_t id;
+        void (*cb_func)();
+        list_data* list;
+}list_thread;
+
+static void* thread_func(void *callback);
+
 #if 0
 // ===========================================
 // need to do
@@ -45,7 +53,8 @@ int open_listdata_type_subdir(char* path, list_data** plist,extetype exte_type, 
     return 0;
 }
 
-int list_init(list_data** plist)
+//int list_init(list_data** plist)
+int list_init(list_data** plist, void (*callback)(void))
 {
     list_data* list;
 
@@ -101,22 +110,44 @@ int list_init(list_data** plist)
     }
 
     list_mutex_new(list, TRUE, TRUE);
-	
-    store_list_usb(list, (char*)USB_PATH, list->root);
-
     list->exte_select = (extetype)(alltype|dirct);
-    list->init = 0;
 
-    if (list->num.audio == 0)
-        LIST_BIT_CLR(list->root->has_type, audio);
+	if(callback != NULL)
+	{
+	    list_thread* l_thread = (list_thread*)calloc(1,sizeof(list_thread));
 
-    if (list->num.video == 0)
-        LIST_BIT_CLR(list->root->has_type, video);
+	    if(l_thread)
+	    {
+            l_thread->cb_func = callback;
+            l_thread->list = list;
 
-    if (list->num.image == 0)
-        LIST_BIT_CLR(list->root->has_type, image);
+            if (pthread_create(&l_thread->id, NULL, thread_func, l_thread) < 0)
+            {
+                free(l_thread);
+                goto free_list_drict_num;
+            }
+	    }
+	    else
+	    {
+	        goto free_list_drict_num;
+	    }
+	}
+	else
+	{
+	    store_list_usb(list, (char*)USB_PATH, list->root);
+	    list->init = 0;
 
-    listdata_msort(list, sortAlph);
+        if (list->num.audio == 0)
+            LIST_BIT_CLR(list->root->has_type, audio);
+
+        if (list->num.video == 0)
+            LIST_BIT_CLR(list->root->has_type, video);
+
+        if (list->num.image == 0)
+            LIST_BIT_CLR(list->root->has_type, image);
+
+        listdata_msort(list, sortAlph);
+	}
 
 #ifdef Time_Measure
     gettimeofday(&tv,NULL);
@@ -143,4 +174,31 @@ free_list_data:
         free(list);
 err:
     return 0;
+}
+
+
+static void* thread_func(void *data)
+{
+    list_thread* l_thread = (list_thread*)data;
+    store_list_usb(l_thread->list, (char*)USB_PATH, l_thread->list->root);
+
+    l_thread->list->init = 0;
+
+    if (l_thread->list->num.audio == 0)
+        LIST_BIT_CLR(l_thread->list->root->has_type, audio);
+
+    if (l_thread->list->num.video == 0)
+        LIST_BIT_CLR(l_thread->list->root->has_type, video);
+
+    if (l_thread->list->num.image == 0)
+        LIST_BIT_CLR(l_thread->list->root->has_type, image);
+
+    listdata_msort(l_thread->list, sortAlph);
+
+    l_thread->cb_func();
+
+    free(l_thread);
+
+    pthread_detach(pthread_self());
+    return NULL;
 }
