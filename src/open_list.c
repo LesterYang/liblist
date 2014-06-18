@@ -135,7 +135,6 @@ int list_init(list_data** plist, void (*callback)(void))
 	else
 	{
 	    store_list_usb(list, (char*)USB_PATH, list->root);
-	    list->init = 0;
 
         if (list->num.audio == 0)
             LIST_BIT_CLR(list->root->has_type, audio);
@@ -146,7 +145,8 @@ int list_init(list_data** plist, void (*callback)(void))
         if (list->num.image == 0)
             LIST_BIT_CLR(list->root->has_type, image);
 
-        listdata_msort(list, sortAlph);
+        listdata_msort(list, sortDirt);
+        list->init = 0;
 	}
 
 #ifdef Time_Measure
@@ -182,8 +182,6 @@ static void* thread_func(void *data)
     list_thread* l_thread = (list_thread*)data;
     store_list_usb(l_thread->list, (char*)USB_PATH, l_thread->list->root);
 
-    l_thread->list->init = 0;
-
     if (l_thread->list->num.audio == 0)
         LIST_BIT_CLR(l_thread->list->root->has_type, audio);
 
@@ -193,7 +191,8 @@ static void* thread_func(void *data)
     if (l_thread->list->num.image == 0)
         LIST_BIT_CLR(l_thread->list->root->has_type, image);
 
-    listdata_msort(l_thread->list, sortAlph);
+    listdata_msort(l_thread->list, sortDirt);
+    l_thread->list->init = 0;
 
     l_thread->cb_func();
 

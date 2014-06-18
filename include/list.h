@@ -57,13 +57,9 @@ const char* audio_exte_str[]=
 };
 const char* video_exte_str[]=
 {
-    ".asf",
     ".avi",
     ".flv",
     ".mpg",
-    ".rm",
-    ".rmvb",
-    ".wmv",
     ".mkv",
     ".mov",
     ".vob",
