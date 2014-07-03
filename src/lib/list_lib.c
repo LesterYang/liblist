@@ -512,11 +512,11 @@ list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int in
 
     switch(exte_type)
     {
-        case audio: max_num = item->link_num->audio; head = item->head[eHeadAudio].next;      break;
-        case video: max_num = item->link_num->video; head = item->head[eHeadVideo].next;      break;
-        case image: max_num = item->link_num->image; head = item->head[eHeadImage].next;      break;
-        case dirct: max_num = item->link_num->dirct; head = item->head[eHeadDirct].next;  break;
-        default:                                                                        break;
+        case audio: max_num = item->link_num->audio; head = item->head[eHeadAudio].next;    break;
+        case video: max_num = item->link_num->video; head = item->head[eHeadVideo].next;    break;
+        case image: max_num = item->link_num->image; head = item->head[eHeadImage].next;    break;
+        case dirct: max_num = item->link_num->dirct; head = item->head[eHeadDirct].next;    break;
+        default:                                                                            break;
     }
 
     if(max_num == 0)
