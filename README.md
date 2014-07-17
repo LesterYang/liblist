@@ -4,11 +4,11 @@ liblist
   
 Installation
 ============
-  Open project by Eclipse to Build or use gcc directly.
+  Open project by Eclipse to Build or use gcc command line directly.
   
 Usage
 =====
-  AP compiles with -llist -lpthread -I list.h
+  AP compiles flag with -llist -lpthread -I list.h
 	
   Need to create data structure by open_list()/open_listdata)/open_listdata_type()/open_listdata_subdir)
   /open_listdata_type_subdir() first.
