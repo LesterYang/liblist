@@ -50,6 +50,11 @@ build/
 [Bb]in/
 [Oo]bj/
 
+
+MX51_g3/
+MX51_release/
+
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
