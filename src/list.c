@@ -68,7 +68,8 @@ int list_get_filetype_count(list_data* list, filetype file_type)
 int list_get_count(list_data* list, extetype exte_type)
 {
     qsi_assert(list);
-
+	if (QSI_UNLIKELY(list->init)) return INIT_NOT_DONE;
+	
     return list_get_exte_number(&list->num, exte_type);
 }
 
@@ -76,6 +77,8 @@ int list_get_count(list_data* list, extetype exte_type)
 int list_get_filetype_count_folder(list_data* list, filetype file_type, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     if(list_check_type_item_id(id, dirct))
         return -2;
@@ -87,6 +90,8 @@ int list_get_filetype_count_folder(list_data* list, filetype file_type, int id)
 int list_get_count_in_folder(list_data* list, extetype exte_type, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     if(list_check_type_item_id(id, dirct))
         return -2;
@@ -96,6 +101,9 @@ int list_get_count_in_folder(list_data* list, extetype exte_type, int id)
 
 int list_get_dirct_count_in_folder(list_data* list, extetype exte_type, int id)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+	
     if(list_check_item_id(id))
         return -2;
 
@@ -125,6 +133,8 @@ int list_get_dirct_count_in_folder(list_data* list, extetype exte_type, int id)
 int list_get_id_by_path(list_data* list, char* path)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     list_item *item = list_get_item_by_name(list, path);
 
@@ -136,6 +146,9 @@ int list_get_id_by_path(list_data* list, char* path)
 
 int list_get_parent_id_by_path(list_data* list, char* path)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+	
     int id = list_get_id_by_path(list, path);
 
     return list_get_parent_id_by_id(id);
@@ -143,6 +156,9 @@ int list_get_parent_id_by_path(list_data* list, char* path)
 
 int list_get_parent_id_by_id(int id)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+	
     if(list_check_item_id(id))
         return 0;
 
@@ -155,6 +171,8 @@ int list_get_parent_id_by_id(int id)
 int list_get_root_id(list_data* list)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     return list->root->id;
 }
@@ -359,6 +377,8 @@ extetype list_get_extetype_by_path(list_data* list, char* path)
 int list_get_index_by_id(list_data* list, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     int index = 1;
 
@@ -381,6 +401,8 @@ int list_get_index_by_id(list_data* list, int id)
 int list_get_index_in_folder_by_id(list_data* list, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     int index = 1;
 
@@ -414,6 +436,8 @@ int list_get_index_in_folder_by_id(list_data* list, int id)
 int list_get_dirct_index_by_id(list_data* list, extetype exte_type, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     int index = 0;
     list_item *item = (list_item*)id, *curr;
@@ -435,6 +459,8 @@ int list_get_dirct_index_by_id(list_data* list, extetype exte_type, int id)
 int list_get_dirct_index_in_folder_by_id(list_data* list, extetype exte_type, int id)
 {
     qsi_assert(list);
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
 
     int index = 1;
     list_item *item = (list_item*)id;
@@ -462,6 +488,9 @@ int list_get_dirct_index_in_folder_by_id(list_data* list, extetype exte_type, in
 
 int list_get_index_by_path(list_data* list, char* path)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+		
     int id = list_get_id_by_path(list, path);
 
     if(id)
@@ -472,6 +501,9 @@ int list_get_index_by_path(list_data* list, char* path)
 
 int list_get_index_in_folder_by_path(list_data* list, char* path)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+		
     int id = list_get_id_by_path(list, path);
 
     if(id)
@@ -482,6 +514,9 @@ int list_get_index_in_folder_by_path(list_data* list, char* path)
 
 int list_get_dirct_index_by_path(list_data* list, extetype exte_type, char* path)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+		
     int id = list_get_id_by_path(list, path);
 
     if(id)
@@ -492,6 +527,9 @@ int list_get_dirct_index_by_path(list_data* list, extetype exte_type, char* path
 
 int list_get_dirct_index_in_folder_by_path(list_data* list, extetype exte_type, char* path)
 {
+	if (QSI_UNLIKELY(list->init)) 
+		return INIT_NOT_DONE;
+		
     int id = list_get_id_by_path(list, path);
 
     if(id)

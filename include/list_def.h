@@ -43,6 +43,8 @@
 #define LIST_POISON1  ((void*)0x00100100)
 #define LIST_POISON2  ((void*)0x00200200)
 
+#define	INIT_NOT_DONE (-5)
+
 #define _STR(s) #s
 #define STR(s) _STR(s)
 
@@ -77,7 +79,6 @@
 #else
 #define qsi_assert(expr) qsi_nothing()
 #endif
-
 
 #define liblist_perror(expr)												\
 		do{																	\

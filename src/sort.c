@@ -266,6 +266,8 @@ void listdata_msort(list_data* list, sorttype sort_type)
 {
     qsi_assert(list);
     qsi_assert(list->root);
+    if (QSI_UNLIKELY(list->init)) 
+        return INIT_NOT_DONE;
 
     pthread_mutex_lock(&list->mutex);
 
@@ -327,7 +329,7 @@ list_head* listdata_merge(list_head* i, list_head* j)
     
     item_i = (list_item*)l_container_of(i, list_item, head[g_head_type]);
     item_j = (list_item*)l_container_of(j, list_item, head[g_head_type]);
-	
+    
     if(g_compare_func(&item_i, &item_j) < 0)
     {
         curr = i;
