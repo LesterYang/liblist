@@ -20,7 +20,8 @@ typedef enum{
 
 	allfile		= (1<<5)-1,
 
-	ExteTypeError = -1
+	ExteTypeError = -1,
+	ExteTypeWaitInit = -3
 }extetype;
 
 typedef enum sorttype{
@@ -111,12 +112,15 @@ sorttype list_get_info_sort_type(list_data* list);
 // error code:
 //    -1 : type error
 //    -2 : id error
+//    -3 : list is initializing
 int list_get_count(list_data* list, extetype exte_type);
 int list_get_count_in_folder(list_data* list, extetype exte_type, int id);
 int list_get_dirct_count_in_folder(list_data* list, extetype exte_type, int id);
 
 // Get id.
-// return 0 if complete path error.
+// error code:
+//     0 : complete path error.
+//    -3 : list is initializing
 int list_get_id_by_path(list_data* list, char* path);
 int list_get_parent_id_by_path(list_data* list, char* path);
 int list_get_parent_id_by_id(int id);
@@ -133,6 +137,7 @@ int list_get_root_id(list_data* list);
 //     1. index isn't a a positive number or
 //     2. index is larger than count
 //     3. id error
+//     4. list is initializing
 const char* list_get_name(list_data* list, extetype exte_type, int index);
 const char* list_get_path(list_data* list, extetype exte_type, int index);
 const char* list_get_name_in_folder(list_data* list, extetype exte_type, int id, int index);
@@ -147,7 +152,9 @@ const char* list_get_dirct_path_in_folder(list_data* list, extetype exte_type, i
 // list_get_comp_path_by_id        : Get file name.
 // list_get_parent_file_name_by_id : Get complete path of parent.
 // list_get_parent_comp_path_by_id : Get file name of parent.
-// return NULL if id error
+// return NULL if
+//      1. id error
+//      2. list is initializing
 const char* list_get_name_by_id(int id);
 const char* list_get_path_by_id(list_data* list, int id);
 const char* list_get_parent_name_by_id(list_data* list, int id);
@@ -159,8 +166,9 @@ extetype list_get_extetype_by_path(list_data* list, char* path);
 
 // Get index by id
 // error code:
-//     -1 : id error or it's not a folder for list_get_dirct_xxx()
 //      0 : it's /mnt/usb or the folder doesn't have matched type file for list_get_dirct_xxx()
+//     -1 : id error or it's not a folder for list_get_dirct_xxx()
+//     -3 : list is initializing
 int list_get_index_by_id(list_data* list, int id);
 int list_get_index_in_folder_by_id(list_data* list, int id);
 int list_get_index_by_path(list_data* list, char* path);

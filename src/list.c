@@ -156,9 +156,6 @@ int list_get_parent_id_by_path(list_data* list, char* path)
 
 int list_get_parent_id_by_id(int id)
 {
-	if (QSI_UNLIKELY(list->init)) 
-		return INIT_NOT_DONE;
-	
     if(list_check_item_id(id))
         return 0;
 
@@ -362,6 +359,9 @@ filetype list_get_filetype_by_path(list_data* list, char* path)
 extetype list_get_extetype_by_path(list_data* list, char* path)
 {
     int id;
+
+    if (QSI_UNLIKELY(list->init))
+        return ExteTypeWaitInit;
 
     qsi_assert(path);
 

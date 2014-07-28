@@ -18,7 +18,7 @@
 #define __GNUC__
 #endif
 
-#define Time_Measure
+//#define Time_Measure
 
 #define QSI_ASSERT	1
 #define LIST_DEBUG  1
@@ -43,7 +43,7 @@
 #define LIST_POISON1  ((void*)0x00100100)
 #define LIST_POISON2  ((void*)0x00200200)
 
-#define	INIT_NOT_DONE (-5)
+#define	INIT_NOT_DONE (-3)
 
 #define _STR(s) #s
 #define STR(s) _STR(s)
@@ -51,7 +51,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	2
-#define ReleaseNum	2
+#define ReleaseNum	3
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
