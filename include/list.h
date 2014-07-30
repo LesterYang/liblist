@@ -82,8 +82,9 @@ const char* image_exte_str[]=
 // ==============================
 // Initialize/Open (open_list.c)
 // ==============================
+
 // open "/mnt/usb" to initialize list structure.
-// sort = alphanumeric, file type = audio|video|image|directory
+// default sort = folder
 // return id of "/mnt/usb", or 0 if error.
 // it's non-block if callback != NULL.
 int list_init(list_data** plist, void (*callback)(void));
@@ -91,6 +92,7 @@ int list_init(list_data** plist, void (*callback)(void));
 // =============================
 // Release/Close (clode_list.c)
 // =============================
+
 // Close list_data structure, release memory.
 void list_close(list_data* list);
 
@@ -106,9 +108,9 @@ const char* list_get_exettype_str(extetype exet_type);
 sorttype list_get_info_sort_type(list_data* list);
 
 // Get count of the matched type files.
-// list_get_xxx_count            : Get files count.
-// list_get_xxx_count_folder     : Get files count only in the id directory.
-// list_get_exte_dirct_count_xxx : Get count of directories in the id directory. There are matched files in the directories.
+// list_get_count                 : Get files count.
+// list_get_count_in_folder       : Get files count only in the id directory.
+// list_get_dirct_count_in_folder : Get count of directories in the id directory. There are matched files in the directories.
 // error code:
 //    -1 : type error
 //    -2 : id error
@@ -127,12 +129,14 @@ int list_get_parent_id_by_id(int id);
 int list_get_root_id(list_data* list);
 
 // Get information string by relative index with extension type.
-// list_get_file_name              : Get file name.
-// list_get_comp_path              : Get complete path.
-// list_get_file_name_folder       : Get file name only in the id directory.
-// list_get_comp_path_folder       : Get complete path only in the id directory.
-// list_get_dirct_file_name_folder : Get complete path of a directory that have matched files only in the id directory.
-// list_get_dirct_comp_path_folder : Get file name of a directory that have matched files only in the id directory.
+// list_get_name                 : Get file name.
+// list_get_path                 : Get complete path of file.
+// list_get_name_in_folder       : Get file name only in the id folder.
+// list_get_path_in_folder       : Get complete path of file only in the id folder.
+// list_get_dirct_name           : Get directory name, there are matched files in the directory.
+// list_get_dirct_path           : Get complete path of a directory, there are matched files in the directory.
+// list_get_dirct_name_in_folder : Get directory name only in the id folder, there are matched files in the directory.
+// list_get_dirct_path_in_folder : Get complete path of a directory only in the id folder, there are matched files in the directory.
 // return NULL if
 //     1. index isn't a a positive number or
 //     2. index is larger than count
@@ -148,10 +152,10 @@ const char* list_get_dirct_name_in_folder(list_data* list, extetype exte_type, i
 const char* list_get_dirct_path_in_folder(list_data* list, extetype exte_type, int id, int index);
 
 // Get information string by id.
-// list_get_file_name_by_id        : Get complete path.
-// list_get_comp_path_by_id        : Get file name.
-// list_get_parent_file_name_by_id : Get complete path of parent.
-// list_get_parent_comp_path_by_id : Get file name of parent.
+// list_get_name_by_id        : Get file name.
+// list_get_path_by_id        : Get complete path of the id.
+// list_get_parent_name_by_id : Get parent name.
+// list_get_parent_path_by_id : Get parent complete path.
 // return NULL if
 //      1. id error
 //      2. list is initializing
@@ -166,8 +170,8 @@ extetype list_get_extetype_by_path(list_data* list, char* path);
 
 // Get index by id
 // error code:
-//      0 : it's /mnt/usb or the folder doesn't have matched type file for list_get_dirct_xxx()
-//     -1 : id error or it's not a folder for list_get_dirct_xxx()
+//      0 : it's /mnt/usb or the folder doesn't have matched type file
+//     -1 : id error or it's not a folder
 //     -3 : list is initializing
 int list_get_index_by_id(list_data* list, int id);
 int list_get_index_in_folder_by_id(list_data* list, int id);
