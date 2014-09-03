@@ -20,7 +20,7 @@
 
 //#define Time_Measure
 
-#define QSI_ASSERT	1
+#define QSI_ASSERT	0
 #define LIST_DEBUG  1
 #define ENABLE_FILETYPE 0
 
@@ -51,7 +51,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	2
-#define ReleaseNum	3
+#define ReleaseNum	4
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -68,6 +68,7 @@
 #define qsi_nothing() do {} while (FALSE)
 
 #if (QSI_ASSERT!=0)
+
 #define qsi_assert(expr)                                              	            	\
     do {                                                                            	\
         if (QSI_UNLIKELY(!(expr))) {                                     	            \
@@ -76,8 +77,20 @@
             abort();                                                                	\
         }                                                              	            	\
     } while (0)
+#define qsi_return(expr, ret) qsi_nothing()
+
 #else
+
 #define qsi_assert(expr) qsi_nothing()
+#define qsi_check(expr, ret)                                                           \
+    do {                                                                                \
+        if (QSI_UNLIKELY(!(expr))) {                                                    \
+            printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Return\n",      \
+                        #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);               \
+            return ret;                                                                 \
+        }                                                                               \
+    } while (0)
+
 #endif
 
 #define liblist_perror(expr)												\

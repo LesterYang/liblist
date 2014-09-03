@@ -5,6 +5,7 @@
 void list_close(list_data* list)
 {
     qsi_assert(list);
+    qsi_check(list,);
 
     pthread_mutex_destroy(&list->mutex);
 

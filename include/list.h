@@ -7,6 +7,9 @@
 #ifndef LIST_H_
 #define LIST_H_
 
+#define NULL_LIST (0xFFFFFFF1)
+
+
 typedef enum{
     none_type   = 0,
 	audio		= 1,

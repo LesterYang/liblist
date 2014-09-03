@@ -265,7 +265,9 @@ void listdata_msort_init(list_data* list)
 void listdata_msort(list_data* list, sorttype sort_type)
 {
     qsi_assert(list);
+    qsi_check(list,);
     qsi_assert(list->root);
+
     if (QSI_UNLIKELY(list->init)) 
         return;
 
