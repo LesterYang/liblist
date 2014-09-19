@@ -15,7 +15,7 @@ const char* list_get_version_number(void)
 
 const char* list_get_exettype_str(extetype exet_type)
 {
-    switch(exet_type)
+    switch((int)exet_type)
     {
         case audio:                 return "audio";
         case video:                 return "video";
@@ -123,7 +123,7 @@ int list_get_dirct_count_in_folder(list_data* list, extetype exte_type, int id)
 
     list_dirct_num* n = item->dirct_num;
 
-    switch(exte_type)
+    switch((int)exte_type)
     {
         case audio:             num = n->audio_dirct;                                   break;
         case video:             num = n->video_dirct;                                   break;

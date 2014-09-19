@@ -193,7 +193,7 @@ int list_get_exte_number(list_number* n, extetype exte_type)
 
     int num = -1;
 
-    switch(exte_type)
+    switch((int)exte_type)
     {
         case audio:             num = n->audio;                                  break;
         case video:             num = n->video;                                  break;

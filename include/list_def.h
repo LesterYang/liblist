@@ -21,14 +21,14 @@
 //#define Time_Measure
 
 #define QSI_ASSERT	0
-#define LIST_DEBUG  1
+#define LIST_DEBUG      1
 #define ENABLE_FILETYPE 0
 
 #define MAX_EXTE_LEN    (8)
 #define MAX_NAME        (255)
-#define MAX_PATH	    (4096)
-#define MAX_FILES	    (65536)
-#define BUF_SIZE	    (256)
+#define MAX_PATH        (4096)
+#define MAX_FILES       (65536)
+#define BUF_SIZE        (256)
 
 #define USB_PATH        "/mnt/usb"
 
@@ -51,7 +51,7 @@
 // Version information
 #define MajorVerNum	1
 #define MinorVerNum	2
-#define ReleaseNum	4
+#define ReleaseNum	5
 #define _VerNum(ma, mi, r) _STR(ma##.mi##.r)
 #define VerNum(ma, mi, r) _VerNum(ma, mi, r)
 
@@ -69,42 +69,42 @@
 
 #if (QSI_ASSERT!=0)
 
-#define qsi_assert(expr)                                              	            	\
-    do {                                                                            	\
-        if (QSI_UNLIKELY(!(expr))) {                                     	            \
-        	printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Aborting\n",	\
-						#expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);	            \
-            abort();                                                                	\
-        }                                                              	            	\
+#define qsi_assert(expr)                                                                \
+    do {                                                                                \
+        if (QSI_UNLIKELY(!(expr))) {                                                    \
+            printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Aborting\n",    \
+                    #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);                   \
+            abort();                                                                    \
+        }                                                                               \
     } while (0)
 #define qsi_return(expr, ret) qsi_nothing()
 
 #else
 
 #define qsi_assert(expr) qsi_nothing()
-#define qsi_check(expr, ret)                                                           \
+#define qsi_check(expr, ret)                                                            \
     do {                                                                                \
         if (QSI_UNLIKELY(!(expr))) {                                                    \
             printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Return\n",      \
-                        #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);               \
+                    #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);                   \
             return ret;                                                                 \
         }                                                                               \
     } while (0)
 
 #endif
 
-#define liblist_perror(expr)												\
-		do{																	\
-			printf("liblist : %s failed at function '%s' (%s:%u)\n",		\
-			       #expr , QSI_PRETTY_FUNCTION, __FILE__, __LINE__);		\
-		} while(0)
+#define liblist_perror(expr)                                                            \
+    do{                                                                                 \
+        printf("liblist : %s failed at function '%s' (%s:%u)\n",                        \
+                #expr , QSI_PRETTY_FUNCTION, __FILE__, __LINE__);                       \
+    } while(0)
 
 #if (LIST_DEBUG!=0)
-#define LIST_DBG(expr, ...)                                              	\
-    do {																	\
-    	printf("liblist : ");												\
-    	printf(expr,  ##__VA_ARGS__);										\
-        printf("\n");														\
+#define LIST_DBG(expr, ...)                                                             \
+    do {                                                                                \
+        printf("liblist : ");                                                           \
+        printf(expr,  ##__VA_ARGS__);                                                   \
+        printf("\n");                                                                   \
     } while (0)
 #else
 #define LIST_DBG(expr, ...) qsi_nothing()
@@ -143,7 +143,7 @@
 #define l_container_of(ptr, type, member)                                 \
 ({                                                                        \
     const typeof( ((type *)0)->member ) *__mptr = (ptr);                  \
-    (type *)( (char *)__mptr - l_offsetof(type,member) );                   \
+    (type *)( (char *)__mptr - l_offsetof(type,member) );                 \
 })
 
 #define list_next_entry(pos, member)                                       \
@@ -251,26 +251,26 @@ struct list_item{
 #endif
 
     extetype exte_type;
-	extetype has_type;
-	list_head head[eHeadMax];
-	list_number* link_num;
-	list_dirct_num* dirct_num;
-	size_t name_len;
-	char* name;
-	struct list_item* parent;
+    extetype has_type;
+    list_head head[eHeadMax];
+    list_number* link_num;
+    list_dirct_num* dirct_num;
+    size_t name_len;
+    char* name;
+    struct list_item* parent;
 };
 
 struct list_data{
-	list_number num;
-	list_item *root;
+    list_number num;
+    list_item *root;
 
-	extetype exte_select;
-	sorttype sort;
-	char subdir;
-	char init;
+    extetype exte_select;
+    sorttype sort;
+    char subdir;
+    char init;
 
-	pthread_mutex_t mutex;
-	char path[MAX_PATH];
+    pthread_mutex_t mutex;
+    char path[MAX_PATH];
 };
 
 //============================================

@@ -268,9 +268,6 @@ void listdata_msort(list_data* list, sorttype sort_type)
     qsi_check(list,);
     qsi_assert(list->root);
 
-    if (QSI_UNLIKELY(list->init)) 
-        return;
-
     pthread_mutex_lock(&list->mutex);
 
     g_head_type = eHeadAll;
