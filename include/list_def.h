@@ -317,28 +317,35 @@ void free_list_item(list_item* start);
 // list_lib
 // =========
 const char* list_get_path_by_item(list_data* list, list_item* item);
-void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
-char* list_strdup(const char *str);
 int   list_check_item_id(int id);
 int   list_check_type_item_id(int id, extetype exet_type);
 void  list_compose_name(char* path, list_item* item, int* done);
 int   list_bsearch_index(list_data* list, char* name);
-int   list_count_sign(char* str, char sign);
 int   list_get_file_number(list_number* n, filetype file_type);
 int   list_get_exte_number(list_number* n, extetype exte_type);
 
 char* list_dump_append(const char* dest, const char* src);
 
-void  init_list_head(list_head* head);
-void  list_add(list_head *_new, list_head* _head);
-
 list_item* list_get_item_by_name(list_data* list, char* name);
 list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index);
 list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index);
 
-
 list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int index);
 list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int id, int index);
+
+
+// =========
+// list_util
+// =========
+void  list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority);
+char* list_strdup(const char *str);
+int   list_count_sign(char* str, char sign);
+void  init_list_head(list_head* head);
+void  list_add(list_head *_new, list_head* _head);
+char *list_path_get_filename(const char *p);
+char* list_allocate_backtrace(int frames);
+
+
 
 
 #if 0
