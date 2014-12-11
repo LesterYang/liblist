@@ -21,7 +21,7 @@ LINK       = $(HOST)gcc
 LIBPATH    = -L$(PREFIX)/usr/lib -L$(PREFIX)/usr/local/lib -L$(PREFIX)/lib
 RPATH      =
 RPATH_LINK = $(PREFIX)/usr/lib
-LFLAGS     = -shared -Wl,-rpath-link=$(RPATH_LINK),-soname=liblist.so.1
+LFLAGS     = -rdynamic -shared -Wl,-rpath-link=$(RPATH_LINK),-soname=liblist.so.1
 LIBS       = $(LIBPATH) -lpthread -lmtdev -lQSI-IPCLib 
 AR         = $(HOST)ar
 
