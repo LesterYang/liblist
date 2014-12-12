@@ -13,7 +13,7 @@
 #include <sys/errno.h>
 #include <execinfo.h>
 
-#include "../include/list_def.h"
+#include "../../include/list_def.h"
 
 void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_priority)
 {
@@ -155,7 +155,7 @@ char* list_allocate_backtrace(int frames)
 	if (!symbols)
 		return NULL;
 	
-	num_frame = LIST_MIN((num_addr, frames);
+	num_frame = LIST_MIN(num_addr, frames);
 	
 	amount = 4;
 	
