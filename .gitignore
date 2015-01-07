@@ -255,4 +255,18 @@ Session.vim
 tags
 *.taghl
 
+# SourceInsight #
+#################
+*.IAB
+*.IAD
+*.IMB
+*.IMD
+*.PFI
+*.PO
+*.PR
+*.PRI
+*.PS
+*.SearchResults
+*.WK3
 
+/release/
