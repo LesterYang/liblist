@@ -11,6 +11,25 @@
 static int (*volatile g_compare_func)(const void *, const void *) = listdata_compare_alph;
 static volatile headtype g_head_type = eHeadAll;
 
+void listdata_set_compare_func(sorttype sortType)
+{
+    switch(sortType)
+    {
+        case sortAlph: g_compare_func = listdata_compare_alph;  break;
+        case sortDirt: g_compare_func = listdata_compare_dirt;  break;
+        case sortExte: g_compare_func = listdata_compare_exte;  break;
+        case sortSize: g_compare_func = listdata_compare_size;  break;
+        case sortTime: g_compare_func = listdata_compare_time;  break;
+        default:       g_compare_func = listdata_compare_alph;  break;
+    }
+}
+
+void listdata_set_head_type(headtype eHeadType)
+{
+	g_head_type = eHeadType;
+}
+
+
 /**********************
  *  compare function  *
  **********************/
@@ -206,63 +225,45 @@ int listdata_compare_time(const void* i, const void* j)
 /*********************************
  *  merge sort  for linked list  *
  *********************************/
-void listdata_msort_init(list_data* list)
+ 
+void  listdata_msort_list(list_head* head, headtype eHeadType)
 {
+	listdata_set_head_type(eHeadType);
+	head[eHeadType].next = listdata_merge_sort(head[eHeadType].next);
+	
+	if(head[eHeadType].next)
+        head[eHeadType].next->prev = &head[eHeadType];
+}
+ 
+ 
+void listdata_msort_folder(list_data* list)
+{
+	if(!list)
+		return;
+
     list_item *curr;
     list_head* head = list->root->head;
 
-    g_compare_func = listdata_compare_alph;
+	// sort root directory
+	listdata_msort_list(head, eHeadAudio);
+	listdata_msort_list(head, eHeadVideo);
+	listdata_msort_list(head, eHeadImage);
+	listdata_msort_list(head, eHeadDirct);
 
-    g_head_type = eHeadAudio;
-    head[eHeadAudio].next = listdata_merge_sort(head[eHeadAudio].next);
-
-    g_head_type = eHeadVideo;
-    head[eHeadVideo].next = listdata_merge_sort(head[eHeadVideo].next);
-
-    g_head_type = eHeadImage;
-    head[eHeadImage].next = listdata_merge_sort(head[eHeadImage].next);
-
-    g_head_type = eHeadFolder;
-    head[eHeadDirct].next = listdata_merge_sort(head[eHeadDirct].next);
-
-    if(head[eHeadAudio].next)
-        head[eHeadAudio].next->prev = &head[eHeadAudio];
-    if(head[eHeadVideo].next)
-        head[eHeadVideo].next->prev = &head[eHeadVideo];
-    if(list->root->head[eHeadImage].next)
-        head[eHeadImage].next->prev = &head[eHeadImage];
-    if(list->root->head[eHeadDirct].next)
-        head[eHeadDirct].next->prev = &head[eHeadDirct];
-
+	// sort each subdirectory
     list_for_each_entry(list->root, curr, head[eHeadAll])
     {
         if(curr->exte_type == dirct)
         {
-            g_head_type = eHeadAudio;
-            curr->head[eHeadAudio].next = listdata_merge_sort(curr->head[eHeadAudio].next);
-
-            g_head_type = eHeadVideo;
-            curr->head[eHeadVideo].next = listdata_merge_sort(curr->head[eHeadVideo].next);
-
-            g_head_type = eHeadImage;
-            curr->head[eHeadImage].next = listdata_merge_sort(curr->head[eHeadImage].next);
-
-            g_head_type = eHeadFolder;
-            curr->head[eHeadDirct].next = listdata_merge_sort(curr->head[eHeadDirct].next);
-
-            if(curr->head[eHeadAudio].next)
-                curr->head[eHeadAudio].next->prev = &curr->head[eHeadAudio];
-            if(curr->head[eHeadVideo].next)
-                curr->head[eHeadVideo].next->prev = &curr->head[eHeadVideo];
-            if(curr->head[eHeadImage].next)
-                curr->head[eHeadImage].next->prev = &curr->head[eHeadImage];
-            if(curr->head[eHeadDirct].next)
-                curr->head[eHeadDirct].next->prev = &curr->head[eHeadDirct];
+			listdata_msort_list(curr->head, eHeadAudio);
+			listdata_msort_list(curr->head, eHeadVideo);
+			listdata_msort_list(curr->head, eHeadImage);
+			listdata_msort_list(curr->head, eHeadDirct);
         }
     }
 }
 
-void listdata_msort(list_data* list, sorttype sort_type)
+void listdata_msort(list_data* list, sorttype sortType)
 {
     qsi_assert(list);
     qsi_check(list,);
@@ -270,27 +271,20 @@ void listdata_msort(list_data* list, sorttype sort_type)
 
     pthread_mutex_lock(&list->mutex);
 
-    g_head_type = eHeadAll;
-
-    switch(sort_type)
-    {
-        case sortAlph: g_compare_func = listdata_compare_alph;  break;
-        case sortDirt: g_compare_func = listdata_compare_dirt;  break;
-        case sortExte: g_compare_func = listdata_compare_exte;  break;
-        case sortSize: g_compare_func = listdata_compare_size;  break;
-        case sortTime: g_compare_func = listdata_compare_time;  break;
-        default:                                                break;
-    }
-    list->root->head[eHeadAll].next = listdata_merge_sort(list->root->head[eHeadAll].next);
-    list->sort = sort_type;
-
-    if(list->root->head[eHeadAll].next)
-        list->root->head[eHeadAll].next->prev = &list->root->head[eHeadAll];
+	listdata_set_compare_func(sortType);
+	listdata_msort_list(list->root->head, eHeadAll);
 
     if(list->init)
-        listdata_msort_init(list);
-
+	{
+		listdata_set_compare_func(sortAlph);
+		listdata_msort_folder(list);
+	}
+	else if(sortType != sortDirt)
+		listdata_msort_folder(list);
+	
     pthread_mutex_unlock(&list->mutex);
+	
+	list->sort = sortType;
 }
 
 list_head* listdata_merge_sort(list_head* head)
