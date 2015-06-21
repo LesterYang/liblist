@@ -16,8 +16,8 @@
 
 const char* list_get_path_by_item(list_data* list, list_item* item)
 {
-    qsi_assert(list);
-    qsi_assert(item);
+    lst_assert(list);
+    lst_assert(item);
 
     int done=0;
     list_item* parent = item->parent;
@@ -109,7 +109,7 @@ int list_bsearch_index(list_data* list, char* name)
 #if ENABLE_FILETYPE
 int list_get_file_number(list_number* n, filetype file_type)
 {
-    qsi_assert(n);
+    lst_assert(n);
 
     int num = -1;
 
@@ -133,7 +133,7 @@ int list_get_file_number(list_number* n, filetype file_type)
 
 int list_get_exte_number(list_number* n, extetype exte_type)
 {
-    qsi_assert(n);
+    lst_assert(n);
 
     int num = -1;
 
@@ -174,8 +174,8 @@ char* list_dump_append(const char* dest, const char* src)
 
 list_item * list_get_item_by_name(list_data* list, char* name)
 {
-    qsi_assert(list);
-    qsi_assert(name);
+    lst_assert(list);
+    lst_assert(name);
     list_item *parent, *curr=NULL;
 
     if(memcmp(list->root->name, name, list->root->name_len) != 0)
@@ -210,7 +210,7 @@ list_item * list_get_item_by_name(list_data* list, char* name)
 
 list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     int max_num = 0;
     list_item *item, *curr;
@@ -230,7 +230,7 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
     else
         item = list->root;
 
-    qsi_assert(item->link_num);
+    lst_assert(item->link_num);
 
 
     if(id)
@@ -287,7 +287,7 @@ list_item* list_get_idx(list_data* list, extetype exte_type, int id, int index)
 
 list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, int id, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     if(list_check_type_item_id(id, dirct))
         return NULL;
@@ -295,7 +295,7 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
     int max_num = 0;
     list_item *item = (list_item*)id, *curr;
 
-    qsi_assert(item->dirct_num);
+    lst_assert(item->dirct_num);
 
     if(index <=0)
     {
@@ -341,7 +341,7 @@ list_item* list_get_exet_dirct_idx_folder(list_data* list, extetype exte_type, i
 
 list_item* list_get_idx_all(list_data* list, extetype exte_type, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     int max_num = 0;
     list_item *curr = NULL;
@@ -378,7 +378,7 @@ list_item* list_get_idx_all(list_data* list, extetype exte_type, int index)
 
 list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     int max_num = 0;
     list_item *item, *curr = NULL;
@@ -399,7 +399,7 @@ list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int in
     else
         return list_get_idx_all(list, exte_type, index);
 
-    qsi_assert(item->link_num);
+    lst_assert(item->link_num);
 
     switch(exte_type)
     {
@@ -444,7 +444,7 @@ list_item* list_get_idx_fast(list_data* list, extetype exte_type, int id, int in
 
 list_item* list_get_exet_dirct_idx_all(list_data* list, extetype exte_type, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     int max_num = list->num.dirct;
     list_item *curr = NULL;
@@ -479,7 +479,7 @@ list_item* list_get_exet_dirct_idx_all(list_data* list, extetype exte_type, int 
 
 list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int id, int index)
 {
-    qsi_assert(list);
+    lst_assert(list);
 
     int max_num = 0;
     list_item *item, *curr = NULL;
@@ -494,7 +494,7 @@ list_item* list_get_exet_dirct_idx_fast(list_data* list, extetype exte_type, int
         return list_get_exet_dirct_idx_all(list, exte_type, index);
 
 
-    qsi_assert(item->dirct_num);
+    lst_assert(item->dirct_num);
 
     if(index <=0)
     {

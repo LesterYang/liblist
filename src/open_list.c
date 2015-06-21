@@ -63,7 +63,7 @@ int list_init(list_data** plist, void (*callback)(void))
     start_utime = tv.tv_sec * 1000000 + tv.tv_usec;
 #endif
 
-    qsi_assert(plist);
+    lst_assert(plist);
 
     if(!( *plist=(list_data*)calloc(1, sizeof(list_data)) ))
     {

@@ -20,21 +20,21 @@ void list_mutex_new(list_data* list, list_bool_t recursive, list_bool_t inherit_
     pthread_mutexattr_t attr;
     int r;
 
-    qsi_assert(pthread_mutexattr_init(&attr) == 0);
+    lst_assert(pthread_mutexattr_init(&attr) == 0);
 
     if (recursive)
-        qsi_assert(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) == 0);
+        lst_assert(pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE) == 0);
 
     if (inherit_priority)
-        qsi_assert(pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT) == 0);
+        lst_assert(pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT) == 0);
 
     if ((r = pthread_mutex_init(&list->mutex, &attr)))
     {
         LIST_DBG("init normal mutexes");
-        qsi_assert((r == ENOTSUP) && inherit_priority);
+        lst_assert((r == ENOTSUP) && inherit_priority);
 
-        qsi_assert(pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_NONE) == 0);
-        qsi_assert(pthread_mutex_init(&list->mutex, &attr) == 0);
+        lst_assert(pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_NONE) == 0);
+        lst_assert(pthread_mutex_init(&list->mutex, &attr) == 0);
     }
 }
 

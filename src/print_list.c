@@ -4,8 +4,8 @@
 
 void print_listdata(list_data* list)
 {
-    qsi_assert(list);
-    qsi_check(list,);
+    lst_assert(list);
+    lst_check(list,);
 
     int i=0;
     list_item *curr;
@@ -83,8 +83,8 @@ void print_listdata(list_data* list)
 
 void print_list_all(list_data* list)
 {
-    qsi_assert(list);
-    qsi_check(list,);
+    lst_assert(list);
+    lst_check(list,);
 
     printf("========  List All  ========\n");
     print_list_type_all(list, dirct);
@@ -98,8 +98,8 @@ void print_list_type_all(list_data* list, extetype exte_type)
     int idx, max;
     const char* str;
 
-    qsi_assert(list);
-    qsi_check(list,);
+    lst_assert(list);
+    lst_check(list,);
 
     printf("%s :\n", list_get_exettype_str(exte_type));
 
@@ -114,9 +114,9 @@ void print_list_type_all(list_data* list, extetype exte_type)
 void print_list_folder_by_path(list_data* list, char* path)
 {
     int id;
-    qsi_assert(list);
-    qsi_check(list,);
-    qsi_assert(path);
+    lst_assert(list);
+    lst_check(list,);
+    lst_assert(path);
 
     if( (id = list_get_id_by_path(list, path)) )
         print_list_folder_by_id(list, id);
@@ -126,8 +126,8 @@ void print_list_folder_by_path(list_data* list, char* path)
 
 void print_list_folder_by_id(list_data* list, int id)
 {
-    qsi_assert(list);
-    qsi_check(list,);
+    lst_assert(list);
+    lst_check(list,);
     const char* str = list_get_path_by_id(list, id);
 
     printf("==== List %s ====\n", (str)?str:"unknown");
@@ -142,8 +142,8 @@ void print_list_type_in_folder_by_id(list_data* list, int id, extetype exte_type
     int idx, max;
     const char* str;
 
-    qsi_assert(list);
-    qsi_check(list,);
+    lst_assert(list);
+    lst_check(list,);
 
     if(list_check_type_item_id(id, dirct))
         return;

@@ -20,7 +20,7 @@
 
 //#define Time_Measure
 
-#define QSI_ASSERT	0
+#define LST_ASSERT	0
 #define LIST_DEBUG      1
 #define ENABLE_FILETYPE 0
 
@@ -57,36 +57,36 @@
 
 #ifdef __GNUC__
 #define QLIST_IKELY(x) (__builtin_expect(!!(x),1))
-#define QSI_UNLIKELY(x) (__builtin_expect(!!(x),0))
-#define QSI_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#define LST_UNLIKELY(x) (__builtin_expect(!!(x),0))
+#define LST_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #else
-#define QSI_LIKELY(x) (x)
-#define QSI_UNLIKELY(x) (x)
-#define QSI_PRETTY_FUNCTION ""
+#define LST_LIKELY(x) (x)
+#define LST_UNLIKELY(x) (x)
+#define LST_PRETTY_FUNCTION ""
 #endif
 
-#define qsi_nothing() do {} while (FALSE)
+#define lst_nothing() do {} while (FALSE)
 
-#if (QSI_ASSERT!=0)
+#if (LST_ASSERT!=0)
 
-#define qsi_assert(expr)                                                                \
+#define lst_assert(expr)                                                                \
     do {                                                                                \
-        if (QSI_UNLIKELY(!(expr))) {                                                    \
+        if (LST_UNLIKELY(!(expr))) {                                                    \
             printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Aborting\n",    \
-                    #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);                   \
+                    #expr , __FILE__, __LINE__, LST_PRETTY_FUNCTION);                   \
             abort();                                                                    \
         }                                                                               \
     } while (0)
-#define qsi_return(expr, ret) qsi_nothing()
+#define lst_return(expr, ret) lst_nothing()
 
 #else
 
-#define qsi_assert(expr) qsi_nothing()
-#define qsi_check(expr, ret)                                                            \
+#define lst_assert(expr) lst_nothing()
+#define lst_check(expr, ret)                                                            \
     do {                                                                                \
-        if (QSI_UNLIKELY(!(expr))) {                                                    \
+        if (LST_UNLIKELY(!(expr))) {                                                    \
             printf("liblist : Expr '%s' failed at %s:%u, function '%s'. Return\n",      \
-                    #expr , __FILE__, __LINE__, QSI_PRETTY_FUNCTION);                   \
+                    #expr , __FILE__, __LINE__, LST_PRETTY_FUNCTION);                   \
             return ret;                                                                 \
         }                                                                               \
     } while (0)
@@ -96,7 +96,7 @@
 #define liblist_perror(expr)                                                            \
     do{                                                                                 \
         printf("liblist : %s failed at function '%s' (%s:%u)\n",                        \
-                #expr , QSI_PRETTY_FUNCTION, __FILE__, __LINE__);                       \
+                #expr , LST_PRETTY_FUNCTION, __FILE__, __LINE__);                       \
     } while(0)
 
 #if (LIST_DEBUG!=0)
@@ -107,7 +107,7 @@
         printf("\n");                                                                   \
     } while (0)
 #else
-#define LIST_DBG(expr, ...) qsi_nothing()
+#define LIST_DBG(expr, ...) lst_nothing()
 #endif
 
 #ifdef __GNUC__

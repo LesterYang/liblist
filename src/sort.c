@@ -265,9 +265,9 @@ void listdata_msort_folder(list_data* list)
 
 void listdata_msort(list_data* list, sorttype sortType)
 {
-    qsi_assert(list);
-    qsi_check(list,);
-    qsi_assert(list->root);
+    lst_assert(list);
+    lst_check(list,);
+    lst_assert(list->root);
 
     pthread_mutex_lock(&list->mutex);
 

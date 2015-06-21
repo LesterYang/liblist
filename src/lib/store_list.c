@@ -123,7 +123,7 @@ void store_list_usb(list_data* list, char* path, list_item* parent_item)
     struct dirent *ent;
     list_item* item = NULL;
 
-    qsi_assert(path);
+    lst_assert(path);
 
     if ((dir = opendir (path)) == NULL) {
         liblist_perror("opendir");
